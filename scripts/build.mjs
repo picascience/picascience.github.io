@@ -26,7 +26,8 @@ function normalize(a, where) {
   if (!out.colors) out.colors = PALETTE[hash(out.id || "") % PALETTE.length];
   if (!Array.isArray(out.colors) || out.colors.length !== 2 || !out.colors.every(c => HEX.test(c)))
     errors.push(`${where} : "colors" doit être ["#rrggbb", "#rrggbb"]`);
-  if (!out.emoji && !out.icon) warnings.push(`${where} : ni "emoji" ni "icon", la première lettre sera utilisée`);
+  if (!out.icon) warnings.push(`${where} : pas d'icône dessinée ("icon"), l'emoji servira de secours. Dessine un icon.svg !`);
+  if (!out.emoji && !out.icon) warnings.push(`${where} : ni "icon" ni "emoji", la première lettre sera utilisée`);
   if (!out.added) out.added = new Date().toISOString().slice(0, 10);
   if (!DATE.test(out.added)) errors.push(`${where} : "added" doit être AAAA-MM-JJ`);
   if (out.open && out.open !== "tab") errors.push(`${where} : "open" ne peut valoir que "tab"`);
@@ -58,6 +59,7 @@ if (existsSync(extPath)) {
   ext.forEach((a, i) => {
     const where = `registry/external.json[${i}] (${a.id || "?"})`;
     if (!a.url || !/^https:\/\//.test(a.url)) errors.push(`${where} : "url" https manquante`);
+    if (a.icon && !/^https?:/.test(a.icon) && !existsSync(join(ROOT, a.icon))) errors.push(`${where} : icône "${a.icon}" introuvable`);
     apps.push(normalize(a, where));
   });
 }

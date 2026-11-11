@@ -1,8 +1,12 @@
 {
   "name": "Nom court",
   "emoji": "🚀",
-  "colors": ["#4338ca", "#ec4899"],
+  "colors": [
+    "#4338ca",
+    "#ec4899"
+  ],
   "category": "Labo",
   "added": "2026-01-01",
-  "description": "Une ligne sur ce que fait l'appli"
+  "description": "Une ligne sur ce que fait l'appli",
+  "icon": "icon.svg"
 }

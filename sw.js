@@ -1,6 +1,6 @@
 // MK Apps — service worker "réseau d'abord" : toujours la dernière version,
 // et le launcher s'ouvre quand même hors connexion.
-const CACHE = "mk-apps-v1";
+const CACHE = "mk-apps-v2";
 const SHELL = ["./", "index.html", "apps.json", "manifest.webmanifest", "assets/icon-180.png", "assets/icon-512.png"];
 
 self.addEventListener("install", e => {

@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-11T14:37:14.131Z",
+  "generated": "2026-11-11T14:44:03.419Z",
   "apps": [
     {
       "name": "Bienvenue",
@@ -12,6 +12,7 @@
       "category": "Labo",
       "added": "2026-11-11",
       "description": "Appli témoin : si tu la vois, la chaîne marche",
+      "icon": "apps/bienvenue/icon.svg",
       "id": "bienvenue"
     },
     {
@@ -25,7 +26,8 @@
       "url": "https://picascience.github.io/galaxie-infinie/",
       "category": "Jeux",
       "added": "2026-11-10",
-      "description": "Exploration spatiale procédurale"
+      "description": "Exploration spatiale procédurale",
+      "icon": "icons/galaxie-infinie.svg"
     },
     {
       "id": "microeconomie",
@@ -37,7 +39,8 @@
       ],
       "url": "https://picascience.github.io/microeconomie/",
       "category": "Dauphine",
-      "added": "2026-11-09"
+      "added": "2026-11-09",
+      "icon": "icons/microeconomie.svg"
     },
     {
       "id": "cours-algebre",
@@ -49,7 +52,8 @@
       ],
       "url": "https://picascience.github.io/cours-algebre/",
       "category": "Dauphine",
-      "added": "2026-11-04"
+      "added": "2026-11-04",
+      "icon": "icons/cours-algebre.svg"
     },
     {
       "id": "cours-analyse",
@@ -61,7 +65,8 @@
       ],
       "url": "https://picascience.github.io/cours-analyse/",
       "category": "Dauphine",
-      "added": "2026-11-04"
+      "added": "2026-11-04",
+      "icon": "icons/cours-analyse.svg"
     },
     {
       "id": "battle-tank",
@@ -73,7 +78,8 @@
       ],
       "url": "https://picascience.github.io/battle-tank/",
       "category": "Jeux",
-      "added": "2026-11-04"
+      "added": "2026-11-04",
+      "icon": "icons/battle-tank.svg"
     },
     {
       "id": "demonstration",
@@ -85,7 +91,8 @@
       ],
       "url": "https://picascience.github.io/demonstration/",
       "category": "Dauphine",
-      "added": "2026-11-04"
+      "added": "2026-11-04",
+      "icon": "icons/demonstration.svg"
     },
     {
       "id": "quran",
@@ -99,11 +106,12 @@
       "category": "Coran",
       "added": "2026-11-03",
       "dock": true,
-      "description": "Lecture : arabe, Hamidullah, tafsir Ibn Kathir"
+      "description": "Lecture : arabe, Hamidullah, tafsir Ibn Kathir",
+      "icon": "icons/quran.svg"
     },
     {
       "id": "surchauffe-claude",
-      "name": "Surchauffe C",
+      "name": "Temp Claude",
       "emoji": "🔥",
       "colors": [
         "#7c2d12",
@@ -111,11 +119,12 @@
       ],
       "url": "https://picascience.github.io/surchauffe-claude/",
       "category": "Labo",
-      "added": "2026-10-31"
+      "added": "2026-10-31",
+      "icon": "icons/surchauffe-claude.svg"
     },
     {
       "id": "surchauffe-gemini",
-      "name": "Surchauffe G",
+      "name": "Temp Gemini",
       "emoji": "♨️",
       "colors": [
         "#1e40af",
@@ -123,7 +132,8 @@
       ],
       "url": "https://picascience.github.io/surchauffe-gemini/",
       "category": "Labo",
-      "added": "2026-10-31"
+      "added": "2026-10-31",
+      "icon": "icons/surchauffe-gemini.svg"
     },
     {
       "id": "hifdh-coach",
@@ -137,7 +147,8 @@
       "category": "Coran",
       "added": "2026-10-30",
       "dock": true,
-      "description": "Récitation du Coran avec correction"
+      "description": "Récitation du Coran avec correction",
+      "icon": "icons/hifdh-coach.svg"
     },
     {
       "id": "500-mots",
@@ -151,7 +162,8 @@
       "category": "Coran",
       "added": "2026-10-27",
       "dock": true,
-      "description": "Les 500 mots les plus fréquents du Coran"
+      "description": "Les 500 mots les plus fréquents du Coran",
+      "icon": "icons/500-mots.svg"
     },
     {
       "id": "idle-particule",
@@ -163,7 +175,8 @@
       ],
       "url": "https://picascience.github.io/Idle-particule/",
       "category": "Jeux",
-      "added": "2026-10-27"
+      "added": "2026-10-27",
+      "icon": "icons/idle-particule.svg"
     }
   ]
 }
