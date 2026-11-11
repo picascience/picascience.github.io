@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0b24">
+<title>Fusion</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#0b0b24;color:#eef;font-family:-apple-system,system-ui,Helvetica,Arial,sans-serif}
+body{overscroll-behavior:none}
+button,input,select{font:inherit;color:inherit}
+#setup{min-height:100%;padding:calc(env(safe-area-inset-top) + 18px) calc(env(safe-area-inset-right) + 14px) calc(env(safe-area-inset-bottom) + 60px) calc(env(safe-area-inset-left) + 14px);max-width:560px;margin:0 auto}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.4px}
+.sub{color:#9aa0c8;font-size:14px;margin:0 0 16px;line-height:1.35}
+.row{display:flex;gap:10px;align-items:center;background:#15163a;border:1px solid #262866;border-radius:16px;padding:9px 8px 9px 10px;margin-bottom:8px}
+.num{width:18px;text-align:center;font-weight:700;color:#7c83d8;font-size:14px;flex:none}
+.prev{width:54px;height:54px;border-radius:50%;flex:none;background:#0b0b24;border:1px solid #33367a;display:grid;place-items:center;overflow:hidden;padding:0;position:relative}
+.prev canvas{width:54px;height:54px;display:block}
+.mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.mid input.name{width:100%;background:#0b0b24;border:1px solid #33367a;border-radius:10px;padding:7px 10px;font-size:16px;outline:none}
+.mid input.name:focus,.emo:focus{border-color:#8b8ff5}
+.tools{display:flex;gap:6px;align-items:center}
+.emo{width:52px;text-align:center;background:#0b0b24;border:1px solid #33367a;border-radius:10px;padding:5px 2px;font-size:16px;outline:none}
+.chip{background:#23256a;border:0;border-radius:10px;padding:6px 10px;font-size:13px;font-weight:600;white-space:nowrap}
+.chip.on{background:#16a34a}
+.chip.rec{background:#dc2626}
+.arr{display:flex;flex-direction:column;gap:4px;flex:none}
+.arr button{width:34px;height:26px;border:0;border-radius:8px;background:#23256a;display:grid;place-items:center;padding:0}
+.arr button:disabled{opacity:.3}
+.arr svg{width:14px;height:14px}
+.box{background:#15163a;border:1px solid #262866;border-radius:16px;padding:12px;margin:14px 0 8px}
+.box label{display:block;font-size:13px;color:#9aa0c8;margin:10px 0 5px}
+.box label:first-child{margin-top:0}
+.box input[type=text],.box select{width:100%;background:#0b0b24;border:1px solid #33367a;border-radius:10px;padding:9px 10px;font-size:16px;outline:none}
+.seg{display:flex;background:#0b0b24;border:1px solid #33367a;border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;border-radius:8px;padding:7px 4px;font-size:14px;font-weight:600;color:#9aa0c8}
+.seg button.on{background:#4f46e5;color:#fff}
+.tog{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:15px}
+.sw{width:50px;height:30px;border-radius:15px;background:#33367a;border:0;position:relative;flex:none;transition:background .15s}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw.on{background:#22c55e}.sw.on::after{transform:translateX(20px)}
+.hint{font-size:12.5px;color:#8187b8;line-height:1.4;margin:6px 2px 0}
+#go{width:100%;border:0;border-radius:16px;padding:16px;font-size:18px;font-weight:800;margin-top:14px;color:#fff;background:linear-gradient(90deg,#f43f5e,#f59e0b,#22c55e,#3b82f6,#a855f7)}
+#reset{background:none;border:0;color:#8187b8;font-size:13px;text-decoration:underline;display:block;margin:14px auto 0}
+#msg{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 50px);transform:translateX(-50%);background:#000c;border:1px solid #444;padding:10px 14px;border-radius:12px;font-size:14px;max-width:86%;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+#msg.on{opacity:1}
+#play{position:fixed;inset:0;background:#000;display:none}
+#play.on{display:block}
+#cv{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+#quit{position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:12px;width:38px;height:38px;border-radius:50%;border:0;background:#ffffff18;display:grid;place-items:center;padding:0;z-index:3}
+#quit svg{width:16px;height:16px}
+#end{position:absolute;inset:0;background:#05051acc;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px 20px 60px;z-index:4;overflow:auto}
+#end.on{display:flex}
+#end h2{margin:0;font-size:24px}
+#end p{margin:0;color:#b6bbe6;font-size:14px;text-align:center;max-width:320px;line-height:1.4}
+#end video{max-height:42vh;max-width:70%;border-radius:14px;border:1px solid #33367a;background:#000}
+#end .b{width:min(300px,100%);border:0;border-radius:14px;padding:13px;font-size:16px;font-weight:700;background:#23256a;text-align:center;text-decoration:none;color:#fff;display:block}
+#end .b.p{background:#4f46e5}
+</style>
+</head>
+<body>
+<div id="setup">
+  <h1>Fusion</h1>
+  <p class="sub">Mets tes 8 éléments dans l'ordre d'évolution. Deux identiques qui se touchent deviennent le suivant, et son nom est prononcé.</p>
+  <div id="list"></div>
+  <div class="box">
+    <label>Titre affiché en haut (facultatif)</label>
+    <input type="text" id="title" maxlength="40" placeholder="Ex. Trouve le point commun">
+    <label>Vitesse de chute</label>
+    <div class="seg" id="speed"><button data-v="0.8">Lente</button><button data-v="0.55">Normale</button><button data-v="0.36">Rapide</button></div>
+    <label>Voix qui dit le nom</label>
+    <select id="lang"><option value="fr-FR">Voix du téléphone · français</option><option value="ar-SA">Voix du téléphone · arabe</option><option value="en-US">Voix du téléphone · anglais</option><option value="off">Aucune voix</option></select>
+    <div class="tog"><span>Bruitages (chute, choc, fusion)</span><button class="sw" id="sfx"></button></div>
+    <div class="tog"><span>Enregistrer la vidéo</span><button class="sw" id="rec"></button></div>
+    <p class="hint">La vidéo enregistrée contient les bruitages et les noms que tu as enregistrés avec « Ma voix ». La voix du téléphone ne peut pas être captée par l'appli : pour l'avoir, utilise l'enregistrement d'écran de l'iPhone.</p>
+  </div>
+  <button id="go">Lancer</button>
+  <button id="reset">Remettre les éléments par défaut</button>
+</div>
+<div id="play">
+  <canvas id="cv" width="1080" height="1920"></canvas>
+  <button id="quit" aria-label="Quitter"><svg viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+  <div id="end">
+    <h2 id="endT"></h2>
+    <p id="endP"></p>
+    <video id="vid" controls playsinline style="display:none"></video>
+    <a class="b p" id="dl" style="display:none">Télécharger la vidéo</a>
+    <button class="b" id="share" style="display:none">Partager / Enregistrer dans Photos</button>
+    <button class="b p" id="again">Rejouer</button>
+    <button class="b" id="edit">Modifier les éléments</button>
+  </div>
+</div>
+<input type="file" id="file" accept="image/*" hidden>
+<div id="msg"></div>
+<script>
+"use strict";
+const KEY = "fusion-video:config";
+const N = 8;
+const DEFAULTS = [["🫐","Myrtille"],["🍒","Cerise"],["🍓","Fraise"],["🍋","Citron"],["🍊","Orange"],["🍎","Pomme"],["🍍","Ananas"],["🍉","Pastèque"]];
+const $ = s => document.querySelector(s);
+const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+
+/* ---------- configuration ---------- */
+function defaults() {
+  return { items: DEFAULTS.map(([e, n]) => ({ emoji: e, name: n, img: null, sticker: false, voice: null })), title: "", speed: 0.55, lang: "fr-FR", sfx: true, rec: false };
+}
+let cfg = defaults();
+try {
+  const s = JSON.parse(localStorage.getItem(KEY));
+  if (s && Array.isArray(s.items) && s.items.length === N) cfg = Object.assign(defaults(), s);
+} catch (e) {}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(cfg)); }
+  catch (e) { toast("Mémoire pleine : retire une photo ou une voix."); }
+}
+let toastT;
+function toast(t) { const m = $("#msg"); m.textContent = t; m.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => m.classList.remove("on"), 3200); }
+
+/* ---------- images des éléments ---------- */
+const imgCache = new Map();
+function loadImg(src) {
+  if (imgCache.has(src)) return imgCache.get(src);
+  const p = new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
+  imgCache.set(src, p); return p;
+}
+// Dessine un élément dans un carré de côté s (centre s/2)
+function drawItem(ctx, it, img, s) {
+  const c = s / 2;
+  if (it.img && img) {
+    if (it.sticker) {
+      const k = Math.min(s / img.width, s / img.height);
+      ctx.drawImage(img, c - img.width * k / 2, c - img.height * k / 2, img.width * k, img.height * k);
+    } else {
+      ctx.save(); ctx.beginPath(); ctx.arc(c, c, c - 1, 0, 7); ctx.clip();
+      const k = Math.max(s / img.width, s / img.height);
+      ctx.drawImage(img, c - img.width * k / 2, c - img.height * k / 2, img.width * k, img.height * k);
+      ctx.restore();
+      ctx.beginPath(); ctx.arc(c, c, c - s * 0.025, 0, 7); ctx.lineWidth = s * 0.04; ctx.strokeStyle = "#fff"; ctx.stroke();
+    }
+  } else if (it.emoji) {
+    ctx.font = (s * 0.86) + "px " + EMOJI_FONT; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = "#fff"; ctx.fillText(it.emoji, c, c + s * 0.05);
+  } else {
+    ctx.beginPath(); ctx.arc(c, c, c - 2, 0, 7); ctx.fillStyle = "#33367a"; ctx.fill();
+    ctx.font = "700 " + (s * 0.5) + "px -apple-system,Helvetica,Arial,sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = "#fff"; ctx.fillText((it.name || "?").slice(0, 1).toUpperCase(), c, c + s * 0.03);
+  }
+}
+async function importImage(file) {
+  const url = URL.createObjectURL(file);
+  const img = await new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = url; });
+  if (!img) { URL.revokeObjectURL(url); return null; }
+  // transparence ? (autocollant détouré) -> on garde la forme, sinon recadrage rond
+  const t = document.createElement("canvas"); t.width = t.height = 24;
+  const tc = t.getContext("2d"); tc.drawImage(img, 0, 0, 24, 24);
+  const d = tc.getImageData(0, 0, 24, 24).data;
+  const al = (x, y) => d[(y * 24 + x) * 4 + 3];
+  const sticker = [al(0, 0), al(23, 0), al(0, 23), al(23, 23)].filter(a => a < 200).length >= 2;
+  const S = 256, c = document.createElement("canvas"); c.width = c.height = S;
+  const x = c.getContext("2d");
+  const k = sticker ? Math.min(S / img.width, S / img.height) : Math.max(S / img.width, S / img.height);
+  x.drawImage(img, S / 2 - img.width * k / 2, S / 2 - img.height * k / 2, img.width * k, img.height * k);
+  URL.revokeObjectURL(url);
+  return { img: sticker ? c.toDataURL("image/png") : c.toDataURL("image/jpeg", 0.85), sticker };
+}
+
+/* ---------- écran de réglage ---------- */
+const list = $("#list");
+let pickIndex = -1;
+function renderList() {
+  list.innerHTML = "";
+  cfg.items.forEach((it, i) => {
+    const row = document.createElement("div"); row.className = "row";
+    row.innerHTML = `<div class="num">${i + 1}</div>
+      <button class="prev" aria-label="Choisir une photo"><canvas width="108" height="108"></canvas></button>
+      <div class="mid">
+        <input class="name" placeholder="Nom à prononcer" maxlength="30">
+        <div class="tools">
+          <input class="emo" placeholder="Emoji" maxlength="12" aria-label="Emoji">
+          <button class="chip ph">${it.img ? "Retirer photo" : "Photo"}</button>
+          <button class="chip vo ${it.voice ? "on" : ""}">${it.voice ? "Voix OK" : "Ma voix"}</button>
+        </div>
+      </div>
+      <div class="arr">
+        <button class="up" ${i === 0 ? "disabled" : ""} aria-label="Monter"><svg viewBox="0 0 14 14"><path d="M2 9l5-5 5 5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="dn" ${i === N - 1 ? "disabled" : ""} aria-label="Descendre"><svg viewBox="0 0 14 14"><path d="M2 5l5 5 5-5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>`;
+    const cv = row.querySelector("canvas"), name = row.querySelector(".name"), emo = row.querySelector(".emo");
+    const paint = async () => { const g = cv.getContext("2d"); g.clearRect(0, 0, 108, 108); drawItem(g, it, it.img ? await loadImg(it.img) : null, 108); };
+    paint();
+    name.value = it.name; emo.value = it.emoji;
+    name.oninput = () => { it.name = name.value; save(); if (!it.img && !it.emoji) paint(); };
+    emo.oninput = () => { it.emoji = emo.value.trim(); save(); paint(); };
+    const pick = () => { pickIndex = i; $("#file").value = ""; $("#file").click(); };
+    row.querySelector(".prev").onclick = pick;
+    row.querySelector(".ph").onclick = () => { if (it.img) { it.img = null; it.sticker = false; save(); renderList(); } else pick(); };
+    row.querySelector(".vo").onclick = e => voiceButton(i, e.currentTarget);
+    row.querySelector(".up").onclick = () => move(i, -1);
+    row.querySelector(".dn").onclick = () => move(i, 1);
+    list.appendChild(row);
+  });
+}
+function move(i, d) { const j = i + d; if (j < 0 || j >= N) return; [cfg.items[i], cfg.items[j]] = [cfg.items[j], cfg.items[i]]; save(); renderList(); }
+$("#file").onchange = async e => {
+  const f = e.target.files[0]; if (!f || pickIndex < 0) return;
+  const r = await importImage(f);
+  if (!r) return toast("Image illisible.");
+  Object.assign(cfg.items[pickIndex], r); save(); renderList();
+};
+function bindOptions() {
+  $("#title").value = cfg.title; $("#title").oninput = e => { cfg.title = e.target.value; save(); };
+  const seg = () => document.querySelectorAll("#speed button").forEach(b => b.classList.toggle("on", +b.dataset.v === cfg.speed));
+  document.querySelectorAll("#speed button").forEach(b => b.onclick = () => { cfg.speed = +b.dataset.v; save(); seg(); }); seg();
+  $("#lang").value = cfg.lang; $("#lang").onchange = e => { cfg.lang = e.target.value; save(); };
+  for (const k of ["sfx", "rec"]) { const b = $("#" + k); b.classList.toggle("on", !!cfg[k]); b.onclick = () => { cfg[k] = !cfg[k]; b.classList.toggle("on", cfg[k]); save(); }; }
+}
+$("#reset").onclick = () => { const d = defaults(); cfg.items = d.items; save(); renderList(); };
+
+/* ---------- enregistrement de sa propre voix ---------- */
+let micRec = null;
+async function voiceButton(i, btn) {
+  const it = cfg.items[i];
+  if (micRec) { micRec.stop(); return; }
+  if (it.voice) { it.voice = null; save(); renderList(); toast("Voix retirée. Touche encore pour réenregistrer."); return; }
+  if (!navigator.mediaDevices || !window.MediaRecorder) return toast("Micro indisponible sur cet appareil.");
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch (e) { return toast("Accès au micro refusé."); }
+  const chunks = []; const mr = new MediaRecorder(stream); micRec = mr;
+  btn.classList.add("rec"); btn.textContent = "Stop";
+  mr.ondataavailable = e => e.data.size && chunks.push(e.data);
+  mr.onstop = () => {
+    micRec = null; stream.getTracks().forEach(t => t.stop());
+    const fr = new FileReader();
+    fr.onload = () => { it.voice = fr.result; save(); renderList(); };
+    fr.readAsDataURL(new Blob(chunks, { type: mr.mimeType }));
+  };
+  mr.start();
+  setTimeout(() => { if (micRec === mr) mr.stop(); }, 3000);
+}
+
+/* ---------- son ---------- */
+let AC = null, master = null, recDest = null, voiceBuf = [];
+function audioInit() {
+  if (!AC) {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.gain.value = 0.9; master.connect(AC.destination);
+    recDest = AC.createMediaStreamDestination ? AC.createMediaStreamDestination() : null;
+    if (recDest) master.connect(recDest);
+  }
+  if (AC.state === "suspended") AC.resume();
+}
+async function loadVoices() {
+  voiceBuf = await Promise.all(cfg.items.map(async it => {
+    if (!it.voice) return null;
+    try {
+      const ab = await (await fetch(it.voice)).arrayBuffer();
+      const buf = await new Promise((res, rej) => AC.decodeAudioData(ab, res, rej));
+      const d = buf.getChannelData(0); let k = 0; while (k < d.length && Math.abs(d[k]) < 0.03) k++;
+      return { buf, off: Math.max(0, k / buf.sampleRate - 0.03) };
+    } catch (e) { return null; }
+  }));
+}
+function blip(f0, f1, dur, vol, type) {
+  if (!AC || !cfg.sfx || headless) return;
+  const t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain();
+  o.type = type || "sine"; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+}
+let lastTick = 0;
+function sTick(v) { const n = performance.now(); if (n - lastTick < 55) return; lastTick = n; blip(700 + Math.random() * 500, 300, 0.045, Math.min(0.16, v / 9000), "triangle"); }
+function sDrop() { blip(420, 240, 0.07, 0.1, "sine"); }
+function sMerge(lv) { const f = 760 - lv * 70; blip(f * 0.55, f * 1.5, 0.11, 0.3, "sine"); blip(f * 2, f * 2.6, 0.07, 0.07, "triangle"); }
+function sWin() { blip(1320, 1300, 0.9, 0.22, "sine"); blip(1980, 1960, 0.7, 0.1, "sine"); }
+
+/* voix : une seule à la fois, la plus haute évolution en attente passe d'abord */
+let voicePending = -1, voiceBusyUntil = 0;
+function sayRequest(lv) { if (lv > voicePending) voicePending = lv; }
+function voicePump() {
+  if (headless || voicePending < 0 || performance.now() < voiceBusyUntil) return;
+  const lv = voicePending; voicePending = -1;
+  const it = cfg.items[lv], vb = voiceBuf[lv];
+  if (vb && AC) {
+    const s = AC.createBufferSource(); s.buffer = vb.buf; const g = AC.createGain(); g.gain.value = 1.6;
+    s.connect(g); g.connect(master); s.start(0, vb.off);
+    voiceBusyUntil = performance.now() + (vb.buf.duration - vb.off) * 1000 + 60;
+  } else if (cfg.lang !== "off" && window.speechSynthesis && it.name.trim()) {
+    const u = new SpeechSynthesisUtterance(it.name.trim());
+    u.lang = cfg.lang; u.rate = 1.1;
+    const v = speechSynthesis.getVoices().find(v => v.lang === cfg.lang) || speechSynthesis.getVoices().find(v => v.lang.slice(0, 2) === cfg.lang.slice(0, 2));
+    if (v) u.voice = v;
+    voiceBusyUntil = performance.now() + 2500;
+    u.onend = u.onerror = () => { voiceBusyUntil = performance.now() + 40; };
+    speechSynthesis.speak(u);
+  }
+}
+
+/* ---------- simulation ---------- */
+const W = 1080, H = 1920, CX = 540, CY = 900, R = 470, GAP = 72, CHUTE_TOP = 250;
+const RIN = R - 6, EY = CY - Math.sqrt(R * R - GAP * GAP);
+const RAD = [30, 39, 51, 66, 86, 111, 145, 188];
+const GRAV = 2600;
+const cv = $("#cv"), ctx = cv.getContext("2d");
+let balls, parts, floats, score, seen, state, spawnT, blocked, endT, sprites = [], ringCv = null, headless = false, simTime;
+function resetSim() {
+  balls = []; parts = []; floats = []; score = 0; seen = new Array(N).fill(false);
+  state = "run"; spawnT = 0.5; blocked = 0; endT = 0; simTime = 0; voicePending = -1; voiceBusyUntil = 0;
+}
+function addBall(lv, x, y, vx, vy, fromR) {
+  const b = { lv, x, y, vx, vy, r: fromR || RAD[lv], tr: RAD[lv], rot: 0, pop: fromR ? 1 : 0, dead: false };
+  balls.push(b); seen[lv] = true; return b;
+}
+function spawn() {
+  const u = Math.random(), lv = u < 0.5 ? 0 : u < 0.8 ? 1 : 2, r = RAD[lv], y = CHUTE_TOP + r;
+  for (const b of balls) { const dx = b.x - CX, dy = b.y - y; if (dx * dx + dy * dy < (b.r + r) * (b.r + r) * 0.9) { blocked++; return; } }
+  blocked = 0;
+  addBall(lv, CX + (Math.random() - 0.5) * (GAP - r) * 1.2, y, (Math.random() - 0.5) * 320, 200);
+  sDrop();
+}
+function burst(x, y, r, lv, n) {
+  if (headless) return;
+  for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, v = 200 + Math.random() * 500 + r * 2; parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t: 0, life: 0.45 + Math.random() * 0.4, h: (lv * 45 + Math.random() * 50) % 360, s: 5 + Math.random() * 8 }); }
+}
+function merge(a, b) {
+  a.dead = b.dead = true;
+  const x = (a.x + b.x) / 2, y = (a.y + b.y) / 2, lv = a.lv;
+  if (lv === N - 1) { score += 100; burst(x, y, a.r, lv, 60); sMerge(lv); return; }
+  const n = addBall(lv + 1, x, y, (a.vx + b.vx) / 2, (a.vy + b.vy) / 2, a.r);
+  score += (lv + 2) * 2;
+  burst(x, y, n.tr, lv + 1, 14 + lv * 4); sMerge(lv + 1); sayRequest(lv + 1);
+  if (!headless) floats.push({ x, y: y - n.tr - 10, t: 0, text: cfg.items[lv + 1].name, big: lv + 1 === N - 1 });
+  if (lv + 1 === N - 1 && state === "run") { state = "won"; endT = 3.4; sWin(); burst(CX, CY, 200, 3, 120); }
+}
+function walls(b) {
+  const dx = b.x - CX, dy = b.y - CY, d = Math.hypot(dx, dy) || 0.01;
+  const inChute = b.r < GAP && Math.abs(dx) < GAP && dy < 0 && (b.y < EY + b.r);
+  if (inChute) {
+    if (b.x - b.r < CX - GAP) { b.x = CX - GAP + b.r; if (b.vx < 0) b.vx *= -0.35; }
+    if (b.x + b.r > CX + GAP) { b.x = CX + GAP - b.r; if (b.vx > 0) b.vx *= -0.35; }
+    if (b.y < CHUTE_TOP + b.r) { b.y = CHUTE_TOP + b.r; if (b.vy < 0) b.vy = 0; }
+    return;
+  }
+  if (d + b.r > RIN) {
+    const nx = dx / d, ny = dy / d, k = (RIN - b.r) / d;
+    b.x = CX + dx * k; b.y = CY + dy * k;
+    const vn = b.vx * nx + b.vy * ny;
+    if (vn > 0) { b.vx -= 1.28 * vn * nx; b.vy -= 1.28 * vn * ny; b.vx *= 0.995; b.vy *= 0.995; if (vn > 420) sTick(vn); }
+  }
+}
+function step(dt) {
+  simTime += dt;
+  if (state === "run") {
+    spawnT -= dt;
+    if (spawnT <= 0) { spawn(); spawnT = cfg.speed; if (blocked >= 14) { state = "full"; endT = 1.2; } }
+  } else if (endT > 0) { endT -= dt; if (endT <= 0) finish(); }
+  const boost = blocked > 1 ? 5 : 1;
+  for (const b of balls) {
+    if (b.r !== b.tr) { b.r += (b.tr - b.r) * Math.min(1, dt * 16); if (Math.abs(b.tr - b.r) < 0.3) b.r = b.tr; }
+    if (b.pop > 0) b.pop = Math.max(0, b.pop - dt * 4);
+    b.vy += GRAV * dt;
+  }
+  // léger aimant entre identiques proches : les fusions s'enchaînent mieux
+  for (let i = 0; i < balls.length; i++) for (let j = i + 1; j < balls.length; j++) {
+    const a = balls[i], b = balls[j]; if (a.lv !== b.lv) continue;
+    const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1, lim = (a.r + b.r) * (blocked > 1 ? 4 : 2.2);
+    if (d < lim) { const f = 900 * boost * dt / d; a.vx += dx * f; a.vy += dy * f; b.vx -= dx * f; b.vy -= dy * f; }
+  }
+  for (const b of balls) { b.x += b.vx * dt; b.y += b.vy * dt; b.rot += (b.vx / b.r) * dt * 0.35; }
+  for (let it = 0; it < 4; it++) {
+    for (let i = 0; i < balls.length; i++) {
+      const a = balls[i]; if (a.dead) continue;
+      for (let j = i + 1; j < balls.length; j++) {
+        const b = balls[j]; if (b.dead) continue;
+        const dx = b.x - a.x, dy = b.y - a.y, rs = a.r + b.r, d2 = dx * dx + dy * dy;
+        if (d2 >= rs * rs) continue;
+        if (a.lv === b.lv) { merge(a, b); break; }
+        const d = Math.sqrt(d2) || 0.01, nx = dx / d, ny = dy / d, ov = (rs - d) * 0.85;
+        const ma = a.r * a.r, mb = b.r * b.r, ta = mb / (ma + mb);
+        a.x -= nx * ov * ta; a.y -= ny * ov * ta; b.x += nx * ov * (1 - ta); b.y += ny * ov * (1 - ta);
+        const rv = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+        if (rv < 0) {
+          const jn = -1.22 * rv / (1 / ma + 1 / mb);
+          a.vx -= jn / ma * nx; a.vy -= jn / ma * ny; b.vx += jn / mb * nx; b.vy += jn / mb * ny;
+          if (rv < -520) sTick(-rv);
+        }
+      }
+    }
+    for (const b of balls) if (!b.dead) walls(b);
+  }
+  if (balls.some(b => b.dead)) balls = balls.filter(b => !b.dead);
+  for (const b of balls) { const sp = Math.hypot(b.vx, b.vy); if (sp > 3200) { b.vx *= 3200 / sp; b.vy *= 3200 / sp; } }
+  if (!headless) {
+    for (const p of parts) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 900 * dt; p.vx *= 0.985; }
+    parts = parts.filter(p => p.t < p.life);
+    for (const f of floats) { f.t += dt; f.y -= 70 * dt; }
+    floats = floats.filter(f => f.t < (f.big ? 3 : 1.1));
+  }
+}
+
+/* ---------- rendu ---------- */
+async function buildSprites() {
+  sprites = [];
+  for (let i = 0; i < N; i++) {
+    const it = cfg.items[i], s = Math.round(RAD[i] * 2 * 1.5), c = document.createElement("canvas"); c.width = c.height = s;
+    drawItem(c.getContext("2d"), it, it.img ? await loadImg(it.img) : null, s);
+    sprites.push(c);
+  }
+  ringCv = document.createElement("canvas"); ringCv.width = W; ringCv.height = H;
+  const g = ringCv.getContext("2d"), a0 = Math.asin(GAP / R), SEG = 240;
+  g.lineCap = "round";
+  for (const [lw, al] of [[46, 0.07], [30, 0.12], [18, 0.22], [9, 1]]) {
+    g.lineWidth = lw; g.globalAlpha = al;
+    for (let k = 0; k < SEG; k++) {
+      const t0 = -Math.PI / 2 + a0 + (2 * Math.PI - 2 * a0) * k / SEG, t1 = -Math.PI / 2 + a0 + (2 * Math.PI - 2 * a0) * (k + 1.3) / SEG;
+      g.strokeStyle = `hsl(${(k / SEG * 360 + 20) % 360} 100% 58%)`;
+      g.beginPath(); g.arc(CX, CY, R, t0, t1); g.stroke();
+    }
+  }
+  g.globalAlpha = 1;
+  for (const [lw, al] of [[20, 0.12], [10, 0.25], [5, 1]]) {
+    g.lineWidth = lw; g.strokeStyle = `rgba(255,255,255,${al})`;
+    for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(CX + sx * GAP, CHUTE_TOP - 14); g.lineTo(CX + sx * GAP, EY); g.stroke(); }
+  }
+  // quelques points lumineux fixes
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let k = 0; k < 60; k++) { g.fillStyle = `rgba(160,190,255,${0.15 + rnd() * 0.35})`; g.beginPath(); g.arc(rnd() * W, rnd() * H, 1.5 + rnd() * 2.5, 0, 7); g.fill(); }
+}
+function draw() {
+  ctx.fillStyle = "#0b0b24"; ctx.fillRect(0, 0, W, H);
+  ctx.drawImage(ringCv, 0, 0);
+  if (cfg.title.trim()) {
+    ctx.font = "800 62px -apple-system,Helvetica,Arial,sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = "#fff"; ctx.shadowColor = "#000"; ctx.shadowBlur = 12;
+    ctx.fillText(cfg.title.trim(), CX, 150, W - 80); ctx.shadowBlur = 0;
+  }
+  for (const b of balls) {
+    const sp = sprites[b.lv], k = (b.r * 2 * 1.08 * (1 + b.pop * 0.18)) ;
+    ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.rot); ctx.drawImage(sp, -k / 2, -k / 2, k, k); ctx.restore();
+  }
+  for (const p of parts) { ctx.globalAlpha = 1 - p.t / p.life; ctx.fillStyle = `hsl(${p.h} 100% 65%)`; ctx.beginPath(); ctx.arc(p.x, p.y, p.s * (1 - p.t / p.life * 0.6), 0, 7); ctx.fill(); }
+  ctx.globalAlpha = 1; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  for (const f of floats) {
+    const life = f.big ? 3 : 1.1, a = Math.min(1, (life - f.t) * 3), sc = Math.min(1, f.t * 9);
+    ctx.globalAlpha = a; ctx.font = `800 ${(f.big ? 96 : 50) * (0.6 + 0.4 * sc)}px -apple-system,Helvetica,Arial,sans-serif`;
+    const x = f.big ? CX : Math.max(200, Math.min(W - 200, f.x)), y = f.big ? CY - 300 : f.y;
+    ctx.lineWidth = f.big ? 14 : 9; ctx.strokeStyle = "#0b0b24"; ctx.lineJoin = "round"; ctx.strokeText(f.text, x, y, W - 100);
+    ctx.fillStyle = "#fff"; ctx.fillText(f.text, x, y, W - 100);
+  }
+  ctx.globalAlpha = 1;
+  ctx.font = "800 84px -apple-system,Helvetica,Arial,sans-serif"; ctx.fillStyle = "#c9cbe8"; ctx.fillText("SCORE : " + score, CX, 1470);
+  const s = 92, gap = 22, x0 = CX - (N * s + (N - 1) * gap) / 2 + s / 2;
+  for (let i = 0; i < N; i++) {
+    const x = x0 + i * (s + gap), y = 1590;
+    ctx.beginPath(); ctx.arc(x, y, s / 2, 0, 7); ctx.fillStyle = "#1a1c4a"; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = seen[i] ? "#8b8ff5" : "#3a3d80"; ctx.stroke();
+    if (seen[i]) ctx.drawImage(sprites[i], x - s * 0.4, y - s * 0.4, s * 0.8, s * 0.8);
+    else { ctx.font = "700 44px -apple-system,Helvetica,Arial,sans-serif"; ctx.fillStyle = "#6b70b8"; ctx.fillText("?", x, y + 3); }
+  }
+}
+
+/* ---------- boucle, enregistrement, fin ---------- */
+let raf = 0, lastT = 0, acc = 0, recorder = null, recChunks = [], recUrl = null, recBlob = null;
+function loop(t) {
+  raf = requestAnimationFrame(loop);
+  let dt = Math.min(0.05, (t - lastT) / 1000); lastT = t; acc += dt;
+  while (acc >= 1 / 120) { step(1 / 120); acc -= 1 / 120; }
+  voicePump(); draw();
+}
+function pickMime() {
+  for (const m of ["video/mp4;codecs=avc1.42E01E,mp4a.40.2", "video/mp4", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"]) if (MediaRecorder.isTypeSupported(m)) return m;
+  return "";
+}
+function startRecording() {
+  recorder = null; recChunks = []; recBlob = null;
+  if (!cfg.rec) return;
+  if (!cv.captureStream || !window.MediaRecorder) return toast("Enregistrement non pris en charge ici : utilise l'enregistrement d'écran.");
+  try {
+    const st = cv.captureStream(60);
+    if (recDest) recDest.stream.getAudioTracks().forEach(t => st.addTrack(t));
+    const mime = pickMime();
+    recorder = new MediaRecorder(st, Object.assign({ videoBitsPerSecond: 9e6 }, mime ? { mimeType: mime } : {}));
+    recorder.ondataavailable = e => e.data.size && recChunks.push(e.data);
+    recorder.start(1000);
+  } catch (e) { recorder = null; toast("Enregistrement impossible : utilise l'enregistrement d'écran."); }
+}
+function stopRecording() {
+  return new Promise(res => {
+    if (!recorder || recorder.state === "inactive") return res(null);
+    recorder.onstop = () => res(new Blob(recChunks, { type: recorder.mimeType || "video/mp4" }));
+    recorder.stop();
+  });
+}
+async function start() {
+  audioInit();
+  if (window.speechSynthesis && cfg.lang !== "off") { try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch (e) {} }
+  $("#end").classList.remove("on"); $("#play").classList.add("on");
+  await Promise.all([buildSprites(), loadVoices()]);
+  resetSim(); startRecording();
+  cancelAnimationFrame(raf); lastT = performance.now(); acc = 0; raf = requestAnimationFrame(loop);
+}
+async function finish() {
+  if (headless) return;
+  const won = state === "won"; state = "over";
+  const blob = await stopRecording();
+  $("#endT").textContent = won ? cfg.items[N - 1].name + " !" : "Le cercle est plein";
+  $("#endP").textContent = won ? "Score : " + score : "Relance : chaque partie tombe différemment.";
+  const vid = $("#vid"), dl = $("#dl"), sh = $("#share");
+  vid.style.display = dl.style.display = sh.style.display = "none";
+  if (recUrl) { URL.revokeObjectURL(recUrl); recUrl = null; }
+  if (blob && blob.size) {
+    recBlob = blob; recUrl = URL.createObjectURL(blob);
+    const ext = blob.type.includes("mp4") ? "mp4" : "webm";
+    vid.src = recUrl; vid.style.display = "block";
+    dl.href = recUrl; dl.download = "fusion." + ext; dl.style.display = "block";
+    try { if (navigator.canShare && navigator.canShare({ files: [new File([blob], "fusion." + ext, { type: blob.type })] })) sh.style.display = "block"; } catch (e) {}
+  }
+  $("#end").classList.add("on");
+}
+$("#share").onclick = async () => {
+  if (!recBlob) return;
+  const ext = recBlob.type.includes("mp4") ? "mp4" : "webm";
+  try { await navigator.share({ files: [new File([recBlob], "fusion." + ext, { type: recBlob.type.split(";")[0] })] }); }
+  catch (e) { if (e.name !== "AbortError") toast("Partage bloqué ici : utilise « Télécharger la vidéo »."); }
+};
+function quit() {
+  cancelAnimationFrame(raf); if (recorder && recorder.state !== "inactive") { recorder.onstop = null; recorder.stop(); }
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  $("#vid").pause(); $("#play").classList.remove("on");
+}
+$("#go").onclick = start; $("#again").onclick = start; $("#edit").onclick = quit; $("#quit").onclick = quit;
+document.addEventListener("visibilitychange", () => { lastT = performance.now(); });
+
+// essai sans affichage (tests) : renvoie l'issue d'une partie complète
+window.__sim = function (maxS) {
+  headless = true; resetSim();
+  while (simTime < (maxS || 240) && state === "run") step(1 / 120);
+  const r = { state, time: +simTime.toFixed(1), balls: balls.length, score };
+  headless = false; return r;
+};
+
+renderList(); bindOptions();
+</script>
+</body>
+</html>
