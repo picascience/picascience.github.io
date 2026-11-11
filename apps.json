@@ -1,7 +1,20 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-11T17:14:09.842Z",
+  "generated": "2026-11-11T23:13:51.951Z",
   "apps": [
+    {
+      "name": "Jannah",
+      "emoji": "🗝️",
+      "colors": [
+        "#021009",
+        "#0b4a3a"
+      ],
+      "category": "Coran",
+      "added": "2026-11-12",
+      "description": "Les actes courts qui mènent au Paradis : hadiths sahîh et hasan, avec sources",
+      "icon": "apps/cles-jannah/icon.svg",
+      "id": "cles-jannah"
+    },
     {
       "name": "Bienvenue",
       "emoji": "✨",
