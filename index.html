@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>MK Apps</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MK Apps">
+<meta name="theme-color" content="#07070d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<style>
+  :root {
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --icon: 62px;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #07070d; }
+  body {
+    position: fixed; inset: 0; color: #fff;
+    font: 15px/1.3 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+    overscroll-behavior: none;
+  }
+
+  /* ---------- Fond d'écran vivant ---------- */
+  .wall { position: absolute; inset: -20%; z-index: 0; filter: saturate(1.15); }
+  .wall i { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; animation: drift 26s ease-in-out infinite alternate; }
+  .wall i:nth-child(1) { width: 70vmax; height: 70vmax; left: -10%; top: -5%; background: #3b2a9e; }
+  .wall i:nth-child(2) { width: 60vmax; height: 60vmax; right: -15%; top: 25%; background: #0e6b5c; animation-duration: 32s; animation-delay: -8s; }
+  .wall i:nth-child(3) { width: 55vmax; height: 55vmax; left: 10%; bottom: -20%; background: #8a2a5c; animation-duration: 38s; animation-delay: -15s; }
+  @keyframes drift { to { transform: translate(8%, -6%) scale(1.12) rotate(20deg); } }
+  .stars { position: absolute; inset: 0; z-index: 0; opacity: .5;
+    background-image: radial-gradient(1px 1px at 12% 18%, #fff, transparent), radial-gradient(1px 1px at 72% 12%, #fff, transparent),
+      radial-gradient(1px 1px at 38% 64%, #fff, transparent), radial-gradient(1.5px 1.5px at 88% 52%, #fff, transparent),
+      radial-gradient(1px 1px at 22% 86%, #fff, transparent), radial-gradient(1px 1px at 58% 36%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 8% 48%, #fff, transparent), radial-gradient(1px 1px at 92% 82%, #fff, transparent); }
+
+  /* ---------- Écran d'accueil ---------- */
+  #home { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column;
+    padding: calc(var(--sat) + 14px) 0 calc(var(--sab) + 10px); transition: transform .45s cubic-bezier(.2,.8,.2,1), filter .45s; }
+  body.app-open #home { transform: scale(.92); filter: blur(8px) brightness(.7); }
+
+  .widget { margin: 6px 22px 10px; padding: 16px 18px; border-radius: 24px;
+    background: rgba(255,255,255,.09); backdrop-filter: blur(24px) saturate(1.4); -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,.12); display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+  .widget .time { font-size: 46px; font-weight: 200; letter-spacing: -1.5px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .widget .hello { font-size: 13px; opacity: .75; margin-bottom: 4px; }
+  .widget .dates { text-align: right; font-size: 13px; line-height: 1.45; }
+  .widget .dates b { display: block; font-size: 15px; font-weight: 600; text-transform: capitalize; }
+  .widget .dates span { opacity: .7; }
+  .widget .count { display: inline-block; margin-top: 4px; font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(255,255,255,.14); }
+
+  #pages { flex: 1; display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  #pages::-webkit-scrollbar { display: none; }
+  .page { flex: 0 0 100%; scroll-snap-align: start; display: grid; grid-template-columns: repeat(4, 1fr);
+    align-content: start; row-gap: 22px; padding: 14px 14px 0; }
+
+  .app { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; position: relative;
+    animation: pop .5s cubic-bezier(.2,1.4,.4,1) both; }
+  @keyframes pop { from { opacity: 0; transform: scale(.4); } }
+  .ico { width: var(--icon); height: var(--icon); border-radius: 22.5%; display: grid; place-items: center; position: relative; overflow: hidden;
+    font-size: calc(var(--icon) * .5); font-weight: 700; color: #fff;
+    box-shadow: 0 6px 16px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.25); transition: transform .15s; }
+  .ico::after { content: ""; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(255,255,255,.28), transparent 45%); pointer-events: none; }
+  .ico img { width: 100%; height: 100%; object-fit: cover; }
+  .app:active .ico { transform: scale(.88); filter: brightness(.8); }
+  .lbl { font-size: 11.5px; max-width: 76px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+  .new .lbl::before { content: ""; display: inline-block; width: 6px; height: 6px; margin: 0 4px 1px 0; border-radius: 50%; background: #3b9eff; vertical-align: middle; }
+
+  .dots { display: flex; justify-content: center; gap: 8px; padding: 8px 0 10px; }
+  .dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.35); transition: background .2s; }
+  .dots i.on { background: #fff; }
+
+  .search { align-self: center; display: flex; align-items: center; gap: 6px; padding: 7px 14px; margin-bottom: 12px; border-radius: 99px;
+    background: rgba(255,255,255,.14); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); font-size: 13px; color: rgba(255,255,255,.85); border: 0; }
+  .dock { margin: 0 12px; padding: 14px 8px; border-radius: 32px; display: flex; justify-content: space-evenly;
+    background: rgba(255,255,255,.14); backdrop-filter: blur(30px) saturate(1.5); -webkit-backdrop-filter: blur(30px) saturate(1.5); }
+  .dock .lbl { display: none; }
+
+  /* ---------- Spotlight ---------- */
+  #spot { position: absolute; inset: 0; z-index: 5; display: none; flex-direction: column;
+    padding: calc(var(--sat) + 16px) 16px 0; background: rgba(10,10,20,.55); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); }
+  #spot.on { display: flex; animation: fade .2s; }
+  @keyframes fade { from { opacity: 0; } }
+  #spot .bar { display: flex; gap: 10px; align-items: center; }
+  #spot input { flex: 1; font: inherit; font-size: 17px; color: #fff; padding: 11px 14px; border-radius: 14px; border: 0; outline: 0; background: rgba(255,255,255,.14); }
+  #spot button { background: none; border: 0; color: #fff; font: inherit; font-size: 16px; }
+  #results { margin-top: 14px; overflow-y: auto; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 9px 4px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .row .ico { --icon: 42px; }
+  .row small { display: block; opacity: .6; font-size: 12px; }
+
+  /* ---------- Appli ouverte ---------- */
+  #view { position: absolute; inset: 0; z-index: 10; display: none; background: #000; overflow: hidden; transform-origin: 0 0; }
+  #view.on { display: block; }
+  #view iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
+  #splash { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; transition: opacity .35s; }
+  #splash .big { font-size: 88px; line-height: 1; margin-bottom: 14px; font-weight: 700; }
+  #splash h2 { margin: 0; font-size: 22px; font-weight: 600; }
+  #splash p { margin: 10px auto 0; max-width: 270px; opacity: .8; font-size: 14px; }
+  #splash.gone { opacity: 0; pointer-events: none; }
+  #grab { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--sab) + 26px); display: flex; justify-content: center; align-items: flex-end;
+    padding-bottom: calc(var(--sab) + 8px); touch-action: none; z-index: 2; }
+  #grab::before { content: ""; width: 134px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.85); box-shadow: 0 0 0 .5px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.4); }
+
+  /* ---------- Menu (appui long) ---------- */
+  #sheet { position: absolute; inset: 0; z-index: 20; display: none; align-items: flex-end; background: rgba(0,0,0,.4); }
+  #sheet.on { display: flex; animation: fade .2s; }
+  #sheet .card { width: 100%; margin: 0 10px calc(var(--sab) + 10px); border-radius: 22px; overflow: hidden;
+    background: rgba(40,40,52,.92); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); animation: up .3s cubic-bezier(.2,.9,.3,1); }
+  @keyframes up { from { transform: translateY(100%); } }
+  #sheet .head { display: flex; gap: 14px; align-items: center; padding: 16px; border-bottom: 1px solid rgba(255,255,255,.1); }
+  #sheet .head small { display: block; opacity: .65; font-size: 12.5px; margin-top: 2px; }
+  #sheet button { display: block; width: 100%; text-align: left; padding: 15px 18px; font: inherit; font-size: 16px; color: #fff; background: none; border: 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+  #sheet button:last-child { border: 0; color: #8ab4ff; text-align: center; font-weight: 600; }
+  .toast { position: absolute; left: 50%; top: calc(var(--sat) + 12px); transform: translateX(-50%); z-index: 30; padding: 9px 16px; border-radius: 99px;
+    background: rgba(30,30,40,.9); font-size: 13px; animation: fade .2s; }
+</style>
+</head>
+<body>
+<div class="wall"><i></i><i></i><i></i></div>
+<div class="stars"></div>
+
+<div id="home">
+  <section class="widget">
+    <div>
+      <div class="hello" id="hello">Salam</div>
+      <div class="time" id="time">--:--</div>
+    </div>
+    <div class="dates">
+      <b id="greg"></b>
+      <span id="hijri"></span><br>
+      <span class="count" id="count"></span>
+    </div>
+  </section>
+  <div id="pages"></div>
+  <div class="dots" id="dots"></div>
+  <button class="search" id="openSpot">🔍 Rechercher</button>
+  <nav class="dock" id="dock"></nav>
+</div>
+
+<div id="spot">
+  <div class="bar"><input id="q" type="search" placeholder="Rechercher une appli" autocomplete="off"><button id="closeSpot">Annuler</button></div>
+  <div id="results"></div>
+</div>
+
+<div id="view">
+  <div id="splash"><div><div class="big" id="sIcon"></div><h2 id="sName"></h2><p id="sNote"></p></div></div>
+  <div id="grab" aria-label="Revenir à l'accueil"></div>
+</div>
+
+<div id="sheet"><div class="card" id="sheetCard"></div></div>
+
+<!-- Données de secours : réécrites par scripts/build.mjs à chaque publication -->
+<script id="fallback" type="application/json">
+/*APPS_START*/{"owner":"picascience","generated":"2026-11-11T14:37:14.131Z","apps":[{"name":"Bienvenue","emoji":"✨","colors":["#4338ca","#ec4899"],"category":"Labo","added":"2026-11-11","description":"Appli témoin : si tu la vois, la chaîne marche","id":"bienvenue"},{"id":"galaxie-infinie","name":"Galaxie","emoji":"🪐","colors":["#1e1b4b","#7c3aed"],"url":"https://picascience.github.io/galaxie-infinie/","category":"Jeux","added":"2026-11-10","description":"Exploration spatiale procédurale"},{"id":"microeconomie","name":"Micro-éco","emoji":"📈","colors":["#064e3b","#34d399"],"url":"https://picascience.github.io/microeconomie/","category":"Dauphine","added":"2026-11-09"},{"id":"cours-algebre","name":"Algèbre","emoji":"🧮","colors":["#312e81","#a78bfa"],"url":"https://picascience.github.io/cours-algebre/","category":"Dauphine","added":"2026-11-04"},{"id":"cours-analyse","name":"Analyse","emoji":"∫","colors":["#1e3a8a","#60a5fa"],"url":"https://picascience.github.io/cours-analyse/","category":"Dauphine","added":"2026-11-04"},{"id":"battle-tank","name":"Battle Tank","emoji":"🛡️","colors":["#3f3f46","#84cc16"],"url":"https://picascience.github.io/battle-tank/","category":"Jeux","added":"2026-11-04"},{"id":"demonstration","name":"Démo","emoji":"✏️","colors":["#831843","#f472b6"],"url":"https://picascience.github.io/demonstration/","category":"Dauphine","added":"2026-11-04"},{"id":"quran","name":"Coran","emoji":"📖","colors":["#14532d","#22c55e"],"url":"https://picascience.github.io/Quran/","category":"Coran","added":"2026-11-03","dock":true,"description":"Lecture : arabe, Hamidullah, tafsir Ibn Kathir"},{"id":"surchauffe-claude","name":"Surchauffe C","emoji":"🔥","colors":["#7c2d12","#fb923c"],"url":"https://picascience.github.io/surchauffe-claude/","category":"Labo","added":"2026-10-31"},{"id":"surchauffe-gemini","name":"Surchauffe G","emoji":"♨️","colors":["#1e40af","#f97316"],"url":"https://picascience.github.io/surchauffe-gemini/","category":"Labo","added":"2026-10-31"},{"id":"hifdh-coach","name":"Hifdh Coach","emoji":"🎙️","colors":["#0f766e","#14b8a6"],"url":"https://picascience.github.io/hifdh-coach/","category":"Coran","added":"2026-10-30","dock":true,"description":"Récitation du Coran avec correction"},{"id":"500-mots","name":"500 mots","emoji":"🃏","colors":["#7c2d12","#f59e0b"],"url":"https://picascience.github.io/500-mots/","category":"Coran","added":"2026-10-27","dock":true,"description":"Les 500 mots les plus fréquents du Coran"},{"id":"idle-particule","name":"Particules","emoji":"⚛️","colors":["#0c4a6e","#38bdf8"],"url":"https://picascience.github.io/Idle-particule/","category":"Jeux","added":"2026-10-27"}]}/*APPS_END*/
+</script>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const LIVE = /\.github\.io$/.test(location.hostname) || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  const store = {
+    get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  let APPS = [];
+  const seen = new Set(store.get("mk.seen", []));
+
+  /* ----- Horloge, dates grégorienne + hégirienne ----- */
+  function tick() {
+    const d = new Date(), h = d.getHours();
+    $("#time").textContent = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    $("#hello").textContent = (h < 5 ? "Bonne nuit" : h < 18 ? "Salam" : "Bonsoir") + " Karim";
+    $("#greg").textContent = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+    try { $("#hijri").textContent = new Intl.DateTimeFormat("fr-FR-u-ca-islamic-umalqura", { day: "numeric", month: "long", year: "numeric" }).format(d).replace(/\s?AH$/, " H"); } catch {}
+  }
+  tick(); setInterval(tick, 10000);
+
+  /* ----- Icônes ----- */
+  function icon(a) {
+    const [c1, c2] = a.colors || ["#334155", "#64748b"];
+    const inner = a.icon ? `<img src="${esc(a.icon)}" alt="">` : esc(a.emoji || a.name[0]);
+    return `<div class="ico" style="background:linear-gradient(135deg,${esc(c1)},${esc(c2)})">${inner}</div>`;
+  }
+  const isNew = a => !seen.has(a.id) && a.added && (Date.now() - new Date(a.added)) < 14 * 864e5;
+  function tile(a, i) {
+    return `<div class="app${isNew(a) ? " new" : ""}" data-id="${esc(a.id)}" style="animation-delay:${Math.min(i, 24) * 22}ms">${icon(a)}<div class="lbl">${esc(a.name)}</div></div>`;
+  }
+
+  /* ----- Grille paginée ----- */
+  function render() {
+    const dock = APPS.filter(a => a.dock).slice(0, 4);
+    const grid = APPS.filter(a => !dock.includes(a));
+    $("#dock").innerHTML = dock.map(tile).join("");
+    const pagesEl = $("#pages");
+    const rows = Math.max(2, Math.floor((pagesEl.clientHeight - 14) / 98));
+    const per = rows * 4, pages = [];
+    for (let i = 0; i < Math.max(grid.length, 1); i += per) pages.push(grid.slice(i, i + per));
+    pagesEl.innerHTML = pages.map(p => `<div class="page">${p.map(tile).join("")}</div>`).join("");
+    $("#dots").innerHTML = pages.length > 1 ? pages.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("") : "";
+    $("#count").textContent = `${APPS.length} applis`;
+  }
+  $("#pages").addEventListener("scroll", e => {
+    const i = Math.round(e.target.scrollLeft / e.target.clientWidth);
+    document.querySelectorAll("#dots i").forEach((d, j) => d.classList.toggle("on", i === j));
+  }, { passive: true });
+  let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(render, 150); });
+
+  /* ----- Ouverture / fermeture façon iOS ----- */
+  const view = $("#view");
+  let current = null, originRect = null;
+  const appUrl = a => a.url || `apps/${a.id}/`;
+
+  function open(a, fromEl) {
+    current = a;
+    seen.add(a.id); store.set("mk.seen", [...seen]);
+    fromEl?.closest(".app")?.classList.remove("new");
+    const [c1, c2] = a.colors || ["#334155", "#64748b"];
+    const splash = $("#splash");
+    splash.style.background = `linear-gradient(160deg, ${c1}, ${c2})`;
+    splash.classList.remove("gone");
+    $("#sIcon").textContent = a.icon ? "" : (a.emoji || a.name[0]);
+    $("#sName").textContent = a.name;
+    $("#sNote").textContent = LIVE ? "" : "Aperçu : une fois en ligne sur GitHub Pages, l'appli s'ouvre ici, en plein écran.";
+    view.querySelector("iframe")?.remove();
+    if (LIVE && a.open !== "tab") {
+      const f = document.createElement("iframe");
+      f.src = appUrl(a);
+      f.allow = "microphone; camera; autoplay; fullscreen; clipboard-write; screen-wake-lock";
+      f.onload = () => setTimeout(() => splash.classList.add("gone"), 250);
+      view.prepend(f);
+      setTimeout(() => splash.classList.add("gone"), 6000);
+    } else if (LIVE) { location.href = appUrl(a); return; }
+
+    const ico = fromEl?.querySelector(".ico");
+    originRect = ico ? ico.getBoundingClientRect() : null;
+    view.classList.add("on");
+    document.body.classList.add("app-open");
+    const from = originRect ? frameFor(originRect) : "translate(0,40px) scale(.9)";
+    view.animate([{ transform: from, borderRadius: "40px", opacity: originRect ? 1 : 0 }, { transform: "none", borderRadius: "0px", opacity: 1 }],
+      { duration: 420, easing: "cubic-bezier(.2,.9,.25,1)" });
+  }
+  function frameFor(r) {
+    return `translate(${r.left}px, ${r.top}px) scale(${r.width / innerWidth}, ${r.height / innerHeight})`;
+  }
+  function close(fromTransform) {
+    if (!view.classList.contains("on")) return;
+    const target = current && document.querySelector(`.app[data-id="${CSS.escape(current.id)}"] .ico`);
+    const r = target ? target.getBoundingClientRect() : null;
+    document.body.classList.remove("app-open");
+    const anim = view.animate([{ transform: fromTransform || "none", borderRadius: "40px" },
+      { transform: r ? frameFor(r) : "translate(0,40%) scale(.5)", borderRadius: "40px", opacity: r ? .2 : 0 }],
+      { duration: 380, easing: "cubic-bezier(.3,.7,.2,1)" });
+    anim.onfinish = () => { view.classList.remove("on"); view.style.transform = ""; view.querySelector("iframe")?.remove(); current = null; };
+  }
+
+  /* Glisser la barre vers le haut pour revenir */
+  const grab = $("#grab");
+  let y0 = null, dy = 0;
+  grab.addEventListener("pointerdown", e => { y0 = e.clientY; dy = 0; grab.setPointerCapture(e.pointerId); });
+  grab.addEventListener("pointermove", e => {
+    if (y0 === null) return;
+    dy = Math.max(0, y0 - e.clientY);
+    const s = Math.max(.55, 1 - dy / 900);
+    view.style.transform = `translate(${(1 - s) * innerWidth / 2}px, ${-dy * .6}px) scale(${s})`;
+    view.style.borderRadius = Math.min(40, dy / 3) + "px";
+  });
+  grab.addEventListener("pointerup", () => {
+    if (y0 === null) return;
+    const t = view.style.transform; y0 = null;
+    if (dy > 70 || dy < 4) close(t || "none");
+    else { view.style.transition = "transform .25s, border-radius .25s"; view.style.transform = ""; view.style.borderRadius = "";
+      setTimeout(() => view.style.transition = "", 260); }
+  });
+
+  /* ----- Tap / appui long ----- */
+  let pressT = null, longFired = false;
+  document.addEventListener("pointerdown", e => {
+    const el = e.target.closest(".app"); if (!el) return;
+    longFired = false;
+    pressT = setTimeout(() => { longFired = true; navigator.vibrate?.(10); sheet(byId(el.dataset.id)); }, 480);
+  });
+  ["pointerup", "pointercancel", "pointermove"].forEach(ev => document.addEventListener(ev, e => {
+    if (ev === "pointermove" && Math.abs(e.movementX) + Math.abs(e.movementY) < 3) return;
+    clearTimeout(pressT);
+  }));
+  document.addEventListener("click", e => {
+    const el = e.target.closest(".app, .row"); if (!el) return;
+    if (longFired) { longFired = false; return; }
+    if (el.classList.contains("row")) closeSpot();
+    const a = byId(el.dataset.id);
+    const homeEl = document.querySelector(`#home .app[data-id="${CSS.escape(a.id)}"]`);
+    open(a, homeEl);
+  });
+  document.addEventListener("contextmenu", e => e.target.closest(".app") && e.preventDefault());
+  const byId = id => APPS.find(a => a.id === id);
+
+  function sheet(a) {
+    const abs = new URL(appUrl(a), location.href).href;
+    const added = a.added ? new Date(a.added).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : "";
+    $("#sheetCard").innerHTML = `
+      <div class="head">${icon(a)}<div><b>${esc(a.name)}</b><small>${esc(a.description || a.category || "")}</small><small>${added ? "Ajoutée le " + esc(added) : ""}</small></div></div>
+      <button data-act="open">Ouvrir</button>
+      <button data-act="safari">Ouvrir dans un nouvel onglet</button>
+      <button data-act="copy">Copier le lien</button>
+      <button data-act="cancel">Annuler</button>`;
+    $("#sheet").classList.add("on");
+    $("#sheetCard").onclick = async e => {
+      const act = e.target.dataset.act; if (!act) return;
+      $("#sheet").classList.remove("on");
+      if (act === "open") open(a, document.querySelector(`#home .app[data-id="${CSS.escape(a.id)}"]`));
+      if (act === "safari") window.open(abs, "_blank");
+      if (act === "copy") { try { await navigator.clipboard.writeText(abs); toast("Lien copié"); } catch { toast(abs); } }
+    };
+  }
+  $("#sheet").addEventListener("click", e => { if (e.target.id === "sheet") e.currentTarget.classList.remove("on"); });
+  function toast(t) { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 1800); }
+
+  /* ----- Recherche ----- */
+  const norm = s => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  function results() {
+    const q = norm($("#q").value);
+    const list = APPS.filter(a => !q || norm([a.name, a.category, a.description].join(" ")).includes(q));
+    $("#results").innerHTML = list.map(a => `<div class="row" data-id="${esc(a.id)}">${icon(a)}<div>${esc(a.name)}<small>${esc(a.category || "")}${a.description ? " · " + esc(a.description) : ""}</small></div></div>`).join("")
+      || `<p style="opacity:.6;text-align:center;margin-top:30px">Aucune appli</p>`;
+  }
+  $("#openSpot").onclick = () => { $("#spot").classList.add("on"); $("#q").value = ""; results(); setTimeout(() => $("#q").focus(), 50); };
+  const closeSpot = () => { $("#spot").classList.remove("on"); $("#q").blur(); };
+  $("#closeSpot").onclick = closeSpot;
+  $("#q").addEventListener("input", results);
+
+  /* ----- Données : apps.json frais, sinon secours embarqué ----- */
+  function load(data) {
+    APPS = (data.apps || []).slice().sort((a, b) => (b.added || "").localeCompare(a.added || ""));
+    render();
+  }
+  const fb = $("#fallback").textContent.match(/\/\*APPS_START\*\/([\s\S]*)\/\*APPS_END\*\//);
+  load(JSON.parse(fb ? fb[1] : "{}"));
+  if (LIVE) {
+    fetch("apps.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(d => d && load(d)).catch(() => {});
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && LIVE && !current)
+      fetch("apps.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(d => d && load(d)).catch(() => {});
+  });
+})();
+</script>
+</body>
+</html>
