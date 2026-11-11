@@ -68,7 +68,7 @@ h1{font-size:26px;margin:0 0 4px;letter-spacing:-.4px}
     <label>Titre affiché en haut (facultatif)</label>
     <input type="text" id="title" maxlength="40" placeholder="Ex. Trouve le point commun">
     <label>Vitesse de chute</label>
-    <div class="seg" id="speed"><button data-v="0.8">Lente</button><button data-v="0.55">Normale</button><button data-v="0.36">Rapide</button></div>
+    <div class="seg" id="speed"><button data-v="0.55">Lente</button><button data-v="0.36">Normale</button><button data-v="0.24">Rapide</button></div>
     <label>Voix qui dit le nom</label>
     <select id="lang"><option value="fr-FR">Voix du téléphone · français</option><option value="ar-SA">Voix du téléphone · arabe</option><option value="en-US">Voix du téléphone · anglais</option><option value="off">Aucune voix</option></select>
     <div class="tog"><span>Bruitages (chute, choc, fusion)</span><button class="sw" id="sfx"></button></div>
@@ -103,7 +103,7 @@ const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans
 
 /* ---------- configuration ---------- */
 function defaults() {
-  return { items: DEFAULTS.map(([e, n]) => ({ emoji: e, name: n, img: null, sticker: false, voice: null })), title: "", speed: 0.55, lang: "fr-FR", sfx: true, rec: false };
+  return { items: DEFAULTS.map(([e, n]) => ({ emoji: e, name: n, img: null, sticker: false, voice: null })), title: "", speed: 0.36, lang: "fr-FR", sfx: true, rec: false };
 }
 let cfg = defaults();
 try {
@@ -313,7 +313,7 @@ function addBall(lv, x, y, vx, vy, fromR) {
   balls.push(b); seen[lv] = true; return b;
 }
 function spawn() {
-  const u = Math.random(), lv = u < 0.5 ? 0 : u < 0.8 ? 1 : 2, r = RAD[lv], y = CHUTE_TOP + r;
+  const lv = 0, r = RAD[lv], y = CHUTE_TOP + r;
   for (const b of balls) { const dx = b.x - CX, dy = b.y - y; if (dx * dx + dy * dy < (b.r + r) * (b.r + r) * 0.9) { blocked++; return; } }
   blocked = 0;
   addBall(lv, CX + (Math.random() - 0.5) * (GAP - r) * 1.2, y, (Math.random() - 0.5) * 320, 200);
