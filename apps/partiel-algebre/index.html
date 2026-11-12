@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14080a">
+<title>Partiel Algèbre 1</title>
+<style>
+:root{
+  --bg:#120a0c; --card:#1d1316; --card2:#251a1d; --line:#3a2a2e;
+  --tx:#f3ece9; --mute:#b9a9a6; --acc:#f87171; --gold:#fbbf24; --ok:#4ade80; --blue:#93c5fd;
+  --m:"Cambria Math","STIX Two Math","Latin Modern Math",Georgia,serif;
+}
+@media (prefers-color-scheme: light){
+  :root{--bg:#faf6f4;--card:#ffffff;--card2:#f6eeeb;--line:#ead9d4;--tx:#1d1214;--mute:#6b5a57;--acc:#c62828;--gold:#a16207;--ok:#15803d;--blue:#1d4ed8}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:16.5px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) calc(env(safe-area-inset-bottom) + 48px) env(safe-area-inset-left)}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px}
+header{padding:22px 0 8px}
+h1{font-size:26px;line-height:1.15;margin:0 0 6px;letter-spacing:-.02em}
+h1 span{color:var(--acc)}
+.sub{color:var(--mute);font-size:14.5px;margin:0}
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);margin:12px -16px 0;padding:8px 16px;padding-top:calc(8px + env(safe-area-inset-top)*0)}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chips a{flex:none;text-decoration:none;color:var(--tx);background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:600}
+.chips a.done{border-color:var(--ok);color:var(--ok)}
+section{padding-top:18px;scroll-margin-top:56px}
+h2{font-size:21px;margin:10px 0 4px;letter-spacing:-.01em}
+h2 small{display:block;font-size:13.5px;font-weight:500;color:var(--mute);margin-top:2px}
+h3{font-size:17px;margin:0 0 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px;margin:10px 0}
+.m{font-family:var(--m);font-size:1.07em;white-space:nowrap}
+.mb{font-family:var(--m);font-size:1.07em;display:block;background:var(--card2);border-radius:10px;padding:8px 10px;margin:8px 0;overflow-x:auto;white-space:nowrap}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.02em;border-radius:6px;padding:2px 7px;margin-right:4px;vertical-align:2px}
+.t-hot{background:color-mix(in srgb,var(--acc) 22%,transparent);color:var(--acc)}
+.t-mid{background:color-mix(in srgb,var(--gold) 22%,transparent);color:var(--gold)}
+.t-low{background:color-mix(in srgb,var(--blue) 20%,transparent);color:var(--blue)}
+.bar{height:6px;border-radius:6px;background:var(--card2);margin:8px 0 2px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--acc));border-radius:6px}
+.rank{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start}
+.rank b.n{font-size:22px;color:var(--acc);line-height:1}
+ol,ul{padding-left:22px;margin:6px 0}
+li{margin:4px 0}
+.steps li::marker{color:var(--acc);font-weight:800}
+.copy{border-left:3px solid var(--gold);background:var(--card2);border-radius:0 10px 10px 0;padding:10px 12px;margin:10px 0;font-size:15.5px}
+.copy p{margin:4px 0}
+.copy .lbl,.lbl{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);font-weight:800;margin-bottom:4px;display:block}
+.trap{border-left:3px solid var(--acc)}
+.trap .lbl{color:var(--acc)}
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+summary{list-style:none;cursor:pointer;padding:13px 14px;font-weight:700;display:flex;gap:10px;align-items:flex-start}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+";flex:none;width:22px;height:22px;border-radius:6px;background:var(--card2);color:var(--acc);display:grid;place-items:center;font-weight:800;line-height:1}
+details[open] summary::before{content:"–"}
+details .in{padding:0 14px 14px}
+details .q{font-weight:400;color:var(--tx)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td{border-top:1px solid var(--line);padding:8px 6px;vertical-align:top}
+td:first-child{color:var(--mute);width:44%}
+.def dt{font-weight:800;margin-top:12px}
+.def dd{margin:2px 0 0 0}
+.def dd .p{color:var(--mute);font-size:15px}
+.got{display:flex;align-items:center;gap:10px;margin:14px 0 4px;padding:10px 12px;border-radius:12px;border:1px dashed var(--line);color:var(--mute);font-size:15px;cursor:pointer;user-select:none}
+.got input{width:20px;height:20px;accent-color:var(--ok)}
+.got.on{border-style:solid;border-color:var(--ok);color:var(--ok)}
+.note{font-size:14px;color:var(--mute)}
+.ok{color:var(--ok);font-weight:700}
+.no{color:var(--acc);font-weight:700}
+hr{border:0;border-top:1px solid var(--line);margin:18px 0}
+.top{display:block;text-align:center;color:var(--mute);font-size:14px;margin:24px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Partiel <span>Algèbre 1</span><br>ce qui tombe vraiment</h1>
+  <p class="sub">Programme : poly p. 1 à 25 (applications, relations, ensembles finis), sans le dénombrement. Classement tiré des 6 annales 2019–2024. Rien n'est garanti à 100 %, mais ces blocs ont fait l'essentiel des points chaque année.</p>
+</header>
+
+<nav><div class="chips" id="chips">
+  <a href="#top5">Priorités</a>
+  <a href="#reflexes">Réflexes</a>
+  <a href="#defs">Définitions</a>
+  <a href="#methodes">Méthodes</a>
+  <a href="#demos">Démos</a>
+  <a href="#exos">Exos corrigés</a>
+  <a href="#pieges">Pièges</a>
+  <a href="#logique">Logique</a>
+  <a href="#jourj">Jour J</a>
+</div></nav>
+
+<!-- ================= PRIORITÉS ================= -->
+<section id="top5">
+<h2>Ce qui tombe, par ordre de probabilité<small>Années où le type est tombé sur 6 sujets · points rapportés</small></h2>
+
+<div class="card rank"><b class="n">1</b><div>
+<h3>Injective ? Surjective ?</h3>
+<span class="tag t-hot">6/6 ANS</span><span class="tag t-mid">≈ 3 pts</span>
+<div class="bar"><i style="width:100%"></i></div>
+<div class="note">Tous les ans, sur une fonction de ℝ, ℝ², ℕ ou définie par morceaux.</div>
+</div></div>
+
+<div class="card rank"><b class="n">2</b><div>
+<h3>Image directe f(A), image réciproque f⁻¹(B)</h3>
+<span class="tag t-hot">6/6 ANS</span><span class="tag t-mid">≈ 3 pts</span>
+<div class="bar"><i style="width:100%"></i></div>
+<div class="note">« Déterminer f([0,1]) », « f⁻¹({0}) », « f⁻¹([0,1]) », souvent sans tableau de variations.</div>
+</div></div>
+
+<div class="card rank"><b class="n">3</b><div>
+<h3>Composée et bijection réciproque</h3>
+<span class="tag t-hot">5/6 ANS</span><span class="tag t-mid">≈ 2,5 pts</span>
+<div class="bar"><i style="width:85%"></i></div>
+<div class="note">« Calculer f∘f. Que peut-on en déduire ? » → f bijective et f⁻¹ = f.</div>
+</div></div>
+
+<div class="card rank"><b class="n">4</b><div>
+<h3>Relations : équivalence, classes</h3>
+<span class="tag t-hot">2024 : 11,5 PTS</span><span class="tag t-low">1/6 ans</span>
+<div class="bar"><i style="width:90%"></i></div>
+<div class="note">Rare avant, mais c'est la moitié du sujet le plus récent, qui suit le même poly que toi. <b>À considérer comme très probable.</b></div>
+</div></div>
+
+<div class="card rank"><b class="n">5</b><div>
+<h3>Preuves « abstraites » (double inclusion, ⇔)</h3>
+<span class="tag t-mid">4/6 ANS</span><span class="tag t-mid">≈ 2 pts</span>
+<div class="bar"><i style="width:65%"></i></div>
+<div class="note">« Montrer que f injective ⇔ f⁻¹(f(A)) = A », « f(A)∩B = ∅ ⇔ A∩f⁻¹(B) = ∅ ».</div>
+</div></div>
+
+<div class="card rank"><b class="n">6</b><div>
+<h3>Ensembles finis, équipotence, P(E)</h3>
+<span class="tag t-low">2/6 ANS</span><span class="tag t-low">≈ 1,5 pt</span>
+<div class="bar"><i style="width:30%"></i></div>
+<div class="note">Définition d'« équipotents », lister P({a,b,c}), Card P(E) = 2ⁿ.</div>
+</div></div>
+
+<p class="note">Hors programme cette année (ne pas réviser) : nombres complexes, polynômes, arithmétique, dénombrement (arrangements, combinaisons).</p>
+<label class="got"><input type="checkbox" data-k="top5"> J'ai lu</label>
+</section>
+
+<!-- ================= RÉFLEXES ================= -->
+<section id="reflexes">
+<h2>Réflexes : si tu vois… tu écris…</h2>
+<div class="card"><table>
+<tr><td>« f est-elle injective ? »</td><td>D'abord chercher x ≠ x′ avec f(x) = f(x′) (essayer x et −x, (x,y) et (y,x)). Si tu ne trouves pas : « Soient x, x′ tels que f(x) = f(x′) ».</td></tr>
+<tr><td>« f est-elle surjective ? »</td><td>« Soit y ∈ F. Cherchons x ∈ E tel que f(x) = y. » Résoudre, puis <b>vérifier x ∈ E</b>.</td></tr>
+<tr><td>« Calculer f∘f, en déduire… »</td><td>Si f∘f = id : <b>f bijective et f⁻¹ = f</b>.</td></tr>
+<tr><td>« Calculer f_a∘f_b »</td><td>Trouver f_a∘f_b = f_{a+b} (ou similaire), puis f_a∘f_{−a} = f_0 = id dans les deux sens ⇒ f_a⁻¹ = f_{−a}.</td></tr>
+<tr><td>« Déterminer f⁻¹(B) »</td><td>Chaîne d'équivalences : x ∈ f⁻¹(B) ⇔ f(x) ∈ B ⇔ … ⇔ x ∈ ?</td></tr>
+<tr><td>« Déterminer f(A) »</td><td>Deviner le résultat, puis <b>double inclusion</b> (⊂ : encadrer f(x) ; ⊃ : trouver un antécédent dans A).</td></tr>
+<tr><td>« Montrer que A = B » (ensembles)</td><td>Double inclusion, ou chaîne de ⇔ sur « x ∈ A ».</td></tr>
+<tr><td>« Montrer que R est d'équivalence »</td><td>Trois titres : Réflexivité, Symétrie, Transitivité. Si R s'écrit f(x) = f(y) : c'est immédiat.</td></tr>
+<tr><td>Relation avec un « ou »</td><td>Transitivité : <b>faire les 4 cas</b>. Pour réfuter : un contre-exemple chiffré.</td></tr>
+<tr><td>« Donner la classe de x »</td><td>y ∈ Cl(x) ⇔ y R x ⇔ … résoudre en y. Écrire Cl(x) = { … }.</td></tr>
+<tr><td>« Il existe un unique… »</td><td>Analyse-synthèse : supposer qu'il existe, en déduire la seule forme possible (unicité), puis vérifier qu'elle marche (existence).</td></tr>
+<tr><td>« ⇔ » à démontrer</td><td>Deux parties : (⇒) puis (⇐). Annoncer chacune.</td></tr>
+<tr><td>Question précédente non réussie</td><td>« D'après la question 2 (admise) » et continuer : les points restent prenables.</td></tr>
+</table></div>
+<label class="got"><input type="checkbox" data-k="reflexes"> J'ai lu</label>
+</section>
+
+<!-- ================= DÉFINITIONS ================= -->
+<section id="defs">
+<h2>Définitions à savoir par cœur<small>Phrase simple, puis version à écrire sur la copie</small></h2>
+
+<div class="card"><h3>Applications</h3><dl class="def">
+<dt>Application f : E → F</dt>
+<dd>À <b>chaque</b> x de E on associe <b>un seul</b> f(x) dans F. <span class="p">E = départ, F = arrivée.</span></dd>
+<dt>Image, antécédent</dt>
+<dd>f(x) est l'image de x. x est un antécédent de y si f(x) = y. <span class="p">Un y peut avoir 0, 1 ou plusieurs antécédents.</span></dd>
+<dt>Composée g∘f</dt>
+<dd>On applique f <b>puis</b> g : <span class="m">(g∘f)(x) = g(f(x))</span>. <span class="p">Exige que f arrive dans le départ de g. En général g∘f ≠ f∘g.</span></dd>
+<dt>Restriction f|<sub>A</sub></dt>
+<dd>La même formule, mais seulement sur A ⊂ E.</dd>
+<dt>Identité</dt>
+<dd><span class="m">id<sub>E</sub>(x) = x</span> pour tout x ∈ E.</dd>
+</dl></div>
+
+<div class="card"><h3>Images</h3><dl class="def">
+<dt>Image directe de A ⊂ E</dt>
+<dd>L'ensemble des images des éléments de A.
+<span class="mb">f(A) = { f(x) | x ∈ A }    y ∈ f(A) ⇔ ∃ x ∈ A, y = f(x)</span></dd>
+<dt>Image réciproque de B ⊂ F</dt>
+<dd>L'ensemble des x qui « tombent » dans B.
+<span class="mb">f⁻¹(B) = { x ∈ E | f(x) ∈ B }    x ∈ f⁻¹(B) ⇔ f(x) ∈ B</span>
+<span class="p">Existe <b>toujours</b>, même si f n'est pas bijective. f⁻¹({y}) = ensemble des antécédents de y.</span></dd>
+</dl></div>
+
+<div class="card"><h3>Injective, surjective, bijective</h3><dl class="def">
+<dt>Injective</dt>
+<dd>Deux éléments différents n'ont jamais la même image. <span class="p">Chaque y a <b>au plus</b> un antécédent.</span>
+<span class="mb">∀ x, x′ ∈ E,  f(x) = f(x′) ⇒ x = x′</span></dd>
+<dt>Surjective</dt>
+<dd>Chaque élément de l'arrivée est atteint. <span class="p">Chaque y a <b>au moins</b> un antécédent ; f(E) = F.</span>
+<span class="mb">∀ y ∈ F, ∃ x ∈ E, y = f(x)</span></dd>
+<dt>Bijective</dt>
+<dd>Injective <b>et</b> surjective. <span class="p">Chaque y a <b>exactement</b> un antécédent.</span>
+<span class="mb">∀ y ∈ F, ∃! x ∈ E, y = f(x)</span></dd>
+<dt>Bijection réciproque f⁻¹ : F → E</dt>
+<dd>Elle renvoie chaque y vers son unique antécédent.
+<span class="mb">f⁻¹(y) = x ⇔ y = f(x)    f⁻¹∘f = id<sub>E</sub>,  f∘f⁻¹ = id<sub>F</sub></span></dd>
+<dt>Caractérisation par la composée</dt>
+<dd>S'il existe g : F → E avec <span class="m">g∘f = id<sub>E</sub></span> <b>et</b> <span class="m">f∘g = id<sub>F</sub></span>, alors f est bijective et f⁻¹ = g.</dd>
+<dt>Involution</dt>
+<dd><span class="m">f∘f = id<sub>E</sub></span> ⇒ f bijective et <span class="m">f⁻¹ = f</span>.</dd>
+<dt>Réciproque d'une composée</dt>
+<dd><span class="m">(g∘f)⁻¹ = f⁻¹∘g⁻¹</span> <span class="p">(ordre inversé, comme chaussettes puis chaussures).</span></dd>
+</dl></div>
+
+<div class="card"><h3>Relations</h3><dl class="def">
+<dt>Relation binaire R sur E</dt>
+<dd>Une propriété qui relie (ou non) deux éléments x, y de E ; on note x R y.</dd>
+<dt>Réflexive</dt><dd><span class="m">∀ x ∈ E, x R x</span></dd>
+<dt>Symétrique</dt><dd><span class="m">∀ x, y ∈ E, x R y ⇒ y R x</span></dd>
+<dt>Antisymétrique</dt><dd><span class="m">∀ x, y ∈ E, (x R y et y R x) ⇒ x = y</span> <span class="p">Ce n'est PAS « non symétrique ».</span></dd>
+<dt>Transitive</dt><dd><span class="m">∀ x, y, z ∈ E, (x R y et y R z) ⇒ x R z</span></dd>
+<dt>Relation d'ordre</dt><dd>Réflexive + <b>Antisymétrique</b> + Transitive. <span class="p">Exemples : ≤ sur ℝ, ⊂ sur P(E), « divise » sur ℕ* (pas sur ℤ*).</span></dd>
+<dt>Relation d'équivalence</dt><dd>Réflexive + <b>Symétrique</b> + Transitive. <span class="p">Exemples : =, congruence modulo k, « f(x) = f(y) ».</span></dd>
+<dt>Classe d'équivalence de x</dt>
+<dd>Tous les éléments en relation avec x.
+<span class="mb">Cl(x) = { y ∈ E | y R x }    jamais vide car x ∈ Cl(x)</span></dd>
+<dt>Ensemble quotient E/R</dt><dd>L'ensemble de toutes les classes.</dd>
+<dt>Partition de E</dt>
+<dd>Des parties <b>non vides</b>, <b>disjointes deux à deux</b>, dont la <b>réunion est E</b>. <span class="p">Les classes d'équivalence forment une partition de E.</span></dd>
+</dl></div>
+
+<div class="card"><h3>Ensembles finis</h3><dl class="def">
+<dt>Équipotents</dt><dd>E et F sont équipotents s'il existe une <b>bijection</b> de E sur F.</dd>
+<dt>Dénombrable</dt><dd>Équipotent à ℕ.</dd>
+<dt>Fini, cardinal</dt><dd>E est fini s'il est vide ou en bijection avec ⟦1, n⟧ ; n = Card(E). Card(∅) = 0.</dd>
+<dt>À connaître</dt>
+<dd><span class="mb">A ⊂ E fini ⇒ Card A ≤ Card E, avec égalité ⇔ A = E</span>
+<span class="mb">Card P(E) = 2ⁿ    Card F(E,F) = pⁿ    Card(E×F) = Card E × Card F</span>
+<span class="mb">Card(A∪B) = Card A + Card B − Card(A∩B)</span></dd>
+<dt>Applications entre ensembles finis</dt>
+<dd>f injective ⇒ Card E ≤ Card F. f surjective ⇒ Card E ≥ Card F.<br>
+Si <b>Card E = Card F</b> : f injective ⇔ f surjective ⇔ f bijective.</dd>
+</dl></div>
+<label class="got"><input type="checkbox" data-k="defs"> J'ai lu</label>
+</section>
+
+<!-- ================= MÉTHODES ================= -->
+<section id="methodes">
+<h2>Méthodes de rédaction<small>Les phrases exactes à recopier</small></h2>
+
+<div class="card"><h3>M1 · Montrer que f est injective</h3>
+<ol class="steps">
+<li>« Soient x, x′ ∈ E tels que f(x) = f(x′). »</li>
+<li>Calculer jusqu'à obtenir x = x′. Fonction par morceaux : faire les cas (x et x′ dans le même morceau, ou dans deux morceaux différents).</li>
+<li>« Donc x = x′ : f est injective. »</li>
+</ol>
+<div class="copy"><span class="lbl">Modèle</span>
+<p>f(x) = 3x + 1. Soient x, x′ ∈ ℝ tels que f(x) = f(x′). Alors 3x + 1 = 3x′ + 1, donc 3x = 3x′, donc x = x′. Ainsi f est injective.</p></div>
+<div class="copy trap"><span class="lbl">Pas injective</span><p>Donner <b>deux valeurs chiffrées</b> : « f(1) = 1 = f(−1) alors que 1 ≠ −1, donc f n'est pas injective. »</p></div>
+</div>
+
+<div class="card"><h3>M2 · Montrer que f est surjective</h3>
+<ol class="steps">
+<li>« Soit y ∈ F. Cherchons x ∈ E tel que f(x) = y. »</li>
+<li>Résoudre f(x) = y en x (au brouillon), écrire le x trouvé.</li>
+<li><b>Vérifier que ce x est dans E</b> (signe, valeur interdite…), puis que f(x) = y.</li>
+<li>« Tout y ∈ F a un antécédent : f est surjective. »</li>
+</ol>
+<div class="copy trap"><span class="lbl">Pas surjective</span><p>Exhiber un y sans antécédent et dire pourquoi : « Si (x,y) était un antécédent de (−1, 1), on aurait x² + y² = −1 &lt; 0, impossible. »</p></div>
+</div>
+
+<div class="card"><h3>M3 · Bijective + trouver f⁻¹</h3>
+<p><b>Voie A, la plus rapide si l'énoncé dit « calculer f∘f » ou « f_a∘f_b ») :</b></p>
+<ol class="steps">
+<li>Calculer la composée proprement (mettre au même dénominateur).</li>
+<li>Obtenir f∘f = id (ou trouver g avec g∘f = id <b>et</b> f∘g = id).</li>
+<li>« Donc f est bijective et f⁻¹ = f (ou g). »</li>
+</ol>
+<p><b>Voie B (résoudre) :</b> « Soit y ∈ F. f(x) = y ⇔ … ⇔ x = (formule en y) » avec x ∈ E. Une seule solution : f est bijective, et <span class="m">f⁻¹(y) = (formule)</span>.</p>
+<div class="copy trap"><span class="lbl">Ne pas oublier</span><p>Vérifier que f est <b>bien définie</b> : f(x) doit rester dans l'arrivée (ex. 2024 : prouver f(x) ≠ −1/2).</p></div>
+</div>
+
+<div class="card"><h3>M4 · Image réciproque f⁻¹(B)</h3>
+<ol class="steps">
+<li>Écrire « x ∈ f⁻¹(B) ⇔ f(x) ∈ B ».</li>
+<li>Remplacer f(x) par sa formule, résoudre par équivalences. Fonction par morceaux : un cas par morceau.</li>
+<li>Conclure « f⁻¹(B) = … ».</li>
+</ol>
+<div class="copy"><span class="lbl">Modèle</span>
+<p>f(x) = x². x ∈ f⁻¹([1,4]) ⇔ 1 ≤ x² ≤ 4 ⇔ 1 ≤ |x| ≤ 2 ⇔ x ∈ [−2,−1] ∪ [1,2].<br>Donc f⁻¹([1,4]) = [−2,−1] ∪ [1,2].</p></div>
+</div>
+
+<div class="card"><h3>M5 · Image directe f(A)</h3>
+<ol class="steps">
+<li>Deviner le résultat C (au brouillon).</li>
+<li><b>f(A) ⊂ C</b> : « Soit y ∈ f(A) : ∃ x ∈ A, y = f(x). » Encadrer f(x) pour montrer y ∈ C.</li>
+<li><b>C ⊂ f(A)</b> : « Soit y ∈ C. » Donner un x ∈ A (formule) avec f(x) = y.</li>
+<li>« Par double inclusion, f(A) = C. »</li>
+</ol>
+<div class="copy"><span class="lbl">Modèle</span>
+<p>f(x) = x², A = [−1, 2]. On montre f(A) = [0, 4].<br>
+⊂ : soit x ∈ [−1, 2]. Si x ≤ 0, alors 0 ≤ x² ≤ 1 ; si x ≥ 0, alors 0 ≤ x² ≤ 4. Donc f(x) ∈ [0, 4].<br>
+⊃ : soit y ∈ [0, 4]. On pose x = √y ∈ [0, 2] ⊂ A ; alors f(x) = y. Donc y ∈ f(A).</p></div>
+<p class="note">Partie sous forme de paramètre (ex. A = {(x, x)}) : f(A) = { f(x, x) | x ∈ ℝ } = {(3x, 3x) | x ∈ ℝ}.</p>
+</div>
+
+<div class="card"><h3>M6 · Égalité d'ensembles (double inclusion)</h3>
+<ol class="steps">
+<li>« Montrons A ⊂ B. Soit x ∈ A. … donc x ∈ B. »</li>
+<li>« Montrons B ⊂ A. Soit x ∈ B. … donc x ∈ A. »</li>
+<li>« Par double inclusion, A = B. »</li>
+</ol>
+<p class="note">Variante rapide : x ∈ A ⇔ … ⇔ x ∈ B, si chaque étape est vraiment une équivalence.</p>
+</div>
+
+<div class="card"><h3>M7 · Étudier une relation (R, S, A, T)</h3>
+<ol class="steps">
+<li><b>Réflexive</b> : « Soit x ∈ E. » Vérifier x R x.</li>
+<li><b>Symétrique</b> : « Soient x, y tels que x R y. » Montrer y R x.</li>
+<li><b>Antisymétrique</b> : « Soient x, y tels que x R y et y R x. » Montrer x = y.</li>
+<li><b>Transitive</b> : « Soient x, y, z tels que x R y et y R z. » Montrer x R z. Si la définition contient un « ou » : 4 cas.</li>
+<li>Propriété fausse ⇒ <b>contre-exemple chiffré</b> (vérifier chaque relation par le calcul).</li>
+</ol>
+</div>
+
+<div class="card"><h3>M8 · Classe d'équivalence</h3>
+<ol class="steps">
+<li>« y ∈ Cl(x) ⇔ y R x ⇔ … » (remplacer par la définition).</li>
+<li>Résoudre en y (factoriser !).</li>
+<li>Écrire Cl(x) = { … } et traiter les cas particuliers (ex. quand deux solutions sont égales).</li>
+<li>Si demandé : E/R = ensemble des classes, sans doublon.</li>
+</ol>
+</div>
+
+<div class="card"><h3>M9 · Existence et unicité (analyse-synthèse)</h3>
+<ol class="steps">
+<li><b>Analyse</b> : « Supposons que (x, y) convient. » En déduire x = …, y = … : il n'y a qu'un candidat (<b>unicité</b>).</li>
+<li><b>Synthèse</b> : « Posons x = …, y = …. » Vérifier toutes les conditions (<b>existence</b>).</li>
+<li>Conclure « il existe un unique… ».</li>
+</ol>
+</div>
+<label class="got"><input type="checkbox" data-k="methodes"> J'ai lu</label>
+</section>
+
+<!-- ================= DÉMOS ================= -->
+<section id="demos">
+<h2>Démonstrations du cours à savoir refaire<small>Courtes, et elles tombent sous forme de question</small></h2>
+
+<details><summary>D1 · f et g injectives ⇒ g∘f injective</summary><div class="in">
+<p>Soient x, x′ ∈ E tels que (g∘f)(x) = (g∘f)(x′), c'est-à-dire g(f(x)) = g(f(x′)).<br>
+g est injective, donc f(x) = f(x′). f est injective, donc x = x′.<br>Ainsi g∘f est injective.</p></div></details>
+
+<details><summary>D2 · g∘f injective ⇒ f injective</summary><div class="in">
+<p>Soient x, x′ ∈ E tels que f(x) = f(x′). En appliquant g : g(f(x)) = g(f(x′)), soit (g∘f)(x) = (g∘f)(x′).<br>
+g∘f est injective, donc x = x′. Ainsi f est injective. <span class="note">(On ne peut rien dire de g.)</span></p></div></details>
+
+<details><summary>D3 · f et g surjectives ⇒ g∘f surjective</summary><div class="in">
+<p>Soit z ∈ G. g est surjective : il existe y ∈ F tel que g(y) = z. f est surjective : il existe x ∈ E tel que f(x) = y.<br>
+Alors (g∘f)(x) = g(y) = z. Donc g∘f est surjective.</p></div></details>
+
+<details><summary>D4 · g∘f surjective ⇒ g surjective</summary><div class="in">
+<p>Soit z ∈ G. Il existe x ∈ E tel que g(f(x)) = z. On pose y = f(x) ∈ F : on a g(y) = z.<br>
+Donc g est surjective. <span class="note">(On ne peut rien dire de f.)</span></p></div></details>
+
+<details><summary>D5 · g∘f = id et f∘g = id ⇒ f bijective</summary><div class="in">
+<p>g∘f = id<sub>E</sub> est injective, donc f est injective (D2).<br>
+f∘g = id<sub>F</sub> est surjective, donc f est surjective (D4).<br>
+f est bijective. De plus f⁻¹ = f⁻¹∘(f∘g) = (f⁻¹∘f)∘g = g.</p>
+<p class="note">Cas particulier : f∘f = id ⇒ f bijective et f⁻¹ = f.</p></div></details>
+
+<details><summary>D6 · A ⊂ f⁻¹(f(A)) et f(f⁻¹(B)) ⊂ B</summary><div class="in">
+<p><b>1.</b> Soit x ∈ A. Alors f(x) ∈ f(A), donc x ∈ f⁻¹(f(A)).</p>
+<p><b>2.</b> Soit y ∈ f(f⁻¹(B)). Il existe x ∈ f⁻¹(B) tel que y = f(x). Or x ∈ f⁻¹(B) signifie f(x) ∈ B. Donc y ∈ B.</p></div></details>
+
+<details><summary>D7 · f injective ⇔ ∀A ⊂ E, f⁻¹(f(A)) = A <span class="tag t-hot">2022</span></summary><div class="in">
+<p><b>(⇒)</b> Supposons f injective et soit A ⊂ E. L'inclusion A ⊂ f⁻¹(f(A)) est toujours vraie (D6).<br>
+Soit x ∈ f⁻¹(f(A)). Alors f(x) ∈ f(A) : il existe a ∈ A tel que f(x) = f(a). f est injective, donc x = a ∈ A.<br>
+Par double inclusion, f⁻¹(f(A)) = A.</p>
+<p><b>(⇐)</b> Supposons la propriété vraie pour tout A. Soient x, x′ ∈ E tels que f(x) = f(x′). On prend A = {x′}.<br>
+f(x) = f(x′) ∈ f({x′}), donc x ∈ f⁻¹(f({x′})) = {x′}. Donc x = x′, et f est injective.</p></div></details>
+
+<details><summary>D8 · f(A) ∩ B = ∅ ⇔ A ∩ f⁻¹(B) = ∅ <span class="tag t-hot">2021</span></summary><div class="in">
+<p>On montre la contraposée des deux sens : f(A) ∩ B ≠ ∅ ⇔ A ∩ f⁻¹(B) ≠ ∅.</p>
+<p><b>(⇒)</b> Soit y ∈ f(A) ∩ B. Il existe a ∈ A tel que y = f(a). Comme f(a) = y ∈ B, on a a ∈ f⁻¹(B). Donc a ∈ A ∩ f⁻¹(B) ≠ ∅.</p>
+<p><b>(⇐)</b> Soit a ∈ A ∩ f⁻¹(B). Alors f(a) ∈ f(A) et f(a) ∈ B. Donc f(a) ∈ f(A) ∩ B ≠ ∅.</p></div></details>
+
+<details><summary>D9 · Images et opérations (∪, ∩, complémentaire)</summary><div class="in">
+<span class="mb">f(A ∪ B) = f(A) ∪ f(B)    f(A ∩ B) ⊂ f(A) ∩ f(B)</span>
+<span class="mb">f⁻¹(C ∪ D) = f⁻¹(C) ∪ f⁻¹(D)    f⁻¹(C ∩ D) = f⁻¹(C) ∩ f⁻¹(D)</span>
+<span class="mb">f⁻¹(F \ C) = E \ f⁻¹(C)</span>
+<p>Preuve type : x ∈ f⁻¹(C ∩ D) ⇔ f(x) ∈ C ∩ D ⇔ (f(x) ∈ C et f(x) ∈ D) ⇔ (x ∈ f⁻¹(C) et x ∈ f⁻¹(D)) ⇔ x ∈ f⁻¹(C) ∩ f⁻¹(D).</p>
+<div class="copy trap"><span class="lbl">Contre-exemple à connaître</span><p>f(x) = x², A = [−1, 0], B = [0, 1] : f(A ∩ B) = f({0}) = {0}, mais f(A) ∩ f(B) = [0,1]. L'égalité est fausse en général (elle est vraie si f est injective).</p></div></div></details>
+
+<details><summary>D10 · « x R y ⇔ f(x) = f(y) » est une relation d'équivalence</summary><div class="in">
+<p><b>Réflexivité.</b> Soit x ∈ E : f(x) = f(x), donc x R x.<br>
+<b>Symétrie.</b> Si x R y, alors f(x) = f(y), donc f(y) = f(x), donc y R x.<br>
+<b>Transitivité.</b> Si x R y et y R z, alors f(x) = f(y) = f(z), donc x R z.</p>
+<p class="note">Astuce : dès qu'une relation peut s'écrire « même chose pour x et pour y » (x² − x = y² − y, X ∩ A = Y ∩ A…), c'est ce schéma.</p></div></details>
+
+<details><summary>D11 · L'équipotence est une relation d'équivalence <span class="tag t-hot">2024</span></summary><div class="in">
+<p><b>Réflexivité.</b> id<sub>A</sub> est une bijection de A sur A, donc A R A.<br>
+<b>Symétrie.</b> Si f : A → B est bijective, alors f⁻¹ : B → A est bijective, donc B R A.<br>
+<b>Transitivité.</b> Si f : A → B et g : B → C sont bijectives, alors g∘f : A → C est bijective (composée de bijections), donc A R C.</p></div></details>
+
+<details><summary>D12 · f additive : f(0) = 0, et f injective ⇔ f⁻¹({0}) = {0} <span class="tag t-hot">2024</span></summary><div class="in">
+<p>Hypothèse : f(x + y) = f(x) + f(y) pour tous x, y.</p>
+<p><b>f(0) = 0</b> : f(0) = f(0 + 0) = f(0) + f(0), donc f(0) = 0.</p>
+<p><b>(⇒)</b> Si f est injective et x ∈ f⁻¹({0}) : f(x) = 0 = f(0), donc x = 0. Donc f⁻¹({0}) ⊂ {0}, et 0 ∈ f⁻¹({0}) car f(0) = 0.</p>
+<p><b>(⇐)</b> Si f(x) = f(x′), alors f(x − x′) = f(x) − f(x′) = 0 <span class="note">(car f(x′) + f(x − x′) = f(x))</span>. Donc x − x′ ∈ f⁻¹({0}) = {0}, donc x = x′.</p></div></details>
+
+<details><summary>D13 · (g∘f)⁻¹ = f⁻¹∘g⁻¹</summary><div class="in">
+<p>(g∘f)∘(f⁻¹∘g⁻¹) = g∘(f∘f⁻¹)∘g⁻¹ = g∘g⁻¹ = id<sub>G</sub>.<br>
+(f⁻¹∘g⁻¹)∘(g∘f) = f⁻¹∘(g⁻¹∘g)∘f = f⁻¹∘f = id<sub>E</sub>.<br>
+D'après D5, g∘f est bijective et (g∘f)⁻¹ = f⁻¹∘g⁻¹.</p></div></details>
+<label class="got"><input type="checkbox" data-k="demos"> J'ai lu</label>
+</section>
+
+<!-- ================= EXOS ================= -->
+<section id="exos">
+<h2>Exercices types corrigés<small>Essaie 1 minute dans ta tête, puis ouvre le corrigé</small></h2>
+
+<details><summary><span class="q"><b>E1 · Fonction par morceaux.</b> f : ℝ → ℝ, f(x) = 2x si x &lt; 0, f(x) = x² si x ≥ 0. f est-elle injective ? surjective ? Donner f⁻¹.</span></summary><div class="in">
+<div class="copy"><span class="lbl">Corrigé</span>
+<p><b>Surjective.</b> Soit y ∈ ℝ.<br>
+• Si y &lt; 0 : on pose x = y/2. Alors x &lt; 0, donc f(x) = 2·(y/2) = y.<br>
+• Si y ≥ 0 : on pose x = √y. Alors x ≥ 0, donc f(x) = (√y)² = y.<br>
+Tout y a un antécédent : f est surjective.</p>
+<p><b>Injective.</b> Soient x, x′ tels que f(x) = f(x′).<br>
+• x, x′ &lt; 0 : 2x = 2x′, donc x = x′.<br>
+• x, x′ ≥ 0 : x² = x′² avec x, x′ ≥ 0, donc x = x′.<br>
+• x &lt; 0 ≤ x′ : f(x) = 2x &lt; 0 ≤ x′² = f(x′), ce qui contredit f(x) = f(x′). Ce cas est impossible (de même si x′ &lt; 0 ≤ x).<br>
+Donc f est injective, et donc bijective.</p>
+<p><b>Réciproque :</b> f⁻¹(y) = y/2 si y &lt; 0, et f⁻¹(y) = √y si y ≥ 0.</p></div></div></details>
+
+<details><summary><span class="q"><b>E2 · ℝ² → ℝ².</b> g(x, y) = (x + y, xy). Montrer que g n'est ni injective ni surjective.</span></summary><div class="in">
+<div class="copy"><span class="lbl">Corrigé</span>
+<p><b>Non injective :</b> g(1, 2) = (3, 2) = g(2, 1), alors que (1, 2) ≠ (2, 1).</p>
+<p><b>Non surjective :</b> supposons que (0, 1) ait un antécédent (x, y). Alors x + y = 0 et xy = 1. Donc y = −x et −x² = 1, soit x² = −1 : impossible dans ℝ. (0, 1) n'a pas d'antécédent.</p></div></div></details>
+
+<details><summary><span class="q"><b>E3 · f∘f = id (annale 2024).</b> f : ℝ∖{−1/2} → ℝ∖{−1/2}, f(x) = (−x + 3)/(2x + 1). Calculer f∘f, conclure. Déterminer B = {x | f(x) = x}, puis f(B) et f⁻¹(B).</span></summary><div class="in">
+<div class="copy"><span class="lbl">Corrigé</span>
+<p><b>Bien définie :</b> si f(x) = −1/2, alors −x + 3 = −x − 1/2, soit 3 = −1/2 : impossible. Donc f(x) ≠ −1/2.</p>
+<p><b>f∘f :</b> numérateur −f(x) + 3 = (x − 3 + 6x + 3)/(2x + 1) = 7x/(2x + 1) ;<br>
+dénominateur 2f(x) + 1 = (−2x + 6 + 2x + 1)/(2x + 1) = 7/(2x + 1).<br>
+Donc f(f(x)) = 7x/7 = x : <b>f∘f = id</b>. Ainsi f est bijective et <b>f⁻¹ = f</b>.</p>
+<p><b>B :</b> f(x) = x ⇔ −x + 3 = 2x² + x ⇔ 2x² + 2x − 3 = 0. Δ = 4 + 24 = 28, d'où x = (−1 ± √7)/2. Donc B = {(−1+√7)/2, (−1−√7)/2}.</p>
+<p><b>f(B) = B :</b> pour x ∈ B, f(x) = x ∈ B, donc f(B) ⊂ B. Et si x ∈ B, x = f(x) ∈ f(B), donc B ⊂ f(B).<br>
+<b>f⁻¹(B) = B :</b> on a f⁻¹ = f, donc f⁻¹(B) = f(B) = B. <span class="note">(On peut aussi faire une chaîne d'équivalences.)</span></p></div></div></details>
+
+<details><summary><span class="q"><b>E4 · Famille f<sub>a</sub> (annale 2021).</b> f<sub>a</sub>(x, y) = (x, y + ax). Calculer f<sub>a</sub>∘f<sub>b</sub>, en déduire f<sub>a</sub> bijective. Calculer f<sub>a</sub>([0,1]×{0}) et f<sub>a</sub>⁻¹(D) avec D = {(x, y) | y = ax}.</span></summary><div class="in">
+<div class="copy"><span class="lbl">Corrigé</span>
+<p>f<sub>0</sub>(x, y) = (x, y) : <b>f<sub>0</sub> = id</b>.<br>
+f<sub>a</sub>(f<sub>b</sub>(x, y)) = f<sub>a</sub>(x, y + bx) = (x, y + bx + ax) : <b>f<sub>a</sub>∘f<sub>b</sub> = f<sub>a+b</sub></b>.</p>
+<p>Donc f<sub>a</sub>∘f<sub>−a</sub> = f<sub>0</sub> = id et f<sub>−a</sub>∘f<sub>a</sub> = f<sub>0</sub> = id : f<sub>a</sub> est bijective et <b>f<sub>a</sub>⁻¹ = f<sub>−a</sub></b>.</p>
+<p>f<sub>a</sub>([0,1]×{0}) = { f<sub>a</sub>(x, 0) | x ∈ [0,1] } = <b>{(x, ax) | x ∈ [0,1]}</b>, le segment de (0,0) à (1,a).</p>
+<p>(x, y) ∈ f<sub>a</sub>⁻¹(D) ⇔ f<sub>a</sub>(x, y) ∈ D ⇔ y + ax = ax ⇔ y = 0. Donc <b>f<sub>a</sub>⁻¹(D) = ℝ × {0}</b>.</p></div></div></details>
+
+<details><summary><span class="q"><b>E5 · Par morceaux, sans tableau de variations (annale 2023).</b> f(x) = x³ si x &lt; 0, x si 0 ≤ x &lt; 1, ln x si x ≥ 1. Injective ? Surjective ? f⁻¹({0}) et f⁻¹([0,1]).</span></summary><div class="in">
+<div class="copy"><span class="lbl">Corrigé</span>
+<p><b>Non injective :</b> f(1/2) = 1/2 et f(√e) = ln √e = 1/2, avec 1/2 ≠ √e.</p>
+<p><b>Surjective :</b> soit y ∈ ℝ. Si y &lt; 0 : x = ∛y &lt; 0 et f(x) = y. Si y ≥ 0 : x = eʸ ≥ 1 et f(x) = ln(eʸ) = y.</p>
+<p><b>f⁻¹({0})</b> : si x &lt; 0, x³ &lt; 0 ≠ 0. Si 0 ≤ x &lt; 1 : x = 0 convient. Si x ≥ 1 : ln x = 0 ⇔ x = 1. Donc <b>f⁻¹({0}) = {0, 1}</b>.</p>
+<p><b>f⁻¹([0,1])</b> : si x &lt; 0, f(x) &lt; 0, aucune solution. Si 0 ≤ x &lt; 1 : f(x) = x ∈ [0,1], tous conviennent. Si x ≥ 1 : 0 ≤ ln x ≤ 1 ⇔ 1 ≤ x ≤ e. Donc <b>f⁻¹([0,1]) = [0, 1[ ∪ [1, e] = [0, e]</b>.</p></div></div></details>
+
+<details><summary><span class="q"><b>E6 · Projection (annale 2020).</b> f : ℝ² → ℝ, f(x, y) = x. Injective ? f(ℝ²) ? f([0,1]×[0,1]) ? f⁻¹([−1,1]) ?</span></summary><div class="in">
+<div class="copy"><span class="lbl">Corrigé</span>
+<p><b>Non injective :</b> f(0, 0) = 0 = f(0, 1), alors que (0,0) ≠ (0,1).</p>
+<p><b>f(ℝ²) = ℝ :</b> f(ℝ²) ⊂ ℝ par définition, et pour x ∈ ℝ, x = f(x, 0). Donc f est <b>surjective</b>.</p>
+<p><b>f([0,1]²) = [0,1] :</b> si (x, y) ∈ [0,1]², f(x, y) = x ∈ [0,1] ; si x ∈ [0,1], x = f(x, 0) avec (x, 0) ∈ [0,1]².</p>
+<p><b>f⁻¹([−1,1]) :</b> (x, y) ∈ f⁻¹([−1,1]) ⇔ x ∈ [−1,1]. Donc f⁻¹([−1,1]) = [−1,1] × ℝ.</p></div></div></details>
+
+<details><summary><span class="q"><b>E7 · Relation d'équivalence et classes.</b> Sur ℝ : x R y ⇔ x² − x = y² − y. Montrer que R est d'équivalence, déterminer Cl(x), Cl(0), Cl(1/2).</span></summary><div class="in">
+<div class="copy"><span class="lbl">Corrigé</span>
+<p>On pose φ(x) = x² − x : x R y ⇔ φ(x) = φ(y).<br>
+<b>R :</b> φ(x) = φ(x). <b>S :</b> φ(x) = φ(y) ⇒ φ(y) = φ(x). <b>T :</b> φ(x) = φ(y) et φ(y) = φ(z) ⇒ φ(x) = φ(z). R est une relation d'équivalence.</p>
+<p><b>Classe :</b> y ∈ Cl(x) ⇔ y² − y = x² − x ⇔ y² − x² − (y − x) = 0 ⇔ (y − x)(y + x − 1) = 0 ⇔ y = x ou y = 1 − x.<br>
+Donc <b>Cl(x) = {x, 1 − x}</b>. Cl(0) = {0, 1}, Cl(1/2) = {1/2} (les deux solutions sont égales).</p></div></div></details>
+
+<details><summary><span class="q"><b>E8 · Étude complète d'une relation.</b> Sur ℝ : x R y ⇔ |x − y| ≤ 1. Réflexive ? symétrique ? antisymétrique ? transitive ?</span></summary><div class="in">
+<div class="copy"><span class="lbl">Corrigé</span>
+<p><b>Réflexive</b> <span class="ok">oui</span> : |x − x| = 0 ≤ 1.<br>
+<b>Symétrique</b> <span class="ok">oui</span> : |y − x| = |x − y| ≤ 1.<br>
+<b>Antisymétrique</b> <span class="no">non</span> : 0 R 1 et 1 R 0 (|0 − 1| = 1 ≤ 1), mais 0 ≠ 1.<br>
+<b>Transitive</b> <span class="no">non</span> : 0 R 1 et 1 R 2, mais |0 − 2| = 2 &gt; 1, donc on n'a pas 0 R 2.</p>
+<p>Ce n'est ni une relation d'ordre, ni une relation d'équivalence.</p></div></div></details>
+
+<details><summary><span class="q"><b>E9 · Relation avec un « ou » (annale 2024).</b> x R y ⇔ (max(|x|,|y|) ≤ 1 ou x = y). Équivalence ? Classes ?</span></summary><div class="in">
+<div class="copy"><span class="lbl">Corrigé</span>
+<p><b>R :</b> x = x, donc x R x. <b>S :</b> la définition est symétrique en x et y.</p>
+<p><b>T :</b> soient x R y et y R z. 4 cas :<br>
+1) x = y et y = z : x = z, donc x R z.<br>
+2) x = y et max(|y|,|z|) ≤ 1 : alors max(|x|,|z|) ≤ 1, donc x R z.<br>
+3) max(|x|,|y|) ≤ 1 et y = z : alors max(|x|,|z|) ≤ 1, donc x R z.<br>
+4) max(|x|,|y|) ≤ 1 et max(|y|,|z|) ≤ 1 : |x| ≤ 1 et |z| ≤ 1, donc x R z.</p>
+<p><b>Classes :</b> si |x| ≤ 1, Cl(x) = [−1, 1] ; si |x| &gt; 1, Cl(x) = {x}. Par exemple Cl(0) = [−1,1] et Cl(2) = {2}.</p>
+<p class="note">Version « x² + y² ≤ 1 ou x = y » : réflexive et symétrique, mais NON transitive (1 R 0 et 0 R 1/2, pourtant 1 + 1/4 &gt; 1 et 1 ≠ 1/2) et NON antisymétrique (−1 R 0 et 0 R −1).</p></div></div></details>
+
+<details><summary><span class="q"><b>E10 · Relation sur P(E) (annale 2024).</b> X R Y ⇔ X ∩ A = Y ∩ A. Équivalence ? Classe de X si A = ∅ ?</span></summary><div class="in">
+<div class="copy"><span class="lbl">Corrigé</span>
+<p>C'est « φ(X) = φ(Y) » avec φ(X) = X ∩ A, donc une relation d'équivalence (même rédaction que D10).</p>
+<p>Si A = ∅ : Y ∩ ∅ = ∅ = X ∩ ∅ pour tout Y, donc <b>Cl(X) = P(E)</b> : une seule classe.</p>
+<p class="note">Même schéma pour X ∪ A = Y ∪ A, Card X = Card Y, f(x) = f(y)…</p></div></div></details>
+
+<details><summary><span class="q"><b>E11 · Équipotence sur P({a,b,c}).</b> Lister P(E) et les classes pour « A R B ⇔ A et B équipotents ».</span></summary><div class="in">
+<div class="copy"><span class="lbl">Corrigé</span>
+<p>P(E) = {∅, {a}, {b}, {c}, {a,b}, {a,c}, {b,c}, {a,b,c}} : 2³ = 8 éléments.</p>
+<p>Deux parties finies sont équipotentes ⇔ elles ont le même cardinal. Les classes sont :<br>
+Cl(∅) = {∅}<br>Cl({a}) = {{a}, {b}, {c}}<br>Cl({a,b}) = {{a,b}, {a,c}, {b,c}}<br>Cl({a,b,c}) = {{a,b,c}}</p></div></div></details>
+
+<details><summary><span class="q"><b>E12 · Relation d'ordre.</b> Sur ℝ² : (x, y) ≼ (x′, y′) ⇔ x ≤ x′ et y ≤ y′. Ordre ?</span></summary><div class="in">
+<div class="copy"><span class="lbl">Corrigé</span>
+<p><b>R :</b> x ≤ x et y ≤ y.<br>
+<b>A :</b> si x ≤ x′, y ≤ y′, x′ ≤ x et y′ ≤ y, alors x = x′ et y = y′, donc (x, y) = (x′, y′).<br>
+<b>T :</b> x ≤ x′ ≤ x″ et y ≤ y′ ≤ y″ donnent x ≤ x″ et y ≤ y″.<br>
+C'est une relation d'ordre, mais pas totale : (0, 1) et (1, 0) ne sont pas comparables.</p></div></div></details>
+<label class="got"><input type="checkbox" data-k="exos"> J'ai lu</label>
+</section>
+
+<!-- ================= PIÈGES ================= -->
+<section id="pieges">
+<h2>Pièges qui coûtent des points</h2>
+<div class="card"><ol class="steps">
+<li><b>Contre-exemple sans valeurs.</b> « Pas injective car il y a un carré » = 0 point. Il faut écrire f(1) = f(−1) avec 1 ≠ −1.</li>
+<li><b>Antécédent hors du départ.</b> En surjectivité, vérifier que le x trouvé est bien dans E (√y exige y ≥ 0, x ≠ −1/2…).</li>
+<li><b>Écrire f⁻¹(y) quand f n'est pas bijective.</b> Écrire f⁻¹({y}), qui est un ensemble.</li>
+<li><b>Ordre de la composée.</b> g∘f : f d'abord, puis g.</li>
+<li><b>Une seule composée ne suffit pas.</b> g∘f = id seule ne donne pas f bijective : il faut aussi f∘g = id (sauf si g = f : f∘f = id suffit).</li>
+<li><b>Départ et arrivée comptent.</b> x ↦ x² n'est pas injective sur ℝ, mais elle est bijective de ℝ₊ dans ℝ₊.</li>
+<li><b>Équivalences fausses.</b> x² = 4 ⇔ x = 2 est FAUX (x = ±2). Avec des carrés, utiliser les valeurs absolues ou le signe.</li>
+<li><b>f(A ∩ B) = f(A) ∩ f(B) est faux en général</b> (seulement ⊂).</li>
+<li><b>Antisymétrique ≠ non symétrique.</b> Une relation peut être les deux (=) ou aucun des deux.</li>
+<li><b>« ou » dans une relation :</b> la transitivité demande de traiter tous les cas.</li>
+<li><b>Classe d'équivalence :</b> c'est un ensemble ; elle contient toujours x ; cas particuliers quand deux solutions coïncident (Cl(1/2) = {1/2}).</li>
+<li><b>Partition :</b> parties non vides. ℝ₊ et ℝ₋ ne forment pas une partition de ℝ (0 est dans les deux).</li>
+<li><b>Interdit d'utiliser l'analyse</b> quand c'est précisé (tableau de variations, lecture graphique) : encadrements et calculs uniquement.</li>
+<li><b>Vérifier que f est bien définie</b> (valeur interdite atteinte ?) avant de parler de bijection.</li>
+<li><b>« Ordre divise » :</b> c'est un ordre sur ℕ*, pas sur ℤ* (2 | −2 et −2 | 2, mais 2 ≠ −2).</li>
+</ol></div>
+<label class="got"><input type="checkbox" data-k="pieges"> J'ai lu</label>
+</section>
+
+<!-- ================= LOGIQUE ================= -->
+<section id="logique">
+<h2>Logique express</h2>
+<div class="card"><table>
+<tr><td>non(∀ x, P(x))</td><td>∃ x, non P(x)</td></tr>
+<tr><td>non(∃ x, P(x))</td><td>∀ x, non P(x)</td></tr>
+<tr><td>non(P et Q)</td><td>non P ou non Q</td></tr>
+<tr><td>non(P ou Q)</td><td>non P et non Q</td></tr>
+<tr><td>non(P ⇒ Q)</td><td>P et non Q</td></tr>
+<tr><td>Contraposée de P ⇒ Q</td><td><b>non Q ⇒ non P</b> (équivalente à P ⇒ Q)</td></tr>
+<tr><td>Réciproque de P ⇒ Q</td><td>Q ⇒ P (PAS équivalente)</td></tr>
+<tr><td>f non injective</td><td>∃ x, x′ ∈ E, x ≠ x′ et f(x) = f(x′)</td></tr>
+<tr><td>f non surjective</td><td>∃ y ∈ F, ∀ x ∈ E, f(x) ≠ y</td></tr>
+<tr><td>R non transitive</td><td>∃ x, y, z : x R y, y R z, mais pas x R z</td></tr>
+<tr><td>A \ B</td><td>{ x ∈ A | x ∉ B } = A ∩ Bᶜ</td></tr>
+<tr><td>(A ∪ B)ᶜ, (A ∩ B)ᶜ</td><td>Aᶜ ∩ Bᶜ, Aᶜ ∪ Bᶜ (lois de De Morgan)</td></tr>
+<tr><td>A ∩ (B ∪ C)</td><td>(A ∩ B) ∪ (A ∩ C)</td></tr>
+</table></div>
+<label class="got"><input type="checkbox" data-k="logique"> J'ai lu</label>
+</section>
+
+<!-- ================= JOUR J ================= -->
+<section id="jourj">
+<h2>Le jour J : plan de bataille</h2>
+<div class="card"><ol class="steps">
+<li><b>5 min : lire tout le sujet.</b> Le barème dépasse souvent 20 : pas besoin de tout faire.</li>
+<li><b>Prendre d'abord les points faciles :</b> contre-exemples, f∘f, réflexivité/symétrie, définitions (« donner la définition de… »).</li>
+<li><b>Annoncer, puis conclure, chaque réponse :</b> « Montrons que f est injective. … Donc f est injective. »</li>
+<li><b>Toujours introduire les objets :</b> « Soit x ∈ E », « Soient x, x′ ∈ E tels que… ».</li>
+<li><b>Bloqué ?</b> Admettre le résultat de la question et passer à la suite : « D'après 1(a) (admise)… ».</li>
+<li><b>Les questions « En déduire »</b> utilisent presque toujours la question juste au-dessus : cherche le lien.</li>
+<li><b>10 min de relecture :</b> quantificateurs, ensembles de départ, conclusions écrites.</li>
+</ol></div>
+<label class="got"><input type="checkbox" data-k="jourj"> J'ai lu</label>
+<a class="top" href="#">↑ Revenir en haut</a>
+</section>
+
+</div>
+<script>
+(function(){
+  var P='partiel-algebre:';
+  function get(k){try{return localStorage.getItem(P+k)==='1'}catch(e){return false}}
+  function set(k,v){try{localStorage.setItem(P+k,v?'1':'0')}catch(e){}}
+  function paint(k,on){
+    var a=document.querySelector('#chips a[href="#'+k+'"]'); if(a) a.classList.toggle('done',on);
+  }
+  document.querySelectorAll('.got input').forEach(function(cb){
+    var k=cb.dataset.k, on=get(k); cb.checked=on; cb.parentNode.classList.toggle('on',on); paint(k,on);
+    cb.addEventListener('change',function(){set(k,cb.checked);cb.parentNode.classList.toggle('on',cb.checked);paint(k,cb.checked)});
+  });
+})();
+</script>
+</body>
+</html>
