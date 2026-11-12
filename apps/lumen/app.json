@@ -1,0 +1,9 @@
+{
+  "name": "Lumen",
+  "emoji": "✨",
+  "colors": ["#26123f", "#f7a05c"],
+  "category": "Jeux",
+  "added": "2026-11-12",
+  "description": "Guide une orbe de lumière d'île en île et allume les braseros",
+  "icon": "icon.svg"
+}

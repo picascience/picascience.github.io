@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#2b1d4a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Lumen" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icon-180.png" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <title>Lumen</title>
+  <script type="module" crossorigin src="./assets/index-BsqjfFqk.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-B_H-Ia3q.css">
+</head>
+<body>
+  <canvas id="c"></canvas>
+
+  <!-- HUD : aucune lettre en jeu, seulement des pastilles et deux icônes -->
+  <div id="hud" class="hidden">
+    <button id="home" class="icon" aria-label="Menu">
+      <svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5M7 10v8.5h10V10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div id="dots"></div>
+    <button id="mute" class="icon" aria-label="Son">
+      <svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z" fill="currentColor"/><path class="wave" d="M15.5 9.2a4 4 0 0 1 0 5.6M18 7a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path class="cross" d="m16 9.5 5 5m0-5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+    <div id="shards"></div>
+  </div>
+  <div id="stick"><div id="knob"></div></div>
+
+  <!-- Menu -->
+  <div id="menu" class="enter">
+    <h1 id="title" aria-label="Lumen">LUMEN</h1>
+    <div class="menuBottom">
+      <button id="play" class="btn">Jouer</button>
+      <div id="picker" class="hidden">
+        <button id="prev" class="icon small" aria-label="Île précédente"><svg viewBox="0 0 24 24"><path d="m14.5 6-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span id="pickLabel">Île 1</span>
+        <button id="next" class="icon small" aria-label="Île suivante"><svg viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div id="record"></div>
+    </div>
+  </div>
+
+  <!-- Iris lumineux (transitions) -->
+  <div id="iris" class="off"></div>
+  <div id="irisText"><div id="irisLabel"></div><div id="irisSub"></div></div>
+
+  <!-- Écran de démarrage (le temps que Three.js se charge) -->
+  <div id="boot"><div class="bootOrb"></div></div>
+
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "Lumen",
+  "short_name": "Lumen",
+  "description": "Guide une orbe de lumière à travers des îles flottantes au crépuscule.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#2b1d4a",
+  "theme_color": "#2b1d4a",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
