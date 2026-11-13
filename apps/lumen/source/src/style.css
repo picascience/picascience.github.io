@@ -14,9 +14,9 @@ html, body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
   -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent; touch-action: none; overscroll-behavior: none;
-  position: fixed; inset: 0;
+  position: fixed; top: 0; left: 0; right: 0; height: var(--app-h, 100%);
 }
-canvas#c { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; display: block; touch-action: none; }
+canvas#c { position: fixed; top: 0; left: 0; width: 100vw; height: var(--app-h, 100dvh); display: block; touch-action: none; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 .hidden { opacity: 0 !important; pointer-events: none !important; }
 
@@ -44,7 +44,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .icon.off { opacity: .2; pointer-events: none; }
 
 /* ---------- HUD ---------- */
-#hud { position: fixed; inset: 0; pointer-events: none; transition: opacity .5s; }
+#hud { position: fixed; top: 0; left: 0; right: 0; height: var(--app-h, 100%); pointer-events: none; transition: opacity .5s; }
 #hud .icon { position: absolute; top: calc(var(--st) + 10px); pointer-events: auto; }
 #home { left: 14px; }
 #mute { right: 14px; }
@@ -71,7 +71,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 /* ---------- Menu ---------- */
 #menu {
-  position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  position: fixed; top: 0; left: 0; right: 0; height: var(--app-h, 100%); display: flex; flex-direction: column; align-items: center; justify-content: space-between;
   padding: calc(var(--st) + 16vh) 0 calc(var(--sb) + 44px + 30px); transition: opacity .6s;
   background: radial-gradient(120% 60% at 50% 30%, rgba(40,20,70,.0), rgba(30,15,55,.35));
 }
@@ -96,7 +96,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .gemcount { display: inline-flex; align-items: center; gap: 8px; }
 
 /* ---------- Iris lumineux ---------- */
-#iris { position: fixed; inset: 0; pointer-events: none; z-index: 20;
+#iris { position: fixed; top: 0; left: 0; right: 0; height: var(--app-h, 100%); pointer-events: none; z-index: 20;
   background: radial-gradient(circle at var(--x, 50%) var(--y, 50%),
     transparent 0, transparent var(--r, 2000px),
     rgba(255,244,214,.95) calc(var(--r, 2000px) + 1px),
@@ -110,7 +110,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 #irisSub { margin-top: 10px; font-size: 12px; letter-spacing: .28em; text-transform: uppercase; opacity: .7; }
 
 /* ---------- Démarrage ---------- */
-#boot { position: fixed; inset: 0; display: grid; place-items: center; background: #2b1d4a; z-index: 30; transition: opacity .6s; }
+#boot { position: fixed; top: 0; left: 0; right: 0; height: var(--app-h, 100%); display: grid; place-items: center; background: #2b1d4a; z-index: 30; transition: opacity .6s; }
 #boot.done { opacity: 0; pointer-events: none; }
 .bootOrb { width: 18px; height: 18px; border-radius: 50%; background: #fff3d6; box-shadow: 0 0 20px 6px rgba(255,190,110,.7); animation: boot 1.2s ease-in-out infinite; }
 @keyframes boot { 50% { transform: scale(1.35); box-shadow: 0 0 34px 10px rgba(255,190,110,.9); } }

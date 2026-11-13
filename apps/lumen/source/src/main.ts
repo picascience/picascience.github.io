@@ -269,7 +269,29 @@ function completeIsland() {
   transition(() => { loadIsland(next); }, `Île ${next}`, sub);
 }
 
-function resize() { scene.resize(window.innerWidth, window.innerHeight); }
+/**
+ * iOS 26, appli ajoutée à l'écran d'accueil : la fenêtre annonce une hauteur trop courte
+ * (elle s'arrête au-dessus de la barre d'accueil → bande vide en bas). On prend alors la
+ * hauteur physique de l'écran.
+ */
+function appHeight() {
+  const standalone = (navigator as any).standalone === true || matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches;
+  const top = window.top === window;
+  const portrait = window.innerHeight >= window.innerWidth;
+  const screenH = portrait ? Math.max(screen.width, screen.height) : Math.min(screen.width, screen.height);
+  return standalone && top ? Math.max(window.innerHeight, screenH) : window.innerHeight;
+}
+function resize() {
+  const h = appHeight();
+  document.documentElement.style.setProperty('--app-h', `${h}px`);
+  // Valeur de la zone sûre en pixels (utile au geste du panneau de debug)
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;top:0;height:env(safe-area-inset-top,0px);visibility:hidden';
+  document.body.appendChild(probe);
+  document.documentElement.style.setProperty('--st-px', String(probe.offsetHeight));
+  probe.remove();
+  scene.resize(window.innerWidth, h);
+}
 window.addEventListener('resize', resize);
 resize();
 

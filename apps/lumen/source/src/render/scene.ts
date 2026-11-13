@@ -346,7 +346,7 @@ export class Scene3D {
   toScreen(out: { x: number; y: number }, wx: number, wy: number, wz: number) {
     _v.set(wx, wy, wz).project(this.camera);
     out.x = (_v.x * 0.5 + 0.5) * window.innerWidth;
-    out.y = (-_v.y * 0.5 + 0.5) * window.innerHeight;
+    out.y = (-_v.y * 0.5 + 0.5) * this.renderer.domElement.clientHeight;
   }
 
   render() { this.renderer.info.reset(); this.post.render(); }
