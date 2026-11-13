@@ -51,8 +51,8 @@ summary{font-weight:600;cursor:pointer}
 </head>
 <body>
 <main>
-<h1>Compta Fi · Module 3</h1>
-<p class="sub">Dépense, charge, investissement · Résultat et flux · Mesure du résultat</p>
+<h1>Compta Fi</h1>
+<p class="sub">L1 Dauphine · Comprendre les états financiers · Modules 1 à 3</p>
 <nav>
 <button data-v="quiz" class="on">QCM</button>
 <button data-v="fiche">Fiche express</button>
@@ -60,6 +60,43 @@ summary{font-weight:600;cursor:pointer}
 </nav>
 <section id="quiz"></section>
 <section id="fiche" hidden>
+<div class="card">
+<span class="tag">Modules 1 et 2 en bref</span>
+<details><summary>Module 1 · Le circuit financier</summary>
+<p>L'entreprise collecte des <b>fonds propres</b> (actionnaires) et des <b>emprunts</b> (banques) pour acheter des <b>actifs</b>. Fonds propres + emprunts = actifs, car l'argent non utilisé reste en trésorerie, qui est un actif.</p>
+<div class="wrap"><table>
+<tr><td>Chiffre d'affaires</td><td class="n">414</td></tr>
+<tr><td>Salaires et autres charges d'exploitation (180 + 200)</td><td class="n">−380</td></tr>
+<tr><th>Résultat d'exploitation</th><th class="n">34</th></tr>
+<tr><td>Intérêt : 80 × 5 %</td><td class="n">−4</td></tr>
+<tr><th>Résultat imposable</th><th class="n">30</th></tr>
+<tr><td>Impôt : 30 %</td><td class="n">−9</td></tr>
+<tr><th>Résultat net</th><th class="n">21</th></tr>
+</table></div>
+<p>L'ordre compte : banque (intérêt), puis État (impôt), puis actionnaire (résultat net).</p>
+<div class="wrap"><table>
+<tr><th></th><th>Fonds propres</th><th>Emprunt</th></tr>
+<tr><td>Contrôle des décisions</td><td>Oui</td><td>Non</td></tr>
+<tr><td>Remboursement</td><td>Jamais exigible</td><td>À l'échéance</td></tr>
+<tr><td>Rémunération</td><td>Résultat net, variable</td><td>Intérêt, fixe</td></tr>
+</table></div>
+<p><b>Rentabilité financière</b> = résultat net / capitaux propres : 21 / 120 = 17,5 %. <b>Profitabilité</b> = résultat net / chiffre d'affaires.</p>
+<p>Avec 180 de fonds propres et 20 d'emprunt, le résultat net monte à 23,1 mais la rentabilité tombe à 12,8 %. L'emprunt peut améliorer ou dégrader la rentabilité selon le résultat d'exploitation.</p>
+<p><b>Réserves</b> : résultat net non distribué, assimilé à un apport en fonds propres. <b>Dividende</b> : part distribuée.</p>
+</details>
+<details><summary>Module 2 · Les états financiers</summary>
+<p><b>Bilan</b> : photo à une date. Actifs à gauche, classés par liquidité croissante. Capitaux propres et passifs à droite, classés par exigibilité croissante. Les deux totaux sont égaux.</p>
+<div class="wrap"><table>
+<tr><th>Actifs</th><th>Capitaux propres et passifs</th></tr>
+<tr><td>Immobilisations incorporelles (brevets, marques achetées), corporelles (terrains, constructions, matériels), financières (prêts, participations)</td><td>Capitaux propres : capital, réserves, résultat net</td></tr>
+<tr><td>Actifs circulants : stocks, clients, acomptes versés, trésorerie</td><td>Passifs : emprunts, fournisseurs, acomptes reçus, dettes envers l'État, dividendes à payer</td></tr>
+</table></div>
+<p>Une incorporelle créée en interne ne figure pas au bilan.</p>
+<p><b>Liquidité</b> : les actifs liquides couvrent-ils les dettes à court terme ? <b>Solvabilité</b> : la vente de tous les actifs rembourserait-elle tous les passifs ? Insolvable = capitaux propres négatifs.</p>
+<p><b>Compte de résultat</b> : compteur des produits et charges, remis à zéro chaque année. En colonnes, charges à gauche, produits à droite ; un bénéfice s'inscrit à gauche.</p>
+<p><b>État des flux</b> : exploitation + investissement + financement = variation de trésorerie. Exemple Risol : 200 + (−420 + 80) + (180 − 35) = +5, donc trésorerie de 50 à 55.</p>
+</details>
+</div>
 
 <div class="card">
 <span class="tag">L'idée en 3 phrases</span>
@@ -206,9 +243,53 @@ summary{font-weight:600;cursor:pointer}
 
 <script>
 const K='compta-fi:';
-const T={dc:'Dépense / charge',rp:'Recette / produit',rf:'Résultat et flux',mr:'Mesure du résultat',td:'Cas de TD'};
+const T={cf:'Circuit financier',fi:'Financement et rentabilité',bi:'Bilan',cr:'Résultat et flux de l\'année',dc:'Dépense / charge',rp:'Recette / produit',rf:'Résultat et flux',mr:'Mesure du résultat',td:'Cas de TD'};
+const M={cf:1,fi:1,bi:2,cr:2,dc:3,rp:3,rf:3,mr:3,td:3};
 // a: première réponse = la bonne (mélangée à l'affichage)
 const Q=[
+{t:'cf',q:'De combien de sources de financement une entreprise dispose-t-elle fondamentalement ?',a:['Deux : les fonds propres et les emprunts','Une seule : son chiffre d\'affaires','Trois : fonds propres, emprunts et impôts','Deux : les ventes et les subventions'],e:'Les actionnaires apportent les fonds propres, les banques les emprunts. Le chiffre d\'affaires est un revenu, pas un financement.'},
+{t:'cf',q:'Pourquoi fonds propres + emprunts = total des actifs ?',a:['Tous les fonds sont affectés à des actifs ; ce qui n\'est pas dépensé reste en trésorerie, qui est un actif','Parce que la loi oblige à équilibrer les comptes','Parce que les actifs sont évalués pour tomber juste','Ce n\'est vrai que si l\'entreprise fait un bénéfice'],e:'Il n\'y a pas de fonds propres ou d\'emprunt qui ne soit pas affecté à un actif. C\'est la question 2 du test blanc du module 1.'},
+{t:'cf',q:'Le résultat d\'exploitation, c\'est…',a:['Le chiffre d\'affaires moins les charges d\'exploitation','Le chiffre d\'affaires moins les impôts','Le résultat net moins les intérêts','Les fonds propres moins les emprunts'],e:'C\'est le résultat de l\'activité courante, avant intérêt et impôt.'},
+{t:'cf',q:'Dans quel ordre le résultat d\'exploitation est-il utilisé ?',a:['Intérêt, puis impôt, puis actionnaire','Impôt, puis intérêt, puis actionnaire','Actionnaire, puis intérêt, puis impôt','Remboursement de l\'emprunt, puis impôt'],e:'L\'entreprise ne peut rien faire du résultat d\'exploitation tant qu\'elle n\'a pas payé l\'intérêt. L\'impôt vient ensuite, le reste est le résultat net.'},
+{t:'cf',q:'Le résultat imposable se calcule ainsi :',a:['Résultat d\'exploitation − intérêt','Chiffre d\'affaires − intérêt','Résultat d\'exploitation − impôt','Résultat net + dividendes'],e:'On applique ensuite le taux d\'imposition à ce résultat imposable.'},
+{t:'cf',q:'Résultat d\'exploitation 34, emprunt de 80 à 5 %, impôt à 30 %. Résultat net ?',a:['21','23,8','30','19,8'],e:'Intérêt 4, résultat imposable 30, impôt 9, résultat net 21. Le piège 23,8 calcule l\'impôt avant de retirer l\'intérêt.'},
+{t:'cf',q:'Maccina : chiffre d\'affaires 250 000, charges d\'exploitation 160 000 et 60 000, emprunt 50 000 à 10 %, impôt 30 %. Résultat net ?',a:['17 500 €','21 000 €','25 000 €','16 000 €'],e:'Résultat d\'exploitation 30 000, intérêt 5 000, impôt 30 % × 25 000 = 7 500, résultat net 17 500.'},
+{t:'cf',q:'La trésorerie de l\'entreprise est…',a:['Un actif à part entière','Un financement','Un élément des fonds propres','Un produit'],e:'Ce sont les fonds propres ou empruntés qui n\'ont pas encore été utilisés pour acquérir un autre actif.'},
+{t:'cf',q:'Une créance sur un client est…',a:['Un actif circulant','Une immobilisation','Une dette','Une charge'],e:'Le client a été livré mais n\'a pas payé. Elle résulte de l\'activité courante.'},
+{t:'cf',q:'Les bâtiments, matériels et équipements sont appelés…',a:['Immobilisations','Actifs circulants','Charges d\'exploitation','Fonds propres'],e:'Ce sont les actifs d\'infrastructure, nécessaires pour produire. Stocks, créances et trésorerie sont les actifs circulants.'},
+{t:'fi',q:'La rémunération de la banque (l\'intérêt)…',a:['Est fixée dès l\'octroi du prêt et ne dépend pas des performances','Dépend du résultat d\'exploitation','Est décidée en assemblée générale','Est égale au résultat net'],e:'La banque ne contrôle pas les décisions : en contrepartie, sa rémunération est fixe et le prêt a une échéance.'},
+{t:'fi',q:'Les fonds propres apportés par les actionnaires…',a:['Ne sont jamais exigibles : l\'entreprise n\'a pas à les rembourser','Doivent être remboursés à l\'échéance','Sont rémunérés par un intérêt fixe','Appartiennent à la banque'],e:'L\'actionnaire qui veut sortir doit trouver quelqu\'un pour racheter ses titres.'},
+{t:'fi',q:'Les réserves sont…',a:['La part du résultat net non distribuée, assimilée à un apport en fonds propres','De l\'argent bloqué sur un compte bancaire','Une dette envers les actionnaires','La trésorerie de précaution'],e:'Laisser le résultat dans l\'entreprise revient à apporter des fonds propres, sans le coût fiscal d\'un dividende suivi d\'une augmentation de capital.'},
+{t:'fi',q:'La rémunération de l\'actionnaire, c\'est…',a:['Le résultat net en totalité, distribué ou non','Uniquement le dividende','L\'intérêt','Le résultat d\'exploitation'],e:'Le dividende n\'est que la partie distribuée ; le reste part en réserves mais revient aussi à l\'actionnaire.'},
+{t:'fi',q:'La rentabilité financière se calcule par…',a:['Résultat net / capitaux propres','Résultat net / chiffre d\'affaires','Résultat d\'exploitation / total des actifs','Dividende / résultat net'],e:'Résultat net / chiffre d\'affaires, c\'est la profitabilité.'},
+{t:'fi',q:'Résultat net 21, fonds propres 120, emprunt 80. Rentabilité financière ?',a:['17,5 %','10,5 %','26,3 %','5,1 %'],e:'21 / 120. On rapporte le résultat aux seuls fonds propres, pas au total des actifs (200).'},
+{t:'fi',q:'Même activité financée par 180 de fonds propres et 20 d\'emprunt : résultat net 23,1 au lieu de 21. La rentabilité…',a:['Baisse à 12,8 %','Monte car le résultat net est plus élevé','Reste à 17,5 %','Monte à 23,1 %'],e:'23,1 / 180 = 12,8 %. Plus de résultat net ne veut pas dire plus rentable.'},
+{t:'fi',q:'L\'emprunt, pour la rentabilité financière…',a:['Peut l\'améliorer ou la dégrader selon le résultat d\'exploitation','L\'améliore toujours','La dégrade toujours','N\'a aucun effet'],e:'Avec un résultat d\'exploitation élevé (150 dans la vidéo) l\'emprunt l\'améliore ; avec un résultat faible (50) il la dégrade.'},
+{t:'fi',q:'Maccina : résultat net 17 500 avec emprunt de 50 000 à 10 %, 21 000 sans emprunt. Coût effectif de l\'emprunt ?',a:['7 %','10 %','3,5 %','17,5 %'],e:'(21 000 − 17 500) / 50 000 = 7 %. L\'intérêt réduit le résultat imposable, donc l\'impôt.'},
+{t:'bi',q:'Le bilan est…',a:['Une photographie des actifs, capitaux propres et passifs à une date donnée','Un compteur des produits et charges de l\'année','La liste des encaissements et décaissements','Le détail du chiffre d\'affaires'],e:'C\'est une information statique : il dit ce qu\'il en est, pas ce qui s\'est passé.'},
+{t:'bi',q:'Au bilan, les actifs sont classés par…',a:['Liquidité croissante','Exigibilité croissante','Montant décroissant','Date d\'acquisition'],e:'Les immobilisations d\'abord, la trésorerie en dernier.'},
+{t:'bi',q:'Au bilan, les capitaux propres et passifs sont classés par…',a:['Exigibilité croissante','Liquidité croissante','Ordre alphabétique','Taux d\'intérêt'],e:'Les capitaux propres, jamais exigibles, en premier ; les dettes d\'exploitation en dernier.'},
+{t:'bi',q:'Où figure le résultat net de l\'exercice au bilan ?',a:['Dans les capitaux propres','Dans les dettes','Dans la trésorerie','Il ne figure pas au bilan'],e:'Il mesure la richesse créée pour l\'actionnaire. Tant qu\'il n\'est pas affecté, il apparaît dans les capitaux propres.'},
+{t:'bi',q:'Un acompte reçu d\'un client est…',a:['Un passif','Un actif circulant','Un produit','Un élément des capitaux propres'],e:'Tant que l\'entreprise n\'a pas livré, elle a une dette envers son client.'},
+{t:'bi',q:'Un acompte versé à un fournisseur est…',a:['Un actif circulant','Un passif','Une charge','Une immobilisation'],e:'Tant que le fournisseur n\'a pas livré, l\'entreprise a une créance sur lui.'},
+{t:'bi',q:'Les dividendes à payer sont…',a:['Un passif','Des capitaux propres','Un actif circulant','Une charge'],e:'Une fois la distribution décidée, le résultat devient une dette envers les actionnaires.'},
+{t:'bi',q:'Une marque créée par l\'entreprise elle-même…',a:['Ne figure pas au bilan','Figure en immobilisation incorporelle','Figure en immobilisation financière','Figure dans les capitaux propres'],e:'On n\'est sûr ni de son existence ni de sa valeur. Seules les incorporelles acquises figurent au bilan.'},
+{t:'bi',q:'Des actions d\'une autre entreprise détenues durablement sont…',a:['Des immobilisations financières','Des immobilisations incorporelles','Des capitaux propres','De la trésorerie'],e:'Les immobilisations financières regroupent les prêts accordés et les participations.'},
+{t:'bi',q:'Une entreprise est insolvable quand…',a:['La valeur de ses actifs est inférieure à ses passifs','Elle n\'a plus de trésorerie ce mois-ci','Elle a trop de stocks','Son résultat de l\'année est négatif'],e:'Ses capitaux propres sont alors négatifs, souvent après des pertes accumulées. Manquer de trésorerie à court terme, c\'est un problème de liquidité.'},
+{t:'bi',q:'Une entreprise peut-elle être solvable mais illiquide ?',a:['Oui : assez d\'actifs au total, mais pas assez d\'actifs liquides pour une échéance','Non, les deux notions sont identiques','Non, une entreprise solvable a toujours de la trésorerie','Oui, mais seulement si elle n\'a aucun emprunt'],e:'Par exemple si elle a financé des immobilisations avec des ressources à court terme.'},
+{t:'bi',q:'Fangeat : actifs 3 800, passifs 2 200, réserves 600, pas encore de résultat. Capital ?',a:['1 000','1 600','2 800','600'],e:'Capitaux propres = 3 800 − 2 200 = 1 600, dont 600 de réserves : capital 1 000.'},
+{t:'bi',q:'Labis : capital 40, réserves 136, résultat net 8, emprunt 230. Capitaux propres ?',a:['184','176','414','48'],e:'Capital + réserves + résultat net. L\'emprunt est un passif.'},
+{t:'cr',q:'Le compte de résultat sert surtout à…',a:['Expliquer d\'où vient le résultat net','Connaître la trésorerie disponible','Lister les actifs de l\'entreprise','Calculer le capital'],e:'Le résultat figure déjà au bilan ; le compte de résultat permet de comprendre pourquoi il est ce qu\'il est.'},
+{t:'cr',q:'En début d\'année, le compte de résultat…',a:['Est remis à zéro','Reprend les totaux de l\'année précédente','Reprend le résultat de l\'an passé','Reprend la trésorerie'],e:'C\'est un compteur de la période. Le bilan, lui, se poursuit d\'une année sur l\'autre.'},
+{t:'cr',q:'Dans un compte de résultat en colonnes, un bénéfice apparaît…',a:['À gauche, du côté des charges','À droite, du côté des produits','Sous le tableau, hors colonnes','Des deux côtés'],e:'Convention pour que les totaux des deux colonnes soient égaux. Une perte s\'inscrit à droite.'},
+{t:'cr',q:'Allegro : ventes 2 432, marchandises vendues achetées 1 685, autres charges d\'exploitation 678. Résultat d\'exploitation ?',a:['69','747','40','28'],e:'2 432 − 1 685 − 678 = 69. Après 29 d\'intérêts et 30 % d\'impôt, le résultat net est de 28.'},
+{t:'cr',q:'Le bénéfice réalisé en revendant une immobilisation est un produit…',a:['Exceptionnel','D\'exploitation','Financier','Ce n\'est pas un produit'],e:'Céder des immobilisations n\'est pas l\'activité première de l\'entreprise.'},
+{t:'cr',q:'L\'état des flux comprend trois parties :',a:['Exploitation, investissement, financement','Actif, passif, capitaux propres','Produits, charges, résultat','Caisse, banque, placements'],e:'La somme des trois flux donne la variation de trésorerie de la période.'},
+{t:'cr',q:'Le versement de dividendes est un flux…',a:['De financement','D\'exploitation','D\'investissement','Ce n\'est pas un flux'],e:'Comme les emprunts nouveaux, les remboursements et les augmentations de capital.'},
+{t:'cr',q:'La cession d\'un ancien équipement est un flux…',a:['D\'investissement, positif','D\'exploitation, positif','De financement, positif','D\'investissement, négatif'],e:'Les flux d\'investissement confrontent les immobilisations acquises et cédées. Une cession est un encaissement.'},
+{t:'cr',q:'Risol : flux d\'exploitation 200, achat d\'équipements 420, cession 80, emprunt 180, dividendes 35. Flux net ?',a:['+5','+40','−155','+165'],e:'200 + (−420 + 80) + (180 − 35) = 5. Avec 50 de trésorerie initiale, la trésorerie finale est de 55.'},
+{t:'cr',q:'La trésorerie finale est égale à…',a:['La trésorerie initiale + la somme des trois flux','Le résultat net de l\'année','Le chiffre d\'affaires − les charges','Les capitaux propres − les dettes'],e:'Trésorerie initiale + flux d\'exploitation + flux d\'investissement + flux de financement.'},
+{t:'cr',q:'Peut-on avoir une trésorerie en hausse et un résultat négatif sur la même période ?',a:['Oui : par exemple grâce à un emprunt ou une augmentation de capital','Non, jamais','Oui, mais seulement sans amortissement','Non, sauf erreur comptable'],e:'Le résultat confronte produits et charges, la trésorerie encaissements et décaissements. C\'est la question 3 du test blanc du module 2.'},
 {t:'dc',q:'Une charge, c\'est…',a:['Un appauvrissement : une diminution des capitaux propres','Une sortie d\'argent de la trésorerie','Toute facture reçue d\'un fournisseur','Une dette envers un tiers'],e:'Le cours définit la charge par l\'appauvrissement. La sortie d\'argent, c\'est la dépense.'},
 {t:'dc',q:'Une dépense, c\'est…',a:['Un décaissement : une sortie de trésorerie','Un appauvrissement de l\'actionnaire','Une diminution du résultat','Une perte de valeur d\'un actif'],e:'Dépense = décaissement, rien de plus. On peut dépenser sans s\'appauvrir.'},
 {t:'dc',q:'Payer une facture d\'électricité de 15, c\'est…',a:['Une dépense et une charge','Une dépense mais pas une charge','Une charge mais pas une dépense','Ni une dépense ni une charge'],e:'Il y a décaissement (dépense) et on ne reçoit rien de stockable ou cessible en échange : on s\'appauvrit (charge).'},
@@ -255,31 +336,39 @@ const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+
 function load(k,d){try{return JSON.parse(localStorage.getItem(K+k))??d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(K+k,JSON.stringify(v))}catch(e){}}
 let wrong=new Set(load('wrong',[])), seen=new Set(load('seen',[]));
-let theme='all', run=null;
+let theme='all', run=null, mod=load('mod',3);
+// les questions des modules 1 et 2 ont été ajoutées en tête : anciens index décalés
+if(load('v',1)<2){wrong=new Set();seen=new Set();save('wrong',[]);save('seen',[]);save('v',2)}
+const inMod=i=>mod===0||M[Q[i].t]===mod;
 
 function home(){
-  const pool=Q.map((_,i)=>i).filter(i=>theme==='all'||Q[i].t===theme);
+  const mpool=Q.map((_,i)=>i).filter(inMod);
+  const pool=mpool.filter(i=>theme==='all'||Q[i].t===theme);
   const w=[...wrong].filter(i=>i<Q.length);
   $('#quiz').innerHTML=`
+  <div class="row" style="margin:0 0 4px">
+    ${[[1,'Module 1'],[2,'Module 2'],[3,'Module 3'],[0,'Tout']].map(([k,v])=>`<button class="chip ${mod===k?'on':''}" data-m="${k}">${v}</button>`).join('')}
+  </div>
   <div class="card">
     <span class="tag">Comme en TD</span>
-    <p>3 questions tirées au hasard, correction expliquée après chaque réponse.</p>
+    <p>3 questions tirées au hasard${mod?' dans le module '+mod:''}, correction expliquée après chaque réponse.</p>
     <button class="big" id="b3">Test éclair · 3 questions</button>
   </div>
   <div class="card">
     <span class="tag">S'entraîner par thème</span>
     <div class="row" style="margin:10px 0">
       <button class="chip ${theme==='all'?'on':''}" data-t="all">Tout</button>
-      ${Object.entries(T).map(([k,v])=>`<button class="chip ${theme===k?'on':''}" data-t="${k}">${v}</button>`).join('')}
+      ${Object.entries(T).filter(([k])=>mod===0||M[k]===mod).map(([k,v])=>`<button class="chip ${theme===k?'on':''}" data-t="${k}">${v}</button>`).join('')}
     </div>
     <button class="big alt" id="ball">Série complète · ${pool.length} questions</button>
     <button class="big alt" id="bw" ${w.length?'':'disabled'}>Refaire mes erreurs · ${w.length}</button>
     <p class="sub">${seen.size} question${seen.size>1?'s':''} vue${seen.size>1?'s':''} sur ${Q.length}</p>
   </div>`;
-  $('#b3').onclick=()=>start(sh(Q.map((_,i)=>i)).slice(0,3));
+  $('#b3').onclick=()=>start(sh(mpool).slice(0,3));
   $('#ball').onclick=()=>start(sh(pool));
   $('#bw').onclick=()=>start(sh(w));
-  document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{theme=c.dataset.t;home()});
+  document.querySelectorAll('.chip[data-t]').forEach(c=>c.onclick=()=>{theme=c.dataset.t;home()});
+  document.querySelectorAll('.chip[data-m]').forEach(c=>c.onclick=()=>{mod=+c.dataset.m;theme='all';save('mod',mod);home()});
 }
 function start(ids){run={ids,n:0,ok:0};show()}
 function show(){
@@ -307,7 +396,7 @@ function end(){
   $('#quiz').innerHTML=`<div class="card"><span class="tag">Résultat</span><div class="score">${run.ok} / ${t}</div>
   <p style="text-align:center">${run.ok===t?'Sans faute.':run.ok>=t*0.66?'Presque : relis les explications des questions ratées.':'Relis la fiche express puis refais tes erreurs.'}</p>
   <button class="big" id="again">Nouveau test éclair</button><button class="big alt" id="back">Retour</button></div>`;
-  $('#again').onclick=()=>start(sh(Q.map((_,i)=>i)).slice(0,3));
+  $('#again').onclick=()=>start(sh(Q.map((_,i)=>i).filter(inMod)).slice(0,3));
   $('#back').onclick=home;
 }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
