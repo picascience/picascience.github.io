@@ -1,7 +1,20 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-12T22:33:10.065Z",
+  "generated": "2026-11-13T07:17:15.052Z",
   "apps": [
+    {
+      "name": "Compta Fi",
+      "emoji": "📊",
+      "colors": [
+        "#042f2e",
+        "#14b8a6"
+      ],
+      "category": "Dauphine",
+      "added": "2026-11-13",
+      "description": "QCM, fiche express et cas chiffrés de comptabilité financière (L1 Dauphine)",
+      "icon": "apps/compta-fi/icon.svg",
+      "id": "compta-fi"
+    },
     {
       "name": "Jannah",
       "emoji": "🗝️",

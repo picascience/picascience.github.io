@@ -1,0 +1,9 @@
+{
+  "name": "Compta Fi",
+  "emoji": "📊",
+  "colors": ["#042f2e", "#14b8a6"],
+  "category": "Dauphine",
+  "added": "2026-11-13",
+  "description": "QCM, fiche express et cas chiffrés de comptabilité financière (L1 Dauphine)",
+  "icon": "icon.svg"
+}

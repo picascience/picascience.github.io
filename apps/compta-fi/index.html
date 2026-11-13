@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Compta Fi</title>
+<style>
+:root{--bg:#f4f6f5;--card:#fff;--ink:#12211c;--mut:#5b6b65;--line:#dde4e1;--acc:#0f766e;--acc2:#115e59;--ok:#15803d;--okbg:#dcfce7;--ko:#b91c1c;--kobg:#fee2e2;--warn:#92400e;--warnbg:#fef3c7}
+@media (prefers-color-scheme:dark){:root{--bg:#0c1513;--card:#15211e;--ink:#e8f1ee;--mut:#94a8a1;--line:#263632;--acc:#2dd4bf;--acc2:#5eead4;--ok:#4ade80;--okbg:#12351f;--ko:#f87171;--kobg:#3b1414;--warn:#fbbf24;--warnbg:#3a2a08}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:calc(env(safe-area-inset-top) + 12px) calc(env(safe-area-inset-right) + 16px) calc(env(safe-area-inset-bottom) + 48px) calc(env(safe-area-inset-left) + 16px)}
+main{max-width:640px;margin:0 auto}
+h1{font-size:22px;margin:4px 0 2px}
+h2{font-size:18px;margin:22px 0 8px}
+h3{font-size:16px;margin:16px 0 6px}
+p{margin:8px 0}
+.sub{color:var(--mut);font-size:14px;margin:0 0 12px}
+nav{display:flex;gap:6px;margin:12px 0 16px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px}
+nav button{flex:1;border:0;background:none;color:var(--mut);font:inherit;font-weight:600;font-size:14px;padding:9px 4px;border-radius:9px}
+nav button.on{background:var(--acc);color:#fff}
+@media (prefers-color-scheme:dark){nav button.on{color:#06201c}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+.big{display:block;width:100%;border:0;border-radius:12px;background:var(--acc);color:#fff;font:inherit;font-weight:700;padding:14px;margin:8px 0}
+@media (prefers-color-scheme:dark){.big{color:#06201c}}
+.big.alt{background:none;border:1.5px solid var(--acc);color:var(--acc)}
+.big:disabled{opacity:.4}
+.tag{display:inline-block;font-size:12px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.04em}
+.q{font-size:17px;font-weight:600;margin:6px 0 12px}
+.ch{display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;border-radius:11px;padding:12px 14px;margin:8px 0}
+.ch.good{border-color:var(--ok);background:var(--okbg)}
+.ch.bad{border-color:var(--ko);background:var(--kobg)}
+.exp{border-left:4px solid var(--acc);padding:8px 12px;margin:12px 0;background:var(--bg);border-radius:0 8px 8px 0;font-size:15px}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:6px 0 12px}
+.bar i{display:block;height:100%;background:var(--acc)}
+.score{font-size:40px;font-weight:800;text-align:center;margin:8px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:14px;border-radius:99px;padding:6px 12px}
+.chip.on{border-color:var(--acc);background:var(--acc);color:#fff}
+@media (prefers-color-scheme:dark){.chip.on{color:#06201c}}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:8px 0}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg)}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.note{background:var(--warnbg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:14px;margin:10px 0}
+.wrap{overflow-x:auto}
+ul{padding-left:20px;margin:6px 0}
+li{margin:4px 0}
+details{border-top:1px solid var(--line);padding:10px 0}
+summary{font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<main>
+<h1>Compta Fi · Module 3</h1>
+<p class="sub">Dépense, charge, investissement · Résultat et flux · Mesure du résultat</p>
+<nav>
+<button data-v="quiz" class="on">QCM</button>
+<button data-v="fiche">Fiche express</button>
+<button data-v="cas">Cas chiffrés</button>
+</nav>
+<section id="quiz"></section>
+<section id="fiche" hidden>
+
+<div class="card">
+<span class="tag">L'idée en 3 phrases</span>
+<p>Une <b>dépense</b>, c'est de l'argent qui sort ; une <b>charge</b>, c'est un appauvrissement. Les deux ne vont pas toujours ensemble, pareil pour <b>recette</b> (argent qui entre) et <b>produit</b> (enrichissement).</p>
+<p>Donc le <b>résultat</b> (produits − charges) n'est pas la variation de trésorerie (recettes − dépenses).</p>
+<p>On compte un produit quand le travail est fait (bien livré, service rendu), pas quand on est payé, et on lui associe seulement les charges qui ont servi à le gagner.</p>
+</div>
+
+<div class="card">
+<span class="tag">Les 4 mots à ne pas confondre</span>
+<div class="wrap"><table>
+<tr><th>Mot</th><th>Définition du cours</th><th>Où ça se voit</th></tr>
+<tr><td><b>Dépense</b></td><td>Décaissement : sortie d'argent</td><td>Trésorerie, état des flux</td></tr>
+<tr><td><b>Charge</b></td><td>Appauvrissement : baisse des capitaux propres</td><td>Compte de résultat</td></tr>
+<tr><td><b>Recette</b></td><td>Encaissement : entrée d'argent</td><td>Trésorerie, état des flux</td></tr>
+<tr><td><b>Produit</b></td><td>Enrichissement : hausse des capitaux propres</td><td>Compte de résultat</td></tr>
+</table></div>
+<p>Le test à faire à chaque opération : <b>1)</b> de l'argent a-t-il bougé ? <b>2)</b> suis-je plus riche ou plus pauvre, ou ai-je juste échangé une chose contre une autre de même valeur ?</p>
+</div>
+
+<div class="card">
+<span class="tag">Les 3 exemples de la vidéo 3.1</span>
+<div class="wrap"><table>
+<tr><th>Opération</th><th>Dépense ?</th><th>Charge ?</th><th>Effet sur le bilan</th></tr>
+<tr><td>Payer l'électricité : 15</td><td>Oui</td><td>Oui (rien reçu de stockable)</td><td>Trésorerie −15, résultat −15. Total du bilan −15</td></tr>
+<tr><td>Acheter un véhicule : 200</td><td>Oui</td><td>Non (on reçoit un actif de même valeur)</td><td>Trésorerie −200, immobilisations +200. Total inchangé</td></tr>
+<tr><td>Utiliser le véhicule : usure 50</td><td>Non</td><td>Oui (amortissement)</td><td>Immobilisations −50, résultat −50. Total du bilan −50</td></tr>
+</table></div>
+<p><b>Amortissement</b> : perte de valeur d'une immobilisation du fait de son utilisation. C'est une charge sans décaissement. Le véhicule apparaît à l'actif pour sa valeur nette (200 − 50 = 150).</p>
+<p>Côté entrées : un service facturé et payé tout de suite est une recette <b>et</b> un produit. La vente d'un matériel sans profit est une recette mais <b>pas</b> un produit.</p>
+</div>
+
+<div class="card">
+<span class="tag">Résultat ≠ flux (vidéo 3.2)</span>
+<p>Exemple de juin : ventes 120, marchandises vendues achetées 55, salaires 25, frais divers 17, amortissement 12. Tout est payé comptant.</p>
+<div class="wrap"><table>
+<tr><th></th><th>Résultat</th><th>Flux de trésorerie</th></tr>
+<tr><td>Ventes</td><td class="n">+120</td><td class="n">+120</td></tr>
+<tr><td>Marchandises</td><td class="n">−55</td><td class="n">−55</td></tr>
+<tr><td>Salaires</td><td class="n">−25</td><td class="n">−25</td></tr>
+<tr><td>Frais divers</td><td class="n">−17</td><td class="n">−17</td></tr>
+<tr><td>Amortissement</td><td class="n">−12</td><td class="n">0</td></tr>
+<tr><th>Total</th><th class="n">11</th><th class="n">23</th></tr>
+</table></div>
+<p>Marge commerciale = 120 − 55 = 65.</p>
+<p><b>Formule à retenir :</b> flux = résultat + charges non décaissées − produits non encaissés. Ici 11 + 12 = 23.</p>
+</div>
+
+<div class="card">
+<span class="tag">Les 3 principes (vidéo 3.3)</span>
+<ul>
+<li><b>Séparation des exercices</b> : on découpe le temps en périodes de même durée (exercices) pour comparer. Un exercice dure 12 mois au maximum.</li>
+<li><b>Reconnaissance des produits</b> : un produit est enregistré quand l'entreprise a rempli tous ses engagements contractuels (bien livré, service réalisé), que le client ait payé ou non.</li>
+<li><b>Rattachement des charges aux produits</b> (matching) : on ne retient que les charges directement imputables aux produits enregistrés.</li>
+</ul>
+<p>Conséquence : produits et charges suivent une <b>logique d'engagement</b>, pas une logique de caisse.</p>
+<h3>Le libraire</h3>
+<p>3 mars : acompte 5 €. 15 mars : le client récupère le livre (25 €). 30 mars : il paie les 20 € restants. Le produit de 25 € est enregistré le <b>15 mars</b>, jour de la livraison.</p>
+<h3>Rose et ses T-shirts</h3>
+<p>100 vendus à 15 €, 130 achetés à 8 €, frais 240 €. Résultat = 1 500 − (100 × 8) − 240 = <b>460 €</b>, et non 220 €. Les 30 T-shirts non vendus ne sont pas une charge.</p>
+</div>
+
+<div class="card">
+<span class="tag">Pièges classiques</span>
+<ul>
+<li>Croire qu'acheter une machine est une charge : c'est un investissement, la charge viendra par l'amortissement.</li>
+<li>Oublier que l'amortissement baisse le résultat sans toucher la trésorerie.</li>
+<li>Compter un produit à la date de l'acompte ou du paiement au lieu de la livraison.</li>
+<li>Mettre en charge tous les achats au lieu du coût des seules marchandises vendues.</li>
+<li>Dire « le total du bilan ne change pas » pour l'amortissement : il baisse des deux côtés, c'est l'égalité qui est conservée.</li>
+<li>Confondre résultat positif et trésorerie positive.</li>
+</ul>
+</div>
+
+<div class="card">
+<span class="tag">Test blanc du prof : réponses types</span>
+<details><summary>Pourquoi payer l'électricité est une dépense et une charge ?</summary>
+<p>C'est une dépense car le paiement entraîne un décaissement. C'est une charge car, en contrepartie, on ne reçoit aucun actif (rien de cessible ou de stockable) : le patrimoine diminue, donc les capitaux propres baissent.</p></details>
+<details><summary>« L'utilisation d'un actif qui appauvrit sans décaissement laisse le total de l'actif et celui des fonds propres et passifs inchangés » : vrai ?</summary>
+<p>Faux. L'usure (amortissement) diminue la valeur de l'immobilisation à l'actif et diminue le résultat, donc les capitaux propres, du même montant. Les deux totaux baissent ; seule leur égalité est conservée.</p></details>
+<details><summary>Citez 3 principes pour le calcul du résultat</summary>
+<p>Séparation des exercices (résultat calculé par période de 12 mois maximum). Reconnaissance des produits (enregistrés quand les engagements contractuels sont remplis). Rattachement des charges aux produits (seules les charges qui ont permis de générer ces produits).</p></details>
+<p class="sub">Réponses rédigées à partir des vidéos : le corrigé officiel n'est pas publié sur Moodle.</p>
+</div>
+</section>
+
+<section id="cas" hidden>
+<div class="note">Les énoncés viennent du PDF de TD du module 3. Le corrigé officiel est verrouillé sur Moodle : les solutions ci-dessous sont calculées avec la méthode des vidéos, à comparer avec la correction du TD.</div>
+
+<div class="card">
+<span class="tag">Cas La boîte à T-shirts</span>
+<p>Prix de vente 10 €, achat 5 €, frais d'impression et de vente 0,75 € par T-shirt payés en espèces. Presse 50 000 € sur 10 ans. Achetés : 8 000 (dont 300 non payés). Vendus : 7 200 (dont 200 non encaissés). Impôt 30 % payé l'an prochain.</p>
+<details><summary>Compte de résultat</summary>
+<div class="wrap"><table>
+<tr><td>Chiffre d'affaires : 7 200 × 10</td><td class="n">72 000</td></tr>
+<tr><td>Coût d'achat des T-shirts vendus : 7 200 × 5</td><td class="n">−36 000</td></tr>
+<tr><td>Frais d'impression et de vente : 7 200 × 0,75</td><td class="n">−5 400</td></tr>
+<tr><td>Amortissement : 50 000 / 10</td><td class="n">−5 000</td></tr>
+<tr><th>Résultat d'exploitation</th><th class="n">25 600</th></tr>
+<tr><td>Impôt : 30 %</td><td class="n">−7 680</td></tr>
+<tr><th>Résultat net</th><th class="n">17 920</th></tr>
+</table></div></details>
+<details><summary>Tableau des flux</summary>
+<div class="wrap"><table>
+<tr><td>Encaissé des clients : 7 000 × 10</td><td class="n">70 000</td></tr>
+<tr><td>Payé aux fournisseurs : 7 700 × 5</td><td class="n">−38 500</td></tr>
+<tr><td>Frais payés en espèces</td><td class="n">−5 400</td></tr>
+<tr><th>Flux d'exploitation</th><th class="n">26 100</th></tr>
+<tr><td>Achat de la presse (investissement)</td><td class="n">−50 000</td></tr>
+<tr><td>Apport de vos économies (financement)</td><td class="n">+50 000</td></tr>
+<tr><th>Trésorerie fin d'année</th><th class="n">26 100</th></tr>
+</table></div>
+<p class="sub">L'apport de 50 000 € est déduit de « grâce à vos économies ». L'impôt ne sort pas de la caisse cette année.</p></details>
+<details><summary>Pourquoi 25 600 ≠ 26 100 ? Passer de l'un à l'autre</summary>
+<div class="wrap"><table>
+<tr><td>Résultat d'exploitation</td><td class="n">25 600</td></tr>
+<tr><td>+ Amortissement (charge non décaissée)</td><td class="n">+5 000</td></tr>
+<tr><td>− Ventes non encaissées : 200 × 10</td><td class="n">−2 000</td></tr>
+<tr><td>− Stock acheté non vendu : 800 × 5</td><td class="n">−4 000</td></tr>
+<tr><td>+ Achats non payés : 300 × 5</td><td class="n">+1 500</td></tr>
+<tr><th>Flux d'exploitation</th><th class="n">26 100</th></tr>
+</table></div></details>
+</div>
+
+<div class="card">
+<span class="tag">Cas Safex (en K€)</span>
+<p>Encaissé des clients 1 300. Versé aux fournisseurs 540. Salaires 320. Amortissement 240. Créances clients : 110 au début, 142 à la fin. Dettes fournisseurs : 60 au début, 47 à la fin.</p>
+<details><summary>Flux net de trésorerie de l'activité</summary>
+<p>1 300 − 540 − 320 = <b>440</b>. L'amortissement n'est pas un flux.</p></details>
+<details><summary>Résultat sans stock</summary>
+<div class="wrap"><table>
+<tr><td>Ventes : 1 300 + (142 − 110)</td><td class="n">1 332</td></tr>
+<tr><td>Achats : 540 + (47 − 60)</td><td class="n">−527</td></tr>
+<tr><td>Salaires</td><td class="n">−320</td></tr>
+<tr><td>Amortissement</td><td class="n">−240</td></tr>
+<tr><th>Résultat</th><th class="n">245</th></tr>
+</table></div>
+<p>Les créances ont augmenté de 32 : on a vendu plus qu'on n'a encaissé. Les dettes fournisseurs ont baissé de 13 : on a payé plus qu'on n'a acheté.</p></details>
+<details><summary>Résultat avec un stock passant de 112 à 97</summary>
+<p>Le stock a baissé de 15 : on a vendu plus de marchandises qu'on n'en a acheté. Coût des marchandises vendues = 527 + 15 = 542. Résultat = 1 332 − 542 − 320 − 240 = <b>230</b>.</p></details>
+</div>
+</section>
+</main>
+
+<script>
+const K='compta-fi:';
+const T={dc:'Dépense / charge',rp:'Recette / produit',rf:'Résultat et flux',mr:'Mesure du résultat',td:'Cas de TD'};
+// a: première réponse = la bonne (mélangée à l'affichage)
+const Q=[
+{t:'dc',q:'Une charge, c\'est…',a:['Un appauvrissement : une diminution des capitaux propres','Une sortie d\'argent de la trésorerie','Toute facture reçue d\'un fournisseur','Une dette envers un tiers'],e:'Le cours définit la charge par l\'appauvrissement. La sortie d\'argent, c\'est la dépense.'},
+{t:'dc',q:'Une dépense, c\'est…',a:['Un décaissement : une sortie de trésorerie','Un appauvrissement de l\'actionnaire','Une diminution du résultat','Une perte de valeur d\'un actif'],e:'Dépense = décaissement, rien de plus. On peut dépenser sans s\'appauvrir.'},
+{t:'dc',q:'Payer une facture d\'électricité de 15, c\'est…',a:['Une dépense et une charge','Une dépense mais pas une charge','Une charge mais pas une dépense','Ni une dépense ni une charge'],e:'Il y a décaissement (dépense) et on ne reçoit rien de stockable ou cessible en échange : on s\'appauvrit (charge).'},
+{t:'dc',q:'Acheter un véhicule 200, payé comptant, c\'est…',a:['Une dépense mais pas une charge','Une dépense et une charge','Une charge mais pas une dépense','Ni une dépense ni une charge'],e:'On décaisse 200 mais on reçoit un véhicule qui vaut 200 : le patrimoine change de nature, pas de montant. C\'est un investissement.'},
+{t:'dc',q:'Utiliser pendant l\'année un véhicule qui perd 50 de valeur, c\'est…',a:['Une charge mais pas une dépense','Une dépense et une charge','Une dépense mais pas une charge','Ni une dépense ni une charge'],e:'Aucun paiement, mais le véhicule s\'use : le propriétaire s\'appauvrit. Cette charge s\'appelle l\'amortissement.'},
+{t:'dc',q:'L\'amortissement, c\'est…',a:['La perte de valeur d\'une immobilisation due à son utilisation','Le remboursement progressif d\'un emprunt','Le paiement en plusieurs fois d\'une immobilisation','Une réserve d\'argent pour remplacer le matériel'],e:'Définition de la vidéo 3.1. Ce n\'est ni un paiement ni une réserve d\'argent : aucun flux de trésorerie.'},
+{t:'dc',q:'Achat d\'un véhicule 200 payé comptant : quel effet sur le total du bilan ?',a:['Aucun : trésorerie −200, immobilisations +200','Il baisse de 200','Il augmente de 200','Il baisse de 200 côté actif seulement'],e:'Un actif en remplace un autre. Pas d\'appauvrissement, donc ni le résultat ni le total du bilan ne bougent.'},
+{t:'dc',q:'Amortissement de 50 sur un véhicule : quel effet sur le bilan ?',a:['Actif −50 et capitaux propres −50 (via le résultat)','Aucun effet sur les totaux','Trésorerie −50 et résultat −50','Actif −50 et dettes +50'],e:'L\'immobilisation perd 50 et le résultat baisse de 50. Les deux totaux baissent, l\'égalité actif = passif reste vraie. C\'est la question 2 du test blanc.'},
+{t:'dc',q:'Paiement de l\'électricité de 15 : quel effet sur le bilan ?',a:['Trésorerie −15 et résultat −15','Trésorerie −15 et immobilisations +15','Résultat −15 et dettes +15 uniquement','Aucun effet sur le total'],e:'Actifs et capitaux propres diminuent tous deux de 15 : c\'est le montant de l\'appauvrissement.'},
+{t:'dc',q:'Un véhicule acheté 200 et amorti de 50 figure à l\'actif pour…',a:['150, sa valeur nette','200, son prix d\'achat','50, le montant amorti','250'],e:'L\'amortissement conduit à présenter l\'immobilisation à sa valeur nette : 200 − 50.'},
+{t:'rp',q:'Un produit, c\'est…',a:['Un enrichissement : une augmentation des capitaux propres','Un encaissement','Un bien fabriqué par l\'entreprise','Une créance sur un client'],e:'Il n\'y a produit que s\'il y a enrichissement. L\'encaissement, c\'est la recette.'},
+{t:'rp',q:'Facturer un service payé immédiatement par le client, c\'est…',a:['Une recette et un produit','Une recette mais pas un produit','Un produit mais pas une recette','Ni l\'un ni l\'autre'],e:'On encaisse (recette) et on s\'enrichit (produit).'},
+{t:'rp',q:'Vendre un matériel à sa valeur, sans faire de profit, c\'est…',a:['Une recette mais pas un produit','Une recette et un produit','Un produit mais pas une recette','Ni l\'un ni l\'autre'],e:'On encaisse, mais on échange un actif contre de la trésorerie de même valeur : aucun enrichissement.'},
+{t:'rp',q:'Le libraire reçoit le 3 mars un acompte de 5 € pour un livre pas encore livré. C\'est…',a:['Une recette mais pas encore un produit','Une recette et un produit de 5 €','Un produit de 25 €','Ni recette ni produit'],e:'L\'argent est encaissé, mais le libraire n\'a pas encore rempli son engagement (livrer). Le produit attendra la livraison.'},
+{t:'mr',q:'Libraire : acompte 5 € le 3 mars, livre (25 €) remis le 15 mars, solde payé le 30 mars. Quand enregistrer le produit ?',a:['Le 15 mars, pour 25 €','Le 3 mars, pour 25 €','Le 3 mars pour 5 € puis le 30 mars pour 20 €','Le 30 mars, pour 25 €'],e:'Un produit est enregistré quand l\'entreprise a rempli tous ses engagements contractuels : ici, la livraison du livre.'},
+{t:'mr',q:'Rose vend 100 T-shirts à 15 €, en a acheté 130 à 8 € et supporte 240 € de frais. Son résultat est de…',a:['460 €','220 €','700 €','1 260 €'],e:'1 500 − (100 × 8) − 240 = 460. On ne retient que le coût des T-shirts vendus. 220 est le piège (130 × 8).'},
+{t:'mr',q:'Pourquoi les 30 T-shirts achetés mais non vendus par Rose ne sont-ils pas une charge ?',a:['Seules les charges qui ont servi à générer les produits de la période sont retenues','Parce qu\'ils n\'ont pas encore été payés','Parce qu\'ils sont amortis sur plusieurs années','Parce qu\'ils sont comptés en produits'],e:'Principe de rattachement des charges aux produits : si on compte 100 T-shirts en chiffre d\'affaires, on compte 100 T-shirts en coût.'},
+{t:'mr',q:'Lequel n\'est PAS l\'un des trois principes de mesure du résultat vus en vidéo ?',a:['Le principe d\'encaissement','La séparation des exercices','La reconnaissance des produits','Le rattachement des charges aux produits'],e:'Les produits et charges suivent une logique d\'engagement, pas de caisse. Il n\'y a pas de « principe d\'encaissement ».'},
+{t:'mr',q:'Selon le principe de séparation des exercices, un exercice comptable…',a:['Ne peut pas dépasser 12 mois','Dure obligatoirement une année civile','Dure au moins 12 mois','S\'arrête quand tous les clients ont payé'],e:'On découpe le temps en périodes de même durée pour comparer les résultats. Un exercice est égal ou inférieur à l\'année.'},
+{t:'mr',q:'Selon le principe de reconnaissance des produits, un produit est enregistré…',a:['Quand le bien est livré ou le service réalisé','Quand le client paie','Quand le client passe commande','Quand la facture est envoyée, même sans livraison'],e:'Le critère est d\'avoir rempli tous ses engagements contractuels, que le client ait réglé ou non.'},
+{t:'mr',q:'Le principe de « matching », c\'est…',a:['Associer aux produits les charges qui ont permis de les générer','Faire correspondre les recettes et les dépenses','Équilibrer l\'actif et le passif','Comparer le résultat d\'une année sur l\'autre'],e:'Autre nom du principe de rattachement des charges aux produits.'},
+{t:'mr',q:'Tous les salariés ont travaillé cette année sur une production qui sera entièrement vendue l\'an prochain. Les salaires de cette année…',a:['Sont rattachés aux produits de l\'an prochain','Sont une charge de cette année car ils ont été payés','Ne seront jamais une charge','Sont un produit de cette année'],e:'Exemple volontairement extrême de la vidéo : les charges suivent les produits qu\'elles ont permis de générer.'},
+{t:'mr',q:'Les produits et les charges sont enregistrés selon une logique…',a:['D\'engagement : à la date de réalisation','De caisse : à la date d\'encaissement ou de décaissement','De commande : à la date de signature','De facturation uniquement'],e:'Conclusion de la vidéo 3.3 : logique d\'engagement, pas logique de caisse.'},
+{t:'rf',q:'La différence entre les recettes et les dépenses d\'une période mesure…',a:['La variation de trésorerie (flux net)','Le résultat','Les capitaux propres','Le chiffre d\'affaires'],e:'Recettes − dépenses = encaissements − décaissements = flux net de trésorerie. Le résultat, c\'est produits − charges.'},
+{t:'rf',q:'Juin : ventes 120, marchandises vendues 55, salaires 25, frais 17, amortissement 12. Le résultat est de…',a:['11','23','65','35'],e:'120 − 55 − 25 − 17 − 12 = 11. Le 23 est le flux de trésorerie, le 65 la marge commerciale.'},
+{t:'rf',q:'Mêmes données (120, 55, 25, 17, amortissement 12), tout payé comptant. Le flux net de trésorerie est de…',a:['23','11','35','−1'],e:'120 − 55 − 25 − 17 = 23. L\'amortissement ne fait sortir aucun argent.'},
+{t:'rf',q:'Dans l\'exemple de juin, pourquoi le résultat (11) diffère-t-il du flux (23) ?',a:['À cause de l\'amortissement de 12, charge sans décaissement','Parce que les clients n\'ont pas tous payé','Parce que les salaires sont payés le mois suivant','À cause de la marge commerciale'],e:'11 + 12 = 23. La charge d\'amortissement entre dans le résultat mais ne génère aucun flux.'},
+{t:'rf',q:'Pour retrouver le flux de trésorerie à partir du résultat, on…',a:['Ajoute les charges non décaissées et retire les produits non encaissés','Ajoute les produits non encaissés et retire les charges non décaissées','Retire l\'amortissement','Ajoute le chiffre d\'affaires'],e:'Flux = résultat + charges sans décaissement − produits sans encaissement.'},
+{t:'rf',q:'La marge commerciale de l\'exemple de juin (ventes 120, achat des marchandises vendues 55) est de…',a:['65','11','23','175'],e:'Prix de vente − coût d\'achat des marchandises vendues = 120 − 55 = 65. Elle doit couvrir toutes les autres charges.'},
+{t:'rf',q:'Une entreprise peut-elle avoir un résultat positif et une trésorerie qui baisse ?',a:['Oui : par exemple si elle vend à crédit ou achète une immobilisation','Non : un bénéfice augmente toujours la trésorerie','Oui, mais seulement si elle fraude','Non, sauf si elle amortit'],e:'Une vente livrée non payée est un produit sans recette ; un investissement est une dépense sans charge.'},
+{t:'td',q:'Boîte à T-shirts : 7 200 vendus à 10 €, dont 7 000 encaissés. Chiffre d\'affaires de l\'année ?',a:['72 000 €','70 000 €','80 000 €','2 000 €'],e:'Le produit est constaté à la vente (livraison), encaissé ou non : 7 200 × 10.'},
+{t:'td',q:'Boîte à T-shirts : 8 000 achetés à 5 €, 7 200 vendus. Charge d\'achat à retenir dans le résultat ?',a:['36 000 €','40 000 €','38 500 €','35 000 €'],e:'Coût des seuls T-shirts vendus : 7 200 × 5. Les 800 restants sont du stock, un actif.'},
+{t:'td',q:'Boîte à T-shirts : presse achetée 50 000 €, durée de vie 10 ans. Charge de la première année ?',a:['5 000 € d\'amortissement','50 000 €','0 €','500 €'],e:'L\'achat est un investissement. La charge annuelle est l\'usure : 50 000 / 10.'},
+{t:'td',q:'Boîte à T-shirts : 8 000 achetés à 5 €, dont 300 non encore payés. Décaissement fournisseurs ?',a:['38 500 €','40 000 €','36 000 €','1 500 €'],e:'On a payé 7 700 T-shirts : 7 700 × 5. Les 1 500 restants sont une dette fournisseurs.'},
+{t:'td',q:'Safex : 1 300 encaissés des clients ; créances clients passées de 110 à 142. Ventes de l\'année ?',a:['1 332','1 300','1 268','1 442'],e:'Les créances ont augmenté de 32 : on a vendu 32 de plus qu\'on n\'a encaissé. 1 300 + 32.'},
+{t:'td',q:'Safex : 540 versés aux fournisseurs ; dettes fournisseurs passées de 60 à 47. Achats de l\'année ?',a:['527','540','553','493'],e:'Les dettes ont baissé de 13 : on a payé 13 de plus qu\'on n\'a acheté. 540 − 13.'},
+{t:'td',q:'Safex : encaissé 1 300, fournisseurs 540, salaires 320, amortissement 240. Flux net de trésorerie de l\'activité ?',a:['440','200','245','760'],e:'1 300 − 540 − 320 = 440. L\'amortissement n\'est pas un décaissement.'},
+{t:'td',q:'Le stock de marchandises baisse de 15 pendant l\'année. Le coût des marchandises vendues est…',a:['Les achats + 15','Les achats − 15','Égal aux achats','15'],e:'On a vendu tout ce qu\'on a acheté, plus 15 pris dans le stock de départ. Le résultat baisse d\'autant.'}
+];
+
+const $=s=>document.querySelector(s);
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function load(k,d){try{return JSON.parse(localStorage.getItem(K+k))??d}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(K+k,JSON.stringify(v))}catch(e){}}
+let wrong=new Set(load('wrong',[])), seen=new Set(load('seen',[]));
+let theme='all', run=null;
+
+function home(){
+  const pool=Q.map((_,i)=>i).filter(i=>theme==='all'||Q[i].t===theme);
+  const w=[...wrong].filter(i=>i<Q.length);
+  $('#quiz').innerHTML=`
+  <div class="card">
+    <span class="tag">Comme en TD</span>
+    <p>3 questions tirées au hasard, correction expliquée après chaque réponse.</p>
+    <button class="big" id="b3">Test éclair · 3 questions</button>
+  </div>
+  <div class="card">
+    <span class="tag">S'entraîner par thème</span>
+    <div class="row" style="margin:10px 0">
+      <button class="chip ${theme==='all'?'on':''}" data-t="all">Tout</button>
+      ${Object.entries(T).map(([k,v])=>`<button class="chip ${theme===k?'on':''}" data-t="${k}">${v}</button>`).join('')}
+    </div>
+    <button class="big alt" id="ball">Série complète · ${pool.length} questions</button>
+    <button class="big alt" id="bw" ${w.length?'':'disabled'}>Refaire mes erreurs · ${w.length}</button>
+    <p class="sub">${seen.size} question${seen.size>1?'s':''} vue${seen.size>1?'s':''} sur ${Q.length}</p>
+  </div>`;
+  $('#b3').onclick=()=>start(sh(Q.map((_,i)=>i)).slice(0,3));
+  $('#ball').onclick=()=>start(sh(pool));
+  $('#bw').onclick=()=>start(sh(w));
+  document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{theme=c.dataset.t;home()});
+}
+function start(ids){run={ids,n:0,ok:0};show()}
+function show(){
+  const i=run.ids[run.n], q=Q[i], ch=sh(q.a.map((x,k)=>({x,ok:k===0})));
+  $('#quiz').innerHTML=`
+  <div class="sub" style="display:flex;justify-content:space-between"><span>Question ${run.n+1} / ${run.ids.length}</span><button class="chip" id="quit">Quitter</button></div>
+  <div class="bar"><i style="width:${run.n/run.ids.length*100}%"></i></div>
+  <div class="card"><span class="tag">${T[q.t]}</span><div class="q">${esc(q.q)}</div>
+  ${ch.map((c,k)=>`<button class="ch" data-k="${k}">${esc(c.x)}</button>`).join('')}
+  <div id="after"></div></div>`;
+  $('#quit').onclick=home;
+  document.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{
+    const c=ch[b.dataset.k];
+    document.querySelectorAll('.ch').forEach((x,k)=>{x.disabled=true;if(ch[k].ok)x.classList.add('good')});
+    if(c.ok){run.ok++;wrong.delete(i)}else{b.classList.add('bad');wrong.add(i)}
+    seen.add(i);save('wrong',[...wrong]);save('seen',[...seen]);
+    $('#after').innerHTML=`<div class="exp"><b>${c.ok?'Juste.':'Raté.'}</b> ${esc(q.e)}</div><button class="big" id="nx">${run.n+1<run.ids.length?'Question suivante':'Voir mon score'}</button>`;
+    $('#nx').onclick=()=>{run.n++;run.n<run.ids.length?show():end()};
+    $('#nx').scrollIntoView({behavior:'smooth',block:'nearest'});
+  });
+  window.scrollTo(0,0);
+}
+function end(){
+  const t=run.ids.length;
+  $('#quiz').innerHTML=`<div class="card"><span class="tag">Résultat</span><div class="score">${run.ok} / ${t}</div>
+  <p style="text-align:center">${run.ok===t?'Sans faute.':run.ok>=t*0.66?'Presque : relis les explications des questions ratées.':'Relis la fiche express puis refais tes erreurs.'}</p>
+  <button class="big" id="again">Nouveau test éclair</button><button class="big alt" id="back">Retour</button></div>`;
+  $('#again').onclick=()=>start(sh(Q.map((_,i)=>i)).slice(0,3));
+  $('#back').onclick=home;
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+  ['quiz','fiche','cas'].forEach(v=>$('#'+v).hidden=v!==b.dataset.v);
+  if(b.dataset.v==='quiz')home();
+  window.scrollTo(0,0);
+});
+home();
+</script>
+</body>
+</html>
