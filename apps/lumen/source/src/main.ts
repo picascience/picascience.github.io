@@ -54,7 +54,25 @@ window.addEventListener('pointerdown', () => sfx.unlock(), { once: true });
 pressable(muteBtn, () => {
   sfx.setMuted(!sfx.muted); Save.muted = sfx.muted; muteBtn.classList.toggle('muted', sfx.muted);
 });
-pressable($('home'), () => { if (mode === 'play') transition(() => toMenu()); }, () => sfx.click());
+// Bouton maison : tap = retour au menu ; appui long (0,7 s) = panneau de debug.
+// Le panneau ne s'ouvre plus jamais depuis l'écran de jeu : aucun risque en sautant.
+let homeLong = false, homeTimer = 0;
+const homeBtn = $('home');
+homeBtn.addEventListener('pointerdown', () => {
+  homeLong = false;
+  homeTimer = window.setTimeout(() => { homeLong = true; homeBtn.classList.remove('down'); toggleDebug(); }, 700);
+});
+const homeCancel = () => clearTimeout(homeTimer);
+homeBtn.addEventListener('pointerup', homeCancel);
+homeBtn.addEventListener('pointerleave', homeCancel);
+homeBtn.addEventListener('pointercancel', homeCancel);
+pressable(homeBtn, () => { if (!homeLong && mode === 'play') transition(() => toMenu()); }, () => { if (!homeLong) sfx.click(); });
+// Dans le menu : triple tap sur le titre
+let titleTaps = [0, 0, 0];
+$('title').addEventListener('pointerdown', () => {
+  titleTaps = [titleTaps[1], titleTaps[2], performance.now()];
+  if (titleTaps[2] - titleTaps[0] < 700) { titleTaps = [0, 0, 0]; toggleDebug(); }
+});
 
 // --- Anneau du stick (mis à jour sur les événements tactiles, pas dans la boucle) --
 const stick = $('stick'), knob = $('knob');
@@ -65,13 +83,13 @@ input.onStick = (on, ax, ay, cx, cy) => {
   knob.style.transform = `translate(${cx - ax}px, ${cy - ay}px)`;
 };
 
-// --- Panneau de debug : triple tap (chargé à la demande) ---------------------
+// --- Panneau de debug (chargé à la demande) ------------------------------------
 let gui: { show: (v?: boolean) => void; _hidden: boolean } | null = null;
-input.onTripleTap = async () => {
+async function toggleDebug() {
   if (gui) { gui.show(gui._hidden); return; }
   const { createDebug } = await import('./debug/gui');
   gui = createDebug(scene, quality, () => loadIsland(island), (n) => { transition(() => { loadIsland(n); mode = 'play'; }); }) as any;
-};
+}
 
 // --- Menu --------------------------------------------------------------------
 const menu = new Menu(() => {
@@ -269,28 +287,9 @@ function completeIsland() {
   transition(() => { loadIsland(next); }, `Île ${next}`, sub);
 }
 
-/**
- * iOS 26, appli ajoutée à l'écran d'accueil : la fenêtre annonce une hauteur trop courte
- * (elle s'arrête au-dessus de la barre d'accueil → bande vide en bas). On prend alors la
- * hauteur physique de l'écran.
- */
-function appHeight() {
-  const standalone = (navigator as any).standalone === true || matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches;
-  const top = window.top === window;
-  const portrait = window.innerHeight >= window.innerWidth;
-  const screenH = portrait ? Math.max(screen.width, screen.height) : Math.min(screen.width, screen.height);
-  return standalone && top ? Math.max(window.innerHeight, screenH) : window.innerHeight;
-}
 function resize() {
-  const h = appHeight();
-  document.documentElement.style.setProperty('--app-h', `${h}px`);
-  // Valeur de la zone sûre en pixels (utile au geste du panneau de debug)
-  const probe = document.createElement('div');
-  probe.style.cssText = 'position:fixed;top:0;height:env(safe-area-inset-top,0px);visibility:hidden';
-  document.body.appendChild(probe);
-  document.documentElement.style.setProperty('--st-px', String(probe.offsetHeight));
-  probe.remove();
-  scene.resize(window.innerWidth, h);
+  document.documentElement.style.setProperty('--app-h', `${window.innerHeight}px`);
+  scene.resize(window.innerWidth, window.innerHeight);
 }
 window.addEventListener('resize', resize);
 resize();

@@ -1,6 +1,6 @@
 // Service worker de Lumen (généré au build) — portée limitée à ce dossier.
-const CACHE = 'lumen-1dcf1b110b';
-const FILES = ["./","assets/index-r05AhLRz.js","assets/gui-d27cAJMK.js","assets/index-CtHC_V-O.css","manifest.webmanifest","icon.svg","icon-180.png","icon-192.png","icon-512.png"];
+const CACHE = 'lumen-a9b53da095';
+const FILES = ["./","assets/index-CJtwfeoF.js","assets/gui-CQGTY3PZ.js","assets/index-CtHC_V-O.css","manifest.webmanifest","icon.svg","icon-180.png","icon-192.png","icon-512.png"];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
 });

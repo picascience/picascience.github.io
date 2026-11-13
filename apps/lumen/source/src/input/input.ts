@@ -23,16 +23,9 @@ export class Input {
   enabled = true;
   /** Appelé quand le stick change (affichage de l'anneau, hors boucle de jeu). */
   onStick?: (active: boolean, ax: number, ay: number, cx: number, cy: number) => void;
-  /**
-   * Ouverture du panneau de debug, volontaire uniquement (pour ne jamais gêner les sauts) :
-   *  - toucher l'écran avec 3 doigts en même temps, ou
-   *  - triple tap dans la petite zone des pastilles, en haut au centre.
-   */
-  onTripleTap?: () => void;
-  private down = new Set<number>();
+
   /** Premier contact (déverrouillage audio iOS). */
   onFirstTouch?: () => void;
-  private taps = [0, 0, 0];
 
   constructor(el: HTMLElement) {
     el.addEventListener('pointerdown', this.onDown, { passive: false });
@@ -49,14 +42,6 @@ export class Input {
   private onDown = (e: PointerEvent) => {
     e.preventDefault();
     this.onFirstTouch?.();
-    this.down.add(e.pointerId);
-    if (this.down.size === 3) this.onTripleTap?.();                 // 3 doigts
-    const inZone = e.clientY < 90 + (this.safeTop()) && Math.abs(e.clientX - window.innerWidth / 2) < 80;
-    if (inZone) {
-      const now = performance.now();
-      this.taps[0] = this.taps[1]; this.taps[1] = this.taps[2]; this.taps[2] = now;
-      if (now - this.taps[0] < 600) { this.taps[0] = this.taps[1] = this.taps[2] = 0; this.onTripleTap?.(); }
-    } else this.taps[0] = this.taps[1] = this.taps[2] = 0;
     if (!this.enabled) return;
     if (this.active !== -1) { this.jumpQueued = true; return; } // 2e doigt = saut
     this.active = e.pointerId;
@@ -85,12 +70,7 @@ export class Input {
     this.onStick?.(true, this.ax, this.ay, this.cx, this.cy);
   };
 
-  private safeTop() {
-    return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--st-px')) || 0;
-  }
-
   private onUp = (e: PointerEvent) => {
-    this.down.delete(e.pointerId);
     if (e.pointerId !== this.active) return;
     if (performance.now() - this.downT < TAP_MS && this.travel < TAP_PX) this.jumpQueued = true;
     this.active = -1;
