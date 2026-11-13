@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1e1b4b">
+<title>Macro S1</title>
+<style>
+:root{--bg:#f5f5fa;--card:#fff;--ink:#1c1b2e;--mut:#6b6a80;--line:#e4e3ee;--acc:#4f46e5;--acc2:#eef0ff;--ok:#0f9d58;--okbg:#e6f6ec;--ko:#d93025;--kobg:#fdecea;--warn:#b45309;--warnbg:#fff4e0}
+@media (prefers-color-scheme:dark){:root{--bg:#12111f;--card:#1d1c2e;--ink:#eeeef6;--mut:#a3a2b8;--line:#302f45;--acc:#8b87ff;--acc2:#28274a;--ok:#4ade80;--okbg:#12301f;--ko:#f87171;--kobg:#3a1716;--warn:#fbbf24;--warnbg:#35270a}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 8px) 12px 8px;border-bottom:1px solid var(--line)}
+header h1{font-size:15px;margin:0 0 8px;color:var(--mut);font-weight:600;letter-spacing:.02em}
+nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--line);border-radius:10px;padding:3px}
+nav button{border:0;background:transparent;color:var(--mut);font:600 13px/1 inherit;padding:9px 2px;border-radius:8px}
+nav button.on{background:var(--card);color:var(--acc);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+main{padding:14px 14px calc(env(safe-area-inset-bottom) + 60px);max-width:680px;margin:0 auto}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0 0 12px}
+.card h2{font-size:17px;margin:0 0 6px;line-height:1.3}
+.card h3{font-size:15px;margin:12px 0 4px}
+.card p{margin:6px 0}.card ul{margin:6px 0;padding-left:20px}.card li{margin:3px 0}
+.num{display:inline-block;min-width:24px;height:24px;line-height:24px;text-align:center;border-radius:12px;background:var(--acc);color:#fff;font-size:12px;font-weight:700;margin-right:8px}
+.f{display:block;background:var(--acc2);border-left:3px solid var(--acc);border-radius:6px;padding:8px 10px;margin:8px 0;font-family:"Cambria Math",Georgia,serif;font-size:16.5px;overflow-x:auto;white-space:nowrap}
+.src{display:block;font-size:11.5px;color:var(--mut);margin-top:8px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--warnbg);color:var(--warn);margin-right:6px;text-transform:uppercase;letter-spacing:.03em}
+b,strong{font-weight:650}
+.up{color:var(--ok);font-weight:700}.down{color:var(--ko);font-weight:700}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:0 0 12px}.bar i{display:block;height:100%;background:var(--acc);width:0;transition:width .2s}
+.meta{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);margin-bottom:6px}
+.q{font-size:17px;font-weight:600;line-height:1.35;margin:0 0 12px}
+.ch{display:block;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 8px;font:inherit;font-size:15.5px}
+.ch b{color:var(--mut);margin-right:8px}
+.ch.ok{border-color:var(--ok);background:var(--okbg)}.ch.ko{border-color:var(--ko);background:var(--kobg)}
+.ch:disabled{opacity:1}
+.exp{border-radius:12px;padding:12px 14px;margin:4px 0 12px;font-size:14.5px;background:var(--acc2)}
+.btn{display:block;width:100%;border:0;border-radius:12px;background:var(--acc);color:#fff;font:600 16px/1 inherit;padding:15px;margin:0 0 8px}
+.btn.alt{background:var(--card);color:var(--acc);border:1.5px solid var(--acc)}
+.btn:disabled{opacity:.4}
+.score{font-size:44px;font-weight:800;text-align:center;margin:10px 0 0}.score small{font-size:18px;color:var(--mut);font-weight:600}
+.center{text-align:center;color:var(--mut)}
+#fc{perspective:1000px;height:310px;margin:6px 0 14px;touch-action:pan-y}
+#fci{position:relative;width:100%;height:100%;transition:transform .35s;transform-style:preserve-3d}
+#fci.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;overflow:auto;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.face.back{transform:rotateY(180deg);background:var(--acc2)}
+.face .lab{position:absolute;top:10px;left:14px;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.face .big{font-size:20px;font-weight:650;line-height:1.35}
+.face .f{white-space:normal;border:0;background:transparent;font-size:19px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn.ko{background:var(--ko)}.btn.okb{background:var(--ok)}
+</style>
+</head>
+<body>
+<header>
+<h1 id="ttl">Macroéconomie · Séance 1</h1>
+<nav id="nav"><button data-t="fiche">Fiche</button><button data-t="qcm">QCM</button><button data-t="flash">Cartes</button><button data-t="pieges">Pièges</button></nav>
+</header>
+<main>
+<section id="fiche"></section>
+<section id="qcm"></section>
+<section id="flash"></section>
+<section id="pieges"></section>
+</main>
+<script src="./data.js"></script>
+<script>
+(function(){
+var D=window.DATA||{fiche:[],qcm:[],flash:[],pieges:[]},K='macro-s1:';
+function get(k,d){try{var v=localStorage.getItem(K+k);return v==null?d:JSON.parse(v)}catch(e){return d}}
+function set(k,v){try{localStorage.setItem(K+k,JSON.stringify(v))}catch(e){}}
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+function shuf(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+if(D.title)$('ttl').textContent=D.title;
+
+/* onglets */
+function tab(t){[].forEach.call(document.querySelectorAll('nav button'),function(b){b.classList.toggle('on',b.dataset.t===t)});
+ [].forEach.call(document.querySelectorAll('section'),function(s){s.classList.toggle('on',s.id===t)});set('tab',t);window.scrollTo(0,0)}
+$('nav').addEventListener('click',function(e){var b=e.target.closest('button');if(b)tab(b.dataset.t)});
+
+/* fiche + pieges */
+$('fiche').innerHTML=(D.intro?'<div class="card">'+D.intro+'</div>':'')+D.fiche.map(function(x,i){return '<div class="card"><h2><span class="num">'+(i+1)+'</span>'+x.t+'</h2>'+x.h+(x.s?'<span class="src">Source : '+esc(x.s)+'</span>':'')+'</div>'}).join('');
+$('pieges').innerHTML=D.pieges.map(function(x){return '<div class="card"><h2><span class="tag">Piège</span>'+x.t+'</h2>'+x.h+(x.s?'<span class="src">Source : '+esc(x.s)+'</span>':'')+'</div>'}).join('')||'<p class="center">Bientôt disponible.</p>';
+
+/* QCM */
+var S=get('qcm',null);
+function newRun(ids){S={ids:shuf(ids),i:0,ans:{},ord:{}};set('qcm',S);drawQ()}
+function allIds(){return D.qcm.map(function(_,i){return i})}
+function drawQ(){var el=$('qcm');
+ if(!D.qcm.length){el.innerHTML='<p class="center">Bientôt disponible.</p>';return}
+ if(!S||!S.ids||S.ids.some(function(i){return !D.qcm[i]})){S=null;
+  el.innerHTML='<div class="card"><h2>QCM · '+D.qcm.length+' questions</h2><p>4 choix, une seule bonne réponse. Correction immédiate avec explication et source.</p></div><button class="btn" id="go">Commencer</button>';
+  $('go').onclick=function(){newRun(allIds())};return}
+ if(S.i>=S.ids.length)return drawEnd();
+ var id=S.ids[S.i],Q=D.qcm[id],ord=S.ord[id]||(S.ord[id]=shuf([0,1,2,3])),a=S.ans[id],done=a!=null;
+ var h='<div class="meta"><span>Question '+(S.i+1)+' / '+S.ids.length+'</span><span>'+nOk()+' juste(s)</span></div><div class="bar"><i style="width:'+(100*S.i/S.ids.length)+'%"></i></div><p class="q">'+Q.q+'</p>';
+ ord.forEach(function(c,k){var cl='ch';if(done){if(c===Q.a)cl+=' ok';else if(c===a)cl+=' ko'}
+  h+='<button class="'+cl+'" data-c="'+c+'"'+(done?' disabled':'')+'><b>'+'ABCD'[k]+'</b>'+Q.c[c]+'</button>'});
+ if(done)h+='<div class="exp"><strong>'+(a===Q.a?'Juste.':'Faux.')+'</strong> '+Q.e+(Q.s?'<span class="src">Source : '+esc(Q.s)+'</span>':'')+'</div><button class="btn" id="nx">'+(S.i+1<S.ids.length?'Question suivante':'Voir mon score')+'</button>';
+ el.innerHTML=h;
+ [].forEach.call(el.querySelectorAll('.ch'),function(b){b.onclick=function(){S.ans[id]=+b.dataset.c;set('qcm',S);drawQ()}});
+ if(done)$('nx').onclick=function(){S.i++;set('qcm',S);drawQ();window.scrollTo(0,0)};
+}
+function nOk(){return S.ids.filter(function(i){return S.ans[i]===D.qcm[i].a}).length}
+function drawEnd(){var el=$('qcm'),ok=nOk(),n=S.ids.length,err=S.ids.filter(function(i){return S.ans[i]!==D.qcm[i].a});
+ var h='<div class="card"><p class="score">'+ok+'<small> / '+n+'</small></p><p class="center">'+Math.round(100*ok/n)+' % · note sur 20 : '+(20*ok/n).toFixed(1)+'</p></div>';
+ if(err.length){h+='<button class="btn" id="re">Refaire seulement mes erreurs ('+err.length+')</button><div class="card"><h2>À revoir</h2><ul>'+err.map(function(i){return '<li>'+D.qcm[i].q+'<br><span class="up">'+D.qcm[i].c[D.qcm[i].a]+'</span></li>'}).join('')+'</ul></div>'}
+ else h+='<p class="center">Sans faute.</p>';
+ h+='<button class="btn alt" id="all">Recommencer tout le QCM</button>';el.innerHTML=h;
+ if(err.length)$('re').onclick=function(){newRun(err)};$('all').onclick=function(){newRun(allIds())}}
+drawQ();
+
+/* Flashcards */
+var F=get('flash',{known:[],i:0});
+function deck(){var d=D.flash.map(function(_,i){return i}).filter(function(i){return F.known.indexOf(i)<0});return d}
+function drawF(){var el=$('flash'),d=deck();
+ if(!D.flash.length){el.innerHTML='<p class="center">Bientôt disponible.</p>';return}
+ if(!d.length){el.innerHTML='<div class="card"><h2>Toutes les cartes sont sues</h2><p>'+D.flash.length+' cartes maîtrisées.</p></div><button class="btn" id="fr">Tout recommencer</button>';$('fr').onclick=function(){F={known:[],i:0};set('flash',F);drawF()};return}
+ if(F.i>=d.length)F.i=0;var id=d[F.i],c=D.flash[id];
+ el.innerHTML='<div class="meta"><span>Carte '+(F.i+1)+' / '+d.length+' restantes</span><span>'+F.known.length+' sue(s)</span></div><div id="fc"><div id="fci"><div class="face"><span class="lab">Question</span><div class="big">'+c.r+'</div><span class="src">Touchez pour retourner</span></div><div class="face back"><span class="lab">Réponse</span><div>'+c.v+'</div>'+(c.s?'<span class="src">'+esc(c.s)+'</span>':'')+'</div></div></div><div class="row"><button class="btn ko" id="fk">À revoir</button><button class="btn okb" id="fo">Je sais</button></div><p class="center" style="font-size:13px">Glissez à droite = je sais, à gauche = à revoir</p>';
+ var fc=$('fc'),fi=$('fci'),x0=null,dx=0;
+ function nxt(known){if(known)F.known.push(id);else F.i++;set('flash',F);drawF()}
+ fc.onclick=function(){if(Math.abs(dx)<10)fi.classList.toggle('flip')};
+ fc.ontouchstart=function(e){x0=e.touches[0].clientX;dx=0};
+ fc.ontouchmove=function(e){if(x0==null)return;dx=e.touches[0].clientX-x0;fc.style.transform='translateX('+dx+'px) rotate('+dx/25+'deg)'};
+ fc.ontouchend=function(){fc.style.transform='';if(dx>70)nxt(true);else if(dx<-70)nxt(false);x0=null;setTimeout(function(){dx=0},50)};
+ $('fk').onclick=function(){nxt(false)};$('fo').onclick=function(){nxt(true)}}
+drawF();
+tab(get('tab','fiche'));
+})();
+</script>
+</body>
+</html>
