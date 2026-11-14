@@ -1,0 +1,9 @@
+{
+  "name": "Raisonner",
+  "emoji": "∀",
+  "colors": ["#04162a", "#38bdf8"],
+  "category": "Dauphine",
+  "added": "2026-11-14",
+  "description": "CC Raisonnement : décodeur de méthodes, rédactions à trous, speedrun annales, radar à pièges",
+  "icon": "icon.svg"
+}

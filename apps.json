@@ -1,7 +1,20 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-13T08:46:57.906Z",
+  "generated": "2026-11-14T21:31:24.273Z",
   "apps": [
+    {
+      "name": "Raisonner",
+      "emoji": "∀",
+      "colors": [
+        "#04162a",
+        "#38bdf8"
+      ],
+      "category": "Dauphine",
+      "added": "2026-11-14",
+      "description": "CC Raisonnement : décodeur de méthodes, rédactions à trous, speedrun annales, radar à pièges",
+      "icon": "apps/raisonnement/icon.svg",
+      "id": "raisonnement"
+    },
     {
       "name": "Compta Fi",
       "emoji": "📊",
