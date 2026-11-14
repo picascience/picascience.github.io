@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#F9F8F5">
-<title>CAO 3D — Planches techniques</title>
+<title>CAD 3D — Planches techniques</title>
 <link rel="icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,6 +59,7 @@
   .vbtn { display:inline-flex; align-items:center; gap:6px; background:rgba(249,248,245,.94); border:1px solid rgba(24,24,26,.3); color:var(--ink); padding:7px 12px; border-radius:99px; font-family:'JetBrains Mono',monospace; font-size:11px; cursor:pointer; text-decoration:none; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
   .vbtn:hover { background:var(--ink); color:var(--paper); }
   .vbtn.nav { padding:7px 10px; }
+  @media (max-width:640px) { .vbtn .lbl, #v-tab { display:none; } }
 }
 </style>
 </head>
@@ -67,7 +68,7 @@
   <header>
     <div>
       <div class="kicker mono">Atelier · planches techniques interactives</div>
-      <h1>CAO <i>3D</i></h1>
+      <h1>CAD <i>3D</i></h1>
     </div>
     <div class="stats mono">
       <div><b id="st-models">–</b>planches</div>
@@ -87,7 +88,7 @@
     <button class="vbtn nav" id="v-prev" title="Planche précédente">‹</button>
     <button class="vbtn nav" id="v-next" title="Planche suivante">›</button>
     <a class="vbtn" id="v-tab" target="_blank" rel="noopener" title="Ouvrir dans un onglet">↗</a>
-    <button class="vbtn" id="v-close">✕ Planches</button>
+    <button class="vbtn" id="v-close">✕ <span class="lbl">Planches</span></button>
   </div>
   <iframe id="v-frame" title="Planche 3D" allow="fullscreen"></iframe>
 </div>
@@ -153,7 +154,7 @@
     $('v-tab').href = m.file;
     $('viewer').classList.add('open');
     $('viewer').setAttribute('aria-hidden', 'false');
-    document.title = `${m.title} — CAO 3D`;
+    document.title = `${m.title} — CAD 3D`;
     $('v-prev').disabled = models.length < 2; $('v-next').disabled = models.length < 2;
     if (!seen[m.id]) { seen[m.id] = 1; try { localStorage.setItem(KEY, JSON.stringify(seen)); } catch (e) {} }
     if (push) history.pushState({ id: m.id }, '', '#' + m.id); else history.replaceState({ id: m.id }, '', '#' + m.id);
@@ -163,7 +164,7 @@
     $('viewer').classList.remove('open');
     $('viewer').setAttribute('aria-hidden', 'true');
     $('v-frame').src = 'about:blank';
-    document.title = 'CAO 3D — Planches techniques';
+    document.title = 'CAD 3D — Planches techniques';
     current = -1;
     render($('search').value);
     if (push) history.pushState({}, '', location.pathname + location.search);

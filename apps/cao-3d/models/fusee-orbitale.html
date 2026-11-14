@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Fusée Orbitale — Schéma CAO 3D Interactif</title>
+
+  <!-- Google Fonts: Instrument Serif, JetBrains Mono, Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Three.js r128 & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    :root {
+      --paper: #F9F8F5;
+      --paper-panel: rgba(249, 248, 245, 0.86);
+      --ink: #18181A;
+      --ink-muted: #5C5C63;
+      --ink-subtle: rgba(24, 24, 26, 0.14);
+      --ink-faint: rgba(24, 24, 26, 0.06);
+      --accent: #18181A;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Subtle architectural drafting grid background */
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--paper);
+      background-image:
+        radial-gradient(rgba(24, 24, 26, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+      cursor: grab;
+    }
+
+    #canvas-container:active {
+      cursor: grabbing;
+    }
+
+    /* Corner registration marks */
+    .cad-frame {
+      position: fixed;
+      inset: 14px;
+      border: 1px solid var(--ink-subtle);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Top Editorial Bar */
+    .top-bar {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      height: 44px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--ink-subtle);
+      background: var(--paper-panel);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 20;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      letter-spacing: 0.03em;
+    }
+
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .top-left span.slash {
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink-muted);
+      font-size: 11px;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--ink);
+      animation: pulseDot 2.2s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.82); }
+    }
+
+    /* Right-side Editorial HUD */
+    .editorial-hud {
+      position: fixed;
+      top: 78px;
+      right: 34px;
+      width: 340px;
+      max-width: calc(100vw - 48px);
+      padding: 24px 26px;
+      background: var(--paper-panel);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--ink-subtle);
+      border-radius: 14px;
+      z-index: 15;
+      pointer-events: none;
+      box-shadow: 0 12px 36px rgba(24, 24, 26, 0.04);
+    }
+
+    .fig-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ink-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .fig-tag::after {
+      content: "ÉCHELLE 1:120 · ISO";
+      font-weight: 400;
+      font-size: 10px;
+      opacity: 0.7;
+    }
+
+    .hud-title {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 42px;
+      line-height: 0.98;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+
+    .hud-subtitle {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-style: italic;
+      font-size: 24px;
+      line-height: 1.15;
+      color: var(--ink-muted);
+      margin-top: 2px;
+      margin-bottom: 18px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--ink-subtle);
+      margin: 14px 0;
+    }
+
+    .active-assembly {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 20px;
+    }
+
+    .active-assembly .prefix {
+      color: var(--ink-muted);
+      font-weight: 500;
+    }
+
+    .active-assembly .name {
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .giant-counter {
+      margin-top: 16px;
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 46px;
+      line-height: 1;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .giant-counter span.unit {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink-muted);
+      letter-spacing: 0;
+      margin-left: 4px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 4px;
+      background: var(--ink-faint);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 14px 0 10px 0;
+      border: 1px solid rgba(24, 24, 26, 0.08);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--ink);
+      border-radius: 999px;
+      transition: width 0.06s linear;
+    }
+
+    .line-counter {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--ink-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .spec-grid {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--ink-subtle);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+    }
+
+    .spec-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .spec-label {
+      color: var(--ink-muted);
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .spec-val {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* Bottom Controls Pill */
+    .controls-pill {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 10px 20px;
+      background: rgba(249, 248, 245, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(24, 24, 26, 0.22);
+      border-radius: 999px;
+      box-shadow: 0 10px 30px rgba(24, 24, 26, 0.08);
+      z-index: 25;
+      max-width: calc(100vw - 32px);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-replay {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-replay:hover {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .btn-replay:active {
+      transform: scale(0.96);
+    }
+
+    .pill-sep {
+      width: 1px;
+      height: 22px;
+      background: var(--ink-subtle);
+    }
+
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--ink);
+    }
+
+    .slider-group label {
+      font-weight: 500;
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+
+    .slider-val {
+      min-width: 34px;
+      text-align: right;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 86px;
+      height: 3px;
+      background: rgba(24, 24, 26, 0.18);
+      border-radius: 999px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--ink);
+      border: 2px solid var(--paper);
+      box-shadow: 0 0 0 1px var(--ink);
+      cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--ink);
+      border: 2px solid var(--paper);
+      box-shadow: 0 0 0 1px var(--ink);
+      cursor: pointer;
+    }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 860px) {
+      .editorial-hud {
+        top: 66px;
+        right: 22px;
+        width: 270px;
+        padding: 16px 18px;
+      }
+      .hud-title { font-size: 32px; }
+      .hud-subtitle { font-size: 19px; margin-bottom: 10px; }
+      .giant-counter { font-size: 34px; margin-top: 10px; }
+      .spec-grid { display: none; }
+      .controls-pill {
+        bottom: 20px;
+        padding: 8px 14px;
+        gap: 10px;
+        border-radius: 18px;
+      }
+      .pill-sep { display: none; }
+      input[type="range"] { width: 70px; }
+    }
+
+    @media (max-width: 560px) {
+      .top-right { display: none; }
+      .editorial-hud {
+        width: calc(100vw - 44px);
+        right: 22px;
+        left: 22px;
+        padding: 12px 14px;
+      }
+      .hud-title { font-size: 26px; }
+      .hud-subtitle { font-size: 16px; margin-bottom: 6px; }
+      .giant-counter { font-size: 28px; margin-top: 6px; }
+      .divider { margin: 8px 0; }
+    }
+    /* MK Apps : dégager la barre de retour du launcher */
+    .controls-pill { bottom: calc(36px + env(safe-area-inset-bottom)) !important; }
+  </style>
+</head>
+<body>
+
+  <!-- Outer technical drafting frame -->
+  <div class="cad-frame"></div>
+
+  <!-- Top Editorial Bar -->
+  <header class="top-bar">
+    <div class="top-left">
+      <span class="slash">/anatomy</span>
+      <span>schéma CAO 3D interactif · une fusée</span>
+    </div>
+    <div class="top-right">
+      <span class="status-dot"></span>
+      <span>WebGL · CAO Orthographique</span>
+    </div>
+  </header>
+
+  <!-- WebGL Viewport -->
+  <main id="canvas-container" aria-label="Vue CAO 3D interactive d'une fusée orbitale"></main>
+
+  <!-- Right-side Editorial HUD -->
+  <aside class="editorial-hud" aria-live="polite">
+    <div class="fig-tag">No. 02</div>
+    <h1 class="hud-title">Fusée Orbitale</h1>
+    <div class="hud-subtitle">propulsion cryogénique</div>
+
+    <div class="divider"></div>
+
+    <div class="active-assembly">
+      <span class="prefix">Tracé ·</span>
+      <span class="name" id="hud-assembly">Initialisation CAO…</span>
+    </div>
+
+    <div class="giant-counter">
+      <span id="hud-parts-done">0</span><span class="unit">sur <span id="hud-parts-total">0</span> pièces</span>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress-fill" id="hud-progress-bar"></div>
+    </div>
+
+    <div class="line-counter">
+      <span id="hud-lines-text">0 sur 0 lignes</span>
+      <span id="hud-percent">0%</span>
+    </div>
+
+    <div class="spec-grid">
+      <div class="spec-item">
+        <span class="spec-label">Ergols</span>
+        <span class="spec-val">LOX / LH₂ · RP-1</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">Architecture</span>
+        <span class="spec-val">2 Étages + Octaweb</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">Propulsion</span>
+        <span class="spec-val">5× Cycle Générateur</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">Contrôle</span>
+        <span class="spec-val">Cardan + Grilles</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Bottom Interactive Controls Pill -->
+  <nav class="controls-pill" aria-label="Contrôles du schéma CAO">
+    <button type="button" class="btn-replay" id="btn-replay" title="Rejouer l'animation de tracé CAO">
+      <span>↻</span>
+      <span>Rejouer le tracé</span>
+    </button>
+
+    <div class="pill-sep"></div>
+
+    <div class="slider-group">
+      <label for="slider-trace">Tracé</label>
+      <input type="range" id="slider-trace" min="0" max="1" step="0.002" value="0" />
+      <span class="slider-val" id="val-trace">0%</span>
+    </div>
+
+    <div class="pill-sep"></div>
+
+    <div class="slider-group">
+      <label for="slider-explode">Éclaté</label>
+      <input type="range" id="slider-explode" min="0" max="1" step="0.005" value="0" />
+      <span class="slider-val" id="val-explode">0%</span>
+    </div>
+
+    <div class="pill-sep"></div>
+
+    <div class="slider-group">
+      <label for="slider-speed">Vitesse</label>
+      <input type="range" id="slider-speed" min="0" max="2.5" step="0.05" value="1.0" />
+      <span class="slider-val" id="val-speed">1.0×</span>
+    </div>
+  </nav>
+
+  <script>
+    (function () {
+      "use strict";
+
+      // =========================================================================
+      // 1. CONSTANTS & CAD MATERIALS (Archival Paper #F9F8F5 + Ink #18181A)
+      // =========================================================================
+      const PAPER_HEX = 0xF9F8F5;
+      const INK_HEX = 0x18181A;
+
+      const occluderMaterial = new THREE.MeshBasicMaterial({
+        color: PAPER_HEX,
+        polygonOffset: true,
+        polygonOffsetFactor: 1.5,
+        polygonOffsetUnits: 2.0,
+        side: THREE.DoubleSide
+      });
+
+      const lineMaterial = new THREE.LineBasicMaterial({
+        color: INK_HEX,
+        transparent: true,
+        opacity: 0.88
+      });
+
+      // =========================================================================
+      // 2. SCENE, ORTHOGRAPHIC ISOMETRIC CAMERA & RENDERER
+      // =========================================================================
+      const container = document.getElementById("canvas-container");
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(PAPER_HEX);
+
+      let frustumSize = 14.5;
+      const aspect = window.innerWidth / window.innerHeight;
+      const camera = new THREE.OrthographicCamera(
+        (-frustumSize * aspect) / 2,
+        (frustumSize * aspect) / 2,
+        frustumSize / 2,
+        -frustumSize / 2,
+        -100,
+        200
+      );
+
+      // Isometric orthographic vantage point leaving space on right for HUD
+      camera.position.set(16, 13, 18);
+
+      const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        powerPreference: "high-performance"
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.target.set(1.5, 0, 0);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.065;
+      controls.minZoom = 0.45;
+      controls.maxZoom = 3.5;
+      controls.update();
+
+      // =========================================================================
+      // 3. PROCEDURAL CAD PART FACTORY & PART REGISTRY
+      // =========================================================================
+      const rocketRoot = new THREE.Group();
+      scene.add(rocketRoot);
+
+      // Registry of all CAD parts for progressive line drawing, explode & kinematics
+      const cadParts = [];
+      let totalVertices = 0;
+
+      /**
+       * Creates a hidden-line CAD part (occluder mesh + EdgesGeometry line segments)
+       * and registers it in the sequential drawing & explode pipeline.
+       */
+      function addCadPart(opts) {
+        const {
+          geometry,
+          assembly,
+          parent = rocketRoot,
+          position = [0, 0, 0],
+          rotation = [0, 0, 0],
+          scale = [1, 1, 1],
+          explodeVec = [0, 0, 0],
+          threshold = 18,
+          onUpdate = null
+        } = opts;
+
+        const group = new THREE.Group();
+        group.position.set(position[0], position[1], position[2]);
+        group.rotation.set(rotation[0], rotation[1], rotation[2]);
+        group.scale.set(scale[0], scale[1], scale[2]);
+
+        // 1. Solid paper-colored occluder mesh for true hidden-line removal
+        const occluder = new THREE.Mesh(geometry, occluderMaterial);
+        group.add(occluder);
+
+        // 2. Technical ink edge extraction
+        const edgesGeo = new THREE.EdgesGeometry(geometry, threshold);
+        const vertexCount = edgesGeo.attributes.position.count;
+        edgesGeo.setDrawRange(0, 0);
+
+        const lines = new THREE.LineSegments(edgesGeo, lineMaterial);
+        group.add(lines);
+
+        parent.add(group);
+
+        const partRecord = {
+          group,
+          edgesGeo,
+          vertexCount,
+          startVertex: totalVertices,
+          endVertex: totalVertices + vertexCount,
+          assembly,
+          basePos: new THREE.Vector3(position[0], position[1], position[2]),
+          baseRot: new THREE.Euler(rotation[0], rotation[1], rotation[2]),
+          explodeVec: new THREE.Vector3(explodeVec[0], explodeVec[1], explodeVec[2]),
+          onUpdate
+        };
+
+        totalVertices += vertexCount;
+        cadParts.push(partRecord);
+        return partRecord;
+      }
+
+      /**
+       * Helper to build an open-shell cylindrical or conical cutaway wall with real thickness
+       * so EdgesGeometry renders clean architectural cross-section edges.
+       */
+      function createCutawayShellGeometry(rOuterTop, rOuterBot, height, wallThickness, thetaStart, thetaLength, radialSegs = 28) {
+        const halfH = height / 2;
+        const rInTop = Math.max(0.02, rOuterTop - wallThickness);
+        const rInBot = Math.max(0.02, rOuterBot - wallThickness);
+
+        // Closed profile in LatheGeometry points
+        const pts = [
+          new THREE.Vector2(rInBot, -halfH),
+          new THREE.Vector2(rOuterBot, -halfH),
+          new THREE.Vector2(rOuterTop, halfH),
+          new THREE.Vector2(rInTop, halfH),
+          new THREE.Vector2(rInBot, -halfH)
+        ];
+        return new THREE.LatheGeometry(pts, radialSegs, thetaStart, thetaLength);
+      }
+
+      /**
+       * Helper to create a cutaway spherical/ellipsoidal cryogenic dome or tank
+       */
+      function createCutawayTankGeometry(radiusX, radiusY, thetaStart, thetaLength, segs = 24) {
+        const pts = [];
+        const steps = 16;
+        const thick = 0.045;
+        // Outer arc from bottom pole to top pole
+        for (let i = 0; i <= steps; i++) {
+          const a = -Math.PI / 2 + (Math.PI * i) / steps;
+          pts.push(new THREE.Vector2(Math.max(0.001, Math.cos(a) * radiusX), Math.sin(a) * radiusY));
+        }
+        // Inner arc back down
+        for (let i = steps; i >= 0; i--) {
+          const a = -Math.PI / 2 + (Math.PI * i) / steps;
+          pts.push(new THREE.Vector2(Math.max(0.001, Math.cos(a) * (radiusX - thick)), Math.sin(a) * (radiusY - thick)));
+        }
+        pts.push(pts[0].clone());
+        return new THREE.LatheGeometry(pts, segs, thetaStart, thetaLength);
+      }
+
+      /**
+       * Helper to create an aerodynamic ogive fairing cutaway shell
+       */
+      function createOgiveFairingGeometry(radius, height, wallThickness, thetaStart, thetaLength) {
+        const pts = [];
+        const steps = 20;
+        const halfH = height / 2;
+        // Outer ogive curve
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          const y = -halfH + t * height;
+          // Tangent-ogive profile tapering to nose cap radius 0.09
+          const profile = Math.pow(1 - Math.pow(t, 1.38), 0.62);
+          const r = 0.09 + (radius - 0.09) * profile;
+          pts.push(new THREE.Vector2(r, y));
+        }
+        // Inner ogive curve
+        for (let i = steps; i >= 0; i--) {
+          const t = i / steps;
+          const y = -halfH + t * height;
+          const profile = Math.pow(1 - Math.pow(t, 1.38), 0.62);
+          const r = Math.max(0.03, 0.09 + (radius - 0.09) * profile - wallThickness);
+          pts.push(new THREE.Vector2(r, y));
+        }
+        pts.push(pts[0].clone());
+        return new THREE.LatheGeometry(pts, 28, thetaStart, thetaLength);
+      }
+
+      /**
+       * Helper to create a parabolic bell nozzle (full or cutaway)
+       */
+      function createBellNozzleGeometry(throatR, exitR, height, thetaStart = 0, thetaLength = Math.PI * 2, segs = 24) {
+        const pts = [];
+        const steps = 14;
+        const halfH = height / 2;
+        const wall = 0.028;
+        // Outer parabolic contour
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps; // 0 = exit (bottom), 1 = throat (top)
+          const y = -halfH + t * height;
+          const r = exitR - (exitR - throatR) * Math.pow(t, 0.68);
+          pts.push(new THREE.Vector2(r, y));
+        }
+        // Inner contour
+        for (let i = steps; i >= 0; i--) {
+          const t = i / steps;
+          const y = -halfH + t * height;
+          const r = Math.max(0.04, exitR - (exitR - throatR) * Math.pow(t, 0.68) - wall);
+          pts.push(new THREE.Vector2(r, y));
+        }
+        pts.push(pts[0].clone());
+        return new THREE.LatheGeometry(pts, segs, thetaStart, thetaLength);
+      }
+
+      // Cutaway orientation facing camera (+X / +Z quadrant open so interior is visible)
+      const CUT_START = Math.PI * 0.72;
+      const CUT_LEN = Math.PI * 1.32;
+
+      // =========================================================================
+      // 4. HIGH-DENSITY MECHANICAL ROCKET ARCHITECTURE (130+ PARTS)
+      // =========================================================================
+      function buildOrbitalRocket() {
+        const R_MAIN = 0.92;
+
+        // -----------------------------------------------------------------------
+        // SECTION A: COIFFE & CHARGE UTILE (Payload Fairing & Satellite)
+        // Y range: +3.65 to +6.85
+        // -----------------------------------------------------------------------
+        const ASM_FAIRING = "Coiffe & Charge Utile";
+
+        // 1. Nose tip telemetry Pitot / aerodynamic cap
+        addCadPart({
+          geometry: new THREE.ConeGeometry(0.11, 0.34, 16),
+          assembly: ASM_FAIRING,
+          position: [0, 6.72, 0],
+          explodeVec: [0, 4.6, 0]
+        });
+
+        // 2. Cutaway Ogive Payload Fairing Shell
+        addCadPart({
+          geometry: createOgiveFairingGeometry(1.06, 2.55, 0.055, CUT_START, CUT_LEN),
+          assembly: ASM_FAIRING,
+          position: [0, 5.32, 0],
+          explodeVec: [0, 4.2, 0],
+          threshold: 22
+        });
+
+        // 3. Acoustic separation flange ring at base of fairing
+        addCadPart({
+          geometry: createCutawayShellGeometry(1.08, 1.08, 0.14, 0.08, CUT_START, CUT_LEN, 28),
+          assembly: ASM_FAIRING,
+          position: [0, 4.02, 0],
+          explodeVec: [0, 3.85, 0]
+        });
+
+        // 4. Longitudinal internal fairing stiffener ribs (10 radial stringers inside shell)
+        for (let i = 0; i < 10; i++) {
+          const ang = CUT_START + (CUT_LEN * (i + 0.5)) / 10;
+          const rRib = 0.96;
+          addCadPart({
+            geometry: new THREE.BoxGeometry(0.03, 1.45, 0.05),
+            assembly: ASM_FAIRING,
+            position: [Math.cos(ang) * rRib, 4.82, Math.sin(ang) * rRib],
+            rotation: [0, -ang, 0],
+            explodeVec: [Math.cos(ang) * 0.35, 4.1, Math.sin(ang) * 0.35]
+          });
+        }
+
+        // 5. Payload Adapter Conical Truss (PAF)
+        addCadPart({
+          geometry: createCutawayShellGeometry(0.46, 0.88, 0.45, 0.04, 0, Math.PI * 2, 24),
+          assembly: ASM_FAIRING,
+          position: [0, 3.82, 0],
+          explodeVec: [0, 3.15, 0]
+        });
+
+        // 6. Satellite Bus Core (Hexagonal/Octagonal Orbital Bus)
+        addCadPart({
+          geometry: new THREE.CylinderGeometry(0.36, 0.36, 0.82, 8),
+          assembly: ASM_FAIRING,
+          position: [0, 4.52, 0],
+          explodeVec: [0, 3.45, 0]
+        });
+
+        // 7. Satellite Star-Tracker & Apogee Kick Thruster
+        addCadPart({
+          geometry: new THREE.CylinderGeometry(0.14, 0.19, 0.22, 16),
+          assembly: ASM_FAIRING,
+          position: [0, 4.04, 0],
+          explodeVec: [0, 3.35, 0]
+        });
+
+        // 8. Satellite High-Gain Parabolic Telemetry Dish + Feed Horn
+        addCadPart({
+          geometry: new THREE.CylinderGeometry(0.24, 0.05, 0.12, 18, 1, true),
+          assembly: ASM_FAIRING,
+          position: [0, 5.04, 0.06],
+          rotation: [0.35, 0, 0],
+          explodeVec: [0, 3.62, 0.12]
+        });
+        addCadPart({
+          geometry: new THREE.CylinderGeometry(0.015, 0.015, 0.24, 8),
+          assembly: ASM_FAIRING,
+          position: [0, 5.14, 0.1],
+          rotation: [0.35, 0, 0],
+          explodeVec: [0, 3.68, 0.15]
+        });
+
+        // 9. Twin Articulated Solar Array Wings (left & right, gently oscillating)
+        [-1, 1].forEach((side) => {
+          // Yoke hinge
+          addCadPart({
+            geometry: new THREE.BoxGeometry(0.22, 0.05, 0.05),
+            assembly: ASM_FAIRING,
+            position: [side * 0.44, 4.56, 0],
+            explodeVec: [side * 0.5, 3.48, 0]
+          });
+
+          // Inner solar panel segment
+          addCadPart({
+            geometry: new THREE.BoxGeometry(0.46, 0.56, 0.022),
+            assembly: ASM_FAIRING,
+            position: [side * 0.74, 4.56, 0],
+            explodeVec: [side * 0.95, 3.48, 0],
+            onUpdate: (part, t, exp) => {
+              const fold = (1 - exp) * 0.55;
+              const breathe = Math.sin(t * 1.4) * 0.08;
+              part.group.rotation.y = side * (fold + breathe);
+            }
+          });
+
+          // Outer solar panel segment
+          addCadPart({
+            geometry: new THREE.BoxGeometry(0.44, 0.56, 0.022),
+            assembly: ASM_FAIRING,
+            position: [side * 1.21, 4.56, 0],
+            explodeVec: [side * 1.45, 3.48, 0],
+            onUpdate: (part, t, exp) => {
+              const fold = (1 - exp) * -0.85;
+              const breathe = Math.cos(t * 1.4) * 0.1;
+              part.group.rotation.y = side * (fold + breathe);
+            }
+          });
+        });
+
+        // -----------------------------------------------------------------------
+        // SECTION B: ÉTAGE SUPÉRIEUR (Second Stage Cryogenic Tank & Vacuum Engine)
+        // Y range: +1.25 to +3.60
+        // -----------------------------------------------------------------------
+        const ASM_STAGE2 = "Étage Supérieur Cryogénique";
+
+        // 10. Forward Skirt Ring (Cutaway)
+        addCadPart({
+          geometry: createCutawayShellGeometry(0.92, 0.92, 0.34, 0.045, CUT_START, CUT_LEN, 28),
+          assembly: ASM_STAGE2,
+          position: [0, 3.44, 0],
+          explodeVec: [0, 2.75, 0]
+        });
+
+        // 11. Second Stage Outer Fuselage (Cutaway)
+        addCadPart({
+          geometry: createCutawayShellGeometry(0.92, 0.92, 1.48, 0.045, CUT_START, CUT_LEN, 28),
+          assembly: ASM_STAGE2,
+          position: [0, 2.53, 0],
+          explodeVec: [0, 2.45, 0]
+        });
+
+        // 12. Internal Upper LOX Spherical-Ellipsoidal Tank (Cutaway)
+        addCadPart({
+          geometry: createCutawayTankGeometry(0.76, 0.44, CUT_START, CUT_LEN, 24),
+          assembly: ASM_STAGE2,
+          position: [0, 2.96, 0],
+          explodeVec: [0.15, 2.58, 0.15]
+        });
+
+        // 13. Internal Lower LH2 Tank (Cutaway)
+        addCadPart({
+          geometry: createCutawayTankGeometry(0.76, 0.46, CUT_START, CUT_LEN, 24),
+          assembly: ASM_STAGE2,
+          position: [0, 2.08, 0],
+          explodeVec: [-0.12, 2.32, 0.12]
+        });
+
+        // 14. Internal Anti-Slosh Ring Baffles inside Stage 2 Tanks (4 rings)
+        [3.04, 2.86, 2.18, 1.98].forEach((yPos, idx) => {
+          addCadPart({
+            geometry: new THREE.TorusGeometry(0.67, 0.018, 6, 24, CUT_LEN),
+            assembly: ASM_STAGE2,
+            position: [0, yPos, 0],
+            rotation: [Math.PI / 2, 0, CUT_START],
+            explodeVec: [0, 2.45 + (idx < 2 ? 0.12 : -0.08), 0]
+          });
+        });
+
+        // 15. Stage 2 Thrust Frame & Gimbal Block
+        addCadPart({
+          geometry: new THREE.CylinderGeometry(0.42, 0.28, 0.24, 16),
+          assembly: ASM_STAGE2,
+          position: [0, 1.72, 0],
+          explodeVec: [0, 1.85, 0]
+        });
+
+        // 16. Vacuum Bell Nozzle (Cutaway to expose throat & injector)
+        addCadPart({
+          geometry: createBellNozzleGeometry(0.17, 0.62, 0.88, CUT_START, CUT_LEN, 26),
+          assembly: ASM_STAGE2,
+          position: [0, 1.24, 0],
+          explodeVec: [0, 1.55, 0],
+          threshold: 20
+        });
+
+        // 17. Stage 2 Stiffening Bands around Vacuum Nozzle (3 bands)
+        [1.42, 1.18, 0.94].forEach((yBand, idx) => {
+          const rBand = 0.34 + idx * 0.12;
+          addCadPart({
+            geometry: new THREE.TorusGeometry(rBand, 0.016, 6, 24, CUT_LEN),
+            assembly: ASM_STAGE2,
+            position: [0, yBand, 0],
+            rotation: [Math.PI / 2, 0, CUT_START],
+            explodeVec: [0, 1.55, 0]
+          });
+        });
+
+        // 18. Twin Hydraulic Gimbal Actuators for Vacuum Engine
+        [-1, 1].forEach((side) => {
+          addCadPart({
+            geometry: new THREE.CylinderGeometry(0.024, 0.024, 0.34, 8),
+            assembly: ASM_STAGE2,
+            position: [side * 0.28, 1.62, 0.18],
+            rotation: [0, 0, side * 0.38],
+            explodeVec: [side * 0.35, 1.72, 0.25]
+          });
+        });
+
+        // -----------------------------------------------------------------------
+        // SECTION C: INTER-ÉTAGE & AILERONS EN GRILLE (Interstage & Grid Fins)
+        // Y range: +0.55 to +1.80
+        // -----------------------------------------------------------------------
+        const ASM_INTERSTAGE = "Inter-étage & Ailerons en Grille";
+
+        // 19. Interstage Outer Cylindrical Sleeve (Cutaway)
+        addCadPart({
+          geometry: createCutawayShellGeometry(0.93, 0.93, 1.16, 0.04, CUT_START, CUT_LEN, 28),
+          assembly: ASM_INTERSTAGE,
+          position: [0, 1.18, 0],
+          explodeVec: [0, 0.85, 0]
+        });
+
+        // 20. Upper & Lower Interstage Separation Flanges
+        [1.75, 0.61].forEach((yFlange, i) => {
+          addCadPart({
+            geometry: createCutawayShellGeometry(0.96, 0.96, 0.08, 0.07, CUT_START, CUT_LEN, 28),
+            assembly: ASM_INTERSTAGE,
+            position: [0, yFlange, 0],
+            explodeVec: [0, 0.85 + (i === 0 ? 0.15 : -0.1), 0]
+          });
+        });
+
+        // 21. 16 Procedural Internal Structural Longerons inside Interstage
+        for (let i = 0; i < 16; i++) {
+          const ang = (Math.PI * 2 * i) / 16;
+          // Skip front cutout arc so view to vacuum engine stays crisp
+          const normAng = ((ang - CUT_START) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+          if (normAng > CUT_LEN) continue;
+          const rStr = 0.86;
+          addCadPart({
+            geometry: new THREE.BoxGeometry(0.032, 1.06, 0.045),
+            assembly: ASM_INTERSTAGE,
+            position: [Math.cos(ang) * rStr, 1.18, Math.sin(ang) * rStr],
+            rotation: [0, -ang, 0],
+            explodeVec: [Math.cos(ang) * 0.22, 0.85, Math.sin(ang) * 0.22]
+          });
+        }
+
+        // 22. 4 Pneumatic Stage-Separation Pushers
+        for (let i = 0; i < 4; i++) {
+          const ang = (Math.PI / 2) * i + Math.PI / 4;
+          addCadPart({
+            geometry: new THREE.CylinderGeometry(0.03, 0.035, 0.42, 8),
+            assembly: ASM_INTERSTAGE,
+            position: [Math.cos(ang) * 0.78, 1.52, Math.sin(ang) * 0.78],
+            explodeVec: [Math.cos(ang) * 0.25, 1.05, Math.sin(ang) * 0.25]
+          });
+        }
+
+        // 23. 4 Deployable Titanium Grid Fins (Ailerons en Grille) + Hinge Actuators
+        for (let i = 0; i < 4; i++) {
+          const ang = (Math.PI / 2) * i + Math.PI / 4;
+          const dirX = Math.cos(ang);
+          const dirZ = Math.sin(ang);
+
+          // Actuator housing mounted on interstage skin
+          addCadPart({
+            geometry: new THREE.BoxGeometry(0.18, 0.22, 0.18),
+            assembly: ASM_INTERSTAGE,
+            position: [dirX * 0.98, 0.82, dirZ * 0.98],
+            rotation: [0, -ang, 0],
+            explodeVec: [dirX * 0.55, 0.75, dirZ * 0.55]
+          });
+
+          // Grid fin frame + lattice vane assembly
+          const finPivot = new THREE.Group();
+          finPivot.position.set(dirX * 1.06, 0.82, dirZ * 1.06);
+          finPivot.rotation.set(0, -ang, 0);
+          rocketRoot.add(finPivot);
+
+          // Outer frame of grid fin
+          addCadPart({
+            geometry: new THREE.BoxGeometry(0.56, 0.04, 0.42),
+            assembly: ASM_INTERSTAGE,
+            parent: finPivot,
+            position: [0.28, 0, 0],
+            explodeVec: [dirX * 0.85, 0.75, dirZ * 0.85],
+            onUpdate: (part, t, exp) => {
+              // Subtle aerodynamic pitch oscillation
+              const pitch = Math.sin(t * 1.8 + i * 1.57) * 0.14 * (0.3 + 0.7 * exp);
+              part.group.rotation.x = pitch;
+            }
+          });
+
+          // Internal lattice cross-vanes (3 longitudinal + 2 transverse blades)
+          [-0.11, 0, 0.11].forEach((zOff) => {
+            addCadPart({
+              geometry: new THREE.BoxGeometry(0.50, 0.036, 0.015),
+              assembly: ASM_INTERSTAGE,
+              parent: finPivot,
+              position: [0.28, 0, zOff],
+              explodeVec: [dirX * 0.85, 0.75, dirZ * 0.85],
+              onUpdate: (part, t, exp) => {
+                part.group.rotation.x = Math.sin(t * 1.8 + i * 1.57) * 0.14 * (0.3 + 0.7 * exp);
+              }
+            });
+          });
+        }
+
+        // -----------------------------------------------------------------------
+        // SECTION D: PREMIER ÉTAGE & RÉSERVOIRS CRYOGÉNIQUES (First Stage Tanks)
+        // Y range: -3.75 to +0.55
+        // -----------------------------------------------------------------------
+        const ASM_STAGE1 = "Premier Étage & Réservoirs";
+
+        // 24. First Stage Main Cylindrical Fuselage (Cutaway)
+        addCadPart({
+          geometry: createCutawayShellGeometry(R_MAIN, R_MAIN, 4.25, 0.05, CUT_START, CUT_LEN, 30),
+          assembly: ASM_STAGE1,
+          position: [0, -1.58, 0],
+          explodeVec: [0, -0.35, 0]
+        });
+
+        // 25. 16 Vertical Ribbed Longerons inside First Stage Hull
+        for (let i = 0; i < 16; i++) {
+          const ang = (Math.PI * 2 * i) / 16;
+          const normAng = ((ang - CUT_START) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+          if (normAng > CUT_LEN) continue;
+          const rStr = 0.85;
+          addCadPart({
+            geometry: new THREE.BoxGeometry(0.03, 4.12, 0.042),
+            assembly: ASM_STAGE1,
+            position: [Math.cos(ang) * rStr, -1.58, Math.sin(ang) * rStr],
+            rotation: [0, -ang, 0],
+            explodeVec: [Math.cos(ang) * 0.25, -0.35, Math.sin(ang) * 0.25]
+          });
+        }
+
+        // 26. 7 Circumferential Structural Ring Frames inside Stage 1
+        for (let r = 0; r < 7; r++) {
+          const yRing = 0.35 - r * 0.64;
+          addCadPart({
+            geometry: new THREE.TorusGeometry(0.84, 0.022, 6, 28, CUT_LEN),
+            assembly: ASM_STAGE1,
+            position: [0, yRing, 0],
+            rotation: [Math.PI / 2, 0, CUT_START],
+            explodeVec: [0, -0.35, 0]
+          });
+        }
+
+        // 27. Upper Cryogenic LOX Tank (Cutaway Cylindrical + Ellipsoidal Domes)
+        addCadPart({
+          geometry: createCutawayTankGeometry(0.76, 0.88, CUT_START, CUT_LEN, 26),
+          assembly: ASM_STAGE1,
+          position: [0, -0.52, 0],
+          explodeVec: [0.22, -0.15, 0.22]
+        });
+
+        // 28. Common Bulkhead / Inter-tank Ring Truss
+        addCadPart({
+          geometry: createCutawayShellGeometry(0.80, 0.80, 0.22, 0.06, CUT_START, CUT_LEN, 24),
+          assembly: ASM_STAGE1,
+          position: [0, -1.52, 0],
+          explodeVec: [0, -0.35, 0]
+        });
+
+        // 29. Lower Cryogenic Fuel Tank (RP-1 / LH2 Cutaway Tank)
+        addCadPart({
+          geometry: createCutawayTankGeometry(0.76, 0.96, CUT_START, CUT_LEN, 26),
+          assembly: ASM_STAGE1,
+          position: [0, -2.62, 0],
+          explodeVec: [-0.2, -0.55, 0.2]
+        });
+
+        // 30. Central Cryogenic LOX Transfer Downcomer Pipe (runs through lower tank)
+        addCadPart({
+          geometry: new THREE.CylinderGeometry(0.085, 0.085, 2.35, 14),
+          assembly: ASM_STAGE1,
+          position: [0, -2.52, 0],
+          explodeVec: [0.35, -0.45, 0.35]
+        });
+
+        // 31. Downcomer Expansion Bellows Joints (3 bellows rings)
+        [-1.78, -2.52, -3.25].forEach((yBel) => {
+          addCadPart({
+            geometry: new THREE.TorusGeometry(0.105, 0.022, 8, 16),
+            assembly: ASM_STAGE1,
+            position: [0, yBel, 0],
+            rotation: [Math.PI / 2, 0, 0],
+            explodeVec: [0.35, -0.45, 0.35]
+          });
+        });
+
+        // 32. 4 Radial Pressurized Helium COPV Bottles inside LOX Tank
+        for (let i = 0; i < 4; i++) {
+          const ang = CUT_START + 0.35 + i * 0.95;
+          const rCopv = 0.48;
+          addCadPart({
+            geometry: new THREE.CylinderGeometry(0.085, 0.085, 0.62, 12),
+            assembly: ASM_STAGE1,
+            position: [Math.cos(ang) * rCopv, -0.52, Math.sin(ang) * rCopv],
+            explodeVec: [Math.cos(ang) * 0.45, -0.15, Math.sin(ang) * 0.45]
+          });
+        }
+
+        // 33. External Avionics Raceway Conduit along Dorsal Spine
+        const racewayAng = CUT_START + CUT_LEN * 0.5;
+        addCadPart({
+          geometry: new THREE.BoxGeometry(0.11, 4.18, 0.14),
+          assembly: ASM_STAGE1,
+          position: [Math.cos(racewayAng) * 0.97, -1.58, Math.sin(racewayAng) * 0.97],
+          rotation: [0, -racewayAng, 0],
+          explodeVec: [Math.cos(racewayAng) * 0.65, -0.35, Math.sin(racewayAng) * 0.65]
+        });
+
+        // -----------------------------------------------------------------------
+        // SECTION E: BAIE DE PROPULSION, TURBOPOMPES & TUYÈRES (Engine Bay)
+        // Y range: -5.25 to -3.65
+        // -----------------------------------------------------------------------
+        const ASM_ENGINES = "Baie de Propulsion & Turbopompes";
+
+        // 34. Aft Engine Skirt Fairing (Cutaway)
+        addCadPart({
+          geometry: createCutawayShellGeometry(0.93, 0.98, 0.78, 0.045, CUT_START, CUT_LEN, 28),
+          assembly: ASM_ENGINES,
+          position: [0, -4.08, 0],
+          explodeVec: [0, -1.45, 0]
+        });
+
+        // 35. Octaweb Thrust Structure Bulkhead Plate
+        addCadPart({
+          geometry: new THREE.CylinderGeometry(0.86, 0.86, 0.12, 8),
+          assembly: ASM_ENGINES,
+          position: [0, -3.76, 0],
+          explodeVec: [0, -1.35, 0]
+        });
+
+        // 36. 8 Radial Octaweb Thrust Web Beams
+        for (let i = 0; i < 8; i++) {
+          const ang = (Math.PI * 2 * i) / 8;
+          addCadPart({
+            geometry: new THREE.BoxGeometry(0.56, 0.24, 0.045),
+            assembly: ASM_ENGINES,
+            position: [Math.cos(ang) * 0.54, -3.92, Math.sin(ang) * 0.54],
+            rotation: [0, -ang, 0],
+            explodeVec: [Math.cos(ang) * 0.35, -1.55, Math.sin(ang) * 0.35]
+          });
+        }
+
+        // 37. High-Speed Cryogenic Turbopump Assembly (Rotating Impeller + Volute + Gas Generator)
+        // Volute Casing
+        addCadPart({
+          geometry: new THREE.TorusGeometry(0.22, 0.075, 10, 20),
+          assembly: ASM_ENGINES,
+          position: [0, -4.14, 0],
+          rotation: [Math.PI / 2, 0, 0],
+          explodeVec: [0, -1.85, 0]
+        });
+
+        // Spinning Turbopump Shaft & Impeller Rotor (Kinematics via onUpdate)
+        const impellerGroup = new THREE.Group();
+        impellerGroup.position.set(0, -4.14, 0);
+        rocketRoot.add(impellerGroup);
+
+        addCadPart({
+          geometry: new THREE.CylinderGeometry(0.06, 0.06, 0.42, 12),
+          assembly: ASM_ENGINES,
+          parent: impellerGroup,
+          position: [0, 0, 0],
+          explodeVec: [0, -1.95, 0],
+          onUpdate: (part, t, exp, speed) => {
+            part.group.rotation.y = t * 7.5 * (0.4 + speed * 0.6);
+          }
+        });
+
+        // 6 Radial Impeller Blades spinning rapidly
+        for (let b = 0; b < 6; b++) {
+          const bAng = (Math.PI * 2 * b) / 6;
+          addCadPart({
+            geometry: new THREE.BoxGeometry(0.24, 0.07, 0.018),
+            assembly: ASM_ENGINES,
+            parent: impellerGroup,
+            position: [Math.cos(bAng) * 0.12, 0, Math.sin(bAng) * 0.12],
+            rotation: [0.35, -bAng, 0],
+            explodeVec: [0, -1.95, 0],
+            onUpdate: (part, t, exp, speed) => {
+              const spin = t * 7.5 * (0.4 + speed * 0.6);
+              const curAng = bAng + spin;
+              part.group.position.set(Math.cos(curAng) * 0.12, 0, Math.sin(curAng) * 0.12);
+              part.group.rotation.set(0.35, -curAng, 0);
+            }
+          });
+        }
+
+        // Gas Generator Preburner & Exhaust Duct
+        addCadPart({
+          geometry: new THREE.CylinderGeometry(0.08, 0.07, 0.28, 12),
+          assembly: ASM_ENGINES,
+          position: [0.24, -4.12, 0.24],
+          explodeVec: [0.35, -1.85, 0.35]
+        });
+
+        // 38. Cluster of 5 Regenerative-Cooled Rocket Nozzles (1 Center + 4 Outer Gimbaled)
+        const engineConfigs = [
+          { x: 0, z: 0, isCenter: true, phase: 0 },
+          { x: 0.46, z: 0.46, isCenter: false, phase: 0 },
+          { x: -0.46, z: 0.46, isCenter: false, phase: 1.57 },
+          { x: -0.46, z: -0.46, isCenter: false, phase: 3.14 },
+          { x: 0.46, z: -0.46, isCenter: false, phase: 4.71 }
+        ];
+
+        engineConfigs.forEach((eng) => {
+          const exVec = [eng.x * 1.45, -2.65, eng.z * 1.45];
+
+          // Combustion chamber + injector dome
+          addCadPart({
+            geometry: new THREE.CylinderGeometry(0.13, 0.10, 0.26, 16),
+            assembly: ASM_ENGINES,
+            position: [eng.x, -4.38, eng.z],
+            explodeVec: exVec
+          });
+
+          // Bell nozzle (center nozzle is cutaway to reveal regenerative interior)
+          addCadPart({
+            geometry: createBellNozzleGeometry(
+              0.095,
+              0.27,
+              0.66,
+              eng.isCenter ? CUT_START : 0,
+              eng.isCenter ? CUT_LEN : Math.PI * 2,
+              22
+            ),
+            assembly: ASM_ENGINES,
+            position: [eng.x, -4.82, eng.z],
+            explodeVec: exVec,
+            threshold: 20,
+            onUpdate: eng.isCenter
+              ? null
+              : (part, t, exp) => {
+                  const amp = 0.065 * (0.35 + 0.65 * exp);
+                  part.group.rotation.x = Math.sin(t * 2.1 + eng.phase) * amp;
+                  part.group.rotation.z = Math.cos(t * 1.9 + eng.phase) * amp;
+                }
+          });
+
+          // 3 Regenerative Cooling Stiffening Rings per nozzle
+          [-4.62, -4.84, -5.06].forEach((yRing, rIdx) => {
+            const rCool = 0.16 + rIdx * 0.048;
+            addCadPart({
+              geometry: new THREE.TorusGeometry(
+                rCool,
+                0.011,
+                6,
+                20,
+                eng.isCenter ? CUT_LEN : Math.PI * 2
+              ),
+              assembly: ASM_ENGINES,
+              position: [eng.x, yRing, eng.z],
+              rotation: [Math.PI / 2, 0, eng.isCenter ? CUT_START : 0],
+              explodeVec: exVec
+            });
+          });
+        });
+
+        // 39. 4 Deployable Landing Legs (Trains d'Atterrissage Télescopiques)
+        for (let i = 0; i < 4; i++) {
+          const ang = (Math.PI / 2) * i;
+          const dirX = Math.cos(ang);
+          const dirZ = Math.sin(ang);
+
+          // Aerodynamic leg fairing housing
+          addCadPart({
+            geometry: new THREE.BoxGeometry(0.16, 1.35, 0.24),
+            assembly: ASM_ENGINES,
+            position: [dirX * 1.02, -3.72, dirZ * 1.02],
+            rotation: [0, -ang, 0],
+            explodeVec: [dirX * 0.85, -1.55, dirZ * 0.85]
+          });
+
+          // Primary landing leg strut (deploys outward on explode slider)
+          addCadPart({
+            geometry: new THREE.CylinderGeometry(0.032, 0.042, 1.48, 10),
+            assembly: ASM_ENGINES,
+            position: [dirX * 1.14, -4.18, dirZ * 1.14],
+            rotation: [0, -ang, -0.18],
+            explodeVec: [dirX * 1.35, -1.95, dirZ * 1.35],
+            onUpdate: (part, t, exp) => {
+              // Deploy leg outward smoothly as explode increases
+              part.group.rotation.z = -0.18 - exp * 0.58;
+            }
+          });
+
+          // Telescopic upper A-frame brace
+          addCadPart({
+            geometry: new THREE.CylinderGeometry(0.022, 0.022, 0.92, 8),
+            assembly: ASM_ENGINES,
+            position: [dirX * 1.08, -3.86, dirZ * 1.08],
+            rotation: [0, -ang, -0.45],
+            explodeVec: [dirX * 1.15, -1.75, dirZ * 1.15],
+            onUpdate: (part, t, exp) => {
+              part.group.rotation.z = -0.45 - exp * 0.42;
+            }
+          });
+
+          // Footpad
+          addCadPart({
+            geometry: new THREE.CylinderGeometry(0.11, 0.14, 0.04, 12),
+            assembly: ASM_ENGINES,
+            position: [dirX * 1.28, -4.90, dirZ * 1.28],
+            explodeVec: [dirX * 1.85, -2.15, dirZ * 1.85]
+          });
+        }
+      }
+
+      buildOrbitalRocket();
+
+      // =========================================================================
+      // 5. HUD & INTERACTIVE CONTROLS STATE
+      // =========================================================================
+      const hudAssembly = document.getElementById("hud-assembly");
+      const hudPartsDone = document.getElementById("hud-parts-done");
+      const hudPartsTotal = document.getElementById("hud-parts-total");
+      const hudProgressBar = document.getElementById("hud-progress-bar");
+      const hudLinesText = document.getElementById("hud-lines-text");
+      const hudPercent = document.getElementById("hud-percent");
+
+      const btnReplay = document.getElementById("btn-replay");
+      const sliderTrace = document.getElementById("slider-trace");
+      const sliderExplode = document.getElementById("slider-explode");
+      const sliderSpeed = document.getElementById("slider-speed");
+
+      const valTrace = document.getElementById("val-trace");
+      const valExplode = document.getElementById("val-explode");
+      const valSpeed = document.getElementById("val-speed");
+
+      const totalParts = cadParts.length;
+      const totalLineSegments = Math.floor(totalVertices / 2);
+
+      hudPartsTotal.textContent = totalParts.toString();
+
+      const state = {
+        drawProgress: 0,
+        isAutoPlaying: true,
+        drawDuration: 3.5, // ~3.5 seconds sequential CAD reveal
+        explodeFactor: 0,
+        speed: 1.0,
+        elapsedTime: 0
+      };
+
+      function applyDrawProgress(progress) {
+        const clamped = Math.max(0, Math.min(1, progress));
+        state.drawProgress = clamped;
+
+        const targetVertex = Math.floor(clamped * totalVertices);
+        let completedParts = 0;
+        let activeAssemblyName = cadParts[0] ? cadParts[0].assembly : "";
+
+        for (let i = 0; i < totalParts; i++) {
+          const part = cadParts[i];
+          if (targetVertex <= part.startVertex) {
+            part.edgesGeo.setDrawRange(0, 0);
+            part.group.visible = false;
+          } else if (targetVertex >= part.endVertex) {
+            part.edgesGeo.setDrawRange(0, part.vertexCount);
+            part.group.visible = true;
+            completedParts++;
+            activeAssemblyName = part.assembly;
+          } else {
+            // Even vertex alignment so LineSegments pairs remain intact
+            const localCount = Math.floor((targetVertex - part.startVertex) / 2) * 2;
+            part.edgesGeo.setDrawRange(0, localCount);
+            part.group.visible = true;
+            activeAssemblyName = part.assembly;
+          }
+        }
+
+        if (clamped >= 0.999) {
+          activeAssemblyName = "Ensemble Complet Vérifié";
+        } else if (clamped <= 0.001) {
+          activeAssemblyName = "En attente de tracé…";
+        }
+
+        const drawnLines = Math.floor(targetVertex / 2);
+        const pct = Math.round(clamped * 100);
+
+        hudAssembly.textContent = activeAssemblyName;
+        hudPartsDone.textContent = completedParts.toString();
+        hudProgressBar.style.width = `${pct}%`;
+        hudLinesText.textContent = `${drawnLines.toLocaleString("fr-FR")} sur ${totalLineSegments.toLocaleString("fr-FR")} lignes`;
+        hudPercent.textContent = `${pct}%`;
+
+        sliderTrace.value = clamped.toFixed(3);
+        valTrace.textContent = `${pct}%`;
+      }
+
+      function applyExplodeFactor(factor) {
+        const clamped = Math.max(0, Math.min(1, factor));
+        state.explodeFactor = clamped;
+        // Smooth cubic ease-in-out for mechanical separation
+        const eased = clamped < 0.5
+          ? 2 * clamped * clamped
+          : 1 - Math.pow(-2 * clamped + 2, 2) / 2;
+
+        for (let i = 0; i < totalParts; i++) {
+          const part = cadParts[i];
+          part.group.position.copy(part.basePos).addScaledVector(part.explodeVec, eased);
+        }
+
+        sliderExplode.value = clamped.toFixed(3);
+        valExplode.textContent = `${Math.round(clamped * 100)}%`;
+      }
+
+      // Event Listeners for Controls
+      btnReplay.addEventListener("click", () => {
+        state.drawProgress = 0;
+        state.isAutoPlaying = true;
+        applyDrawProgress(0);
+      });
+
+      sliderTrace.addEventListener("input", (e) => {
+        state.isAutoPlaying = false;
+        applyDrawProgress(parseFloat(e.target.value));
+      });
+
+      sliderExplode.addEventListener("input", (e) => {
+        applyExplodeFactor(parseFloat(e.target.value));
+      });
+
+      sliderSpeed.addEventListener("input", (e) => {
+        state.speed = parseFloat(e.target.value);
+        valSpeed.textContent = `${state.speed.toFixed(1)}×`;
+      });
+
+      // Responsive window resize handler
+      function onWindowResize() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const asp = w / h;
+
+        // Slightly widen frustum on narrow mobile screens so rocket never clips
+        frustumSize = w < 640 ? 16.5 : 14.5;
+
+        camera.left = (-frustumSize * asp) / 2;
+        camera.right = (frustumSize * asp) / 2;
+        camera.top = frustumSize / 2;
+        camera.bottom = -frustumSize / 2;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(w, h);
+      }
+
+      window.addEventListener("resize", onWindowResize);
+      onWindowResize();
+
+      // =========================================================================
+      // 6. MAIN ANIMATION LOOP
+      // =========================================================================
+      let lastTime = performance.now();
+
+      function animate(now) {
+        requestAnimationFrame(animate);
+
+        const rawDt = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
+
+        const dt = rawDt * state.speed;
+        state.elapsedTime += dt;
+
+        // Progressive line-drawing reveal (~3.5s at 1.0x speed)
+        if (state.isAutoPlaying) {
+          const effectiveSpeed = state.speed > 0.05 ? state.speed : 1.0;
+          const nextProgress = state.drawProgress + (rawDt * effectiveSpeed) / state.drawDuration;
+          if (nextProgress >= 1) {
+            applyDrawProgress(1);
+            state.isAutoPlaying = false;
+          } else {
+            applyDrawProgress(nextProgress);
+          }
+        }
+
+        // Real-time mechanical kinematics (impeller, gimbaled nozzles, solar wings, grid fins)
+        for (let i = 0; i < totalParts; i++) {
+          const part = cadParts[i];
+          if (part.onUpdate && part.group.visible) {
+            part.onUpdate(part, state.elapsedTime, state.explodeFactor, state.speed);
+          }
+        }
+
+        controls.update();
+        renderer.render(scene, camera);
+      }
+
+      window.onload = function () {
+        applyDrawProgress(0);
+        applyExplodeFactor(0);
+        lastTime = performance.now();
+        requestAnimationFrame(animate);
+      };
+    })();
+  </script>
+</body>
+</html>

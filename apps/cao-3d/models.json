@@ -8,5 +8,15 @@
     "added": "2026-11-14",
     "file": "models/nintendo-switch-2.html",
     "thumb": "thumbs/nintendo-switch-2.webp"
+  },
+  {
+    "id": "fusee-orbitale",
+    "number": "No. 02",
+    "title": "Fusée Orbitale",
+    "subtitle": "propulsion cryogénique",
+    "parts": 168,
+    "added": "2026-11-14",
+    "file": "models/fusee-orbitale.html",
+    "thumb": "thumbs/fusee-orbitale.webp"
   }
 ]
