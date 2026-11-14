@@ -204,7 +204,12 @@
     const grid = APPS.filter(a => !dock.includes(a));
     $("#dock").innerHTML = dock.map(tile).join("");
     const pagesEl = $("#pages");
-    const rows = Math.max(2, Math.floor((pagesEl.clientHeight - 14) / 98));
+    // Mesure la vraie hauteur d'une tuile (icône + nom) pour ne jamais couper la dernière ligne
+    pagesEl.innerHTML = `<div class="page" style="visibility:hidden">${tile({ id: "_probe", name: "Probe" }, 0)}</div>`;
+    const probe = pagesEl.firstElementChild, ps = getComputedStyle(probe);
+    const tileH = probe.firstElementChild.offsetHeight, gap = parseFloat(ps.rowGap) || 22;
+    const avail = pagesEl.clientHeight - parseFloat(ps.paddingTop) - 8;
+    const rows = Math.max(1, Math.floor((avail + gap) / (tileH + gap)));
     const per = rows * 4, pages = [];
     for (let i = 0; i < Math.max(grid.length, 1); i += per) pages.push(grid.slice(i, i + per));
     pagesEl.innerHTML = pages.map(p => `<div class="page">${p.map(tile).join("")}</div>`).join("");
