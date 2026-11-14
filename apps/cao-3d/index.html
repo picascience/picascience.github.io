@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F9F8F5">
+<title>CAO 3D — Planches techniques</title>
+<link rel="icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#F9F8F5; --ink:#18181A; --muted:#8E8D8A; --line:#DEDCD3; --soft:#EFEDE6; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { background:var(--paper); color:var(--ink); font-family:'Plus Jakarta Sans',-apple-system,sans-serif; -webkit-font-smoothing:antialiased; }
+  body {
+    min-height:100vh;
+    background-image:radial-gradient(rgba(24,24,26,.10) 1px, transparent 1px);
+    background-size:24px 24px;
+    padding: max(22px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) calc(56px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  }
+  .mono { font-family:'JetBrains Mono',monospace; }
+  .wrap { max-width:1080px; margin:0 auto; }
+
+  header { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:14px; border-bottom:1px solid var(--ink); padding-bottom:14px; margin-bottom:22px; }
+  .kicker { font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+  h1 { font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(40px, 9vw, 64px); line-height:.95; letter-spacing:-.01em; }
+  h1 i { color:#4A4A48; }
+  .stats { display:flex; gap:18px; font-size:11px; color:var(--muted); }
+  .stats b { display:block; font-family:'Instrument Serif',serif; font-weight:400; font-size:34px; color:var(--ink); line-height:1; }
+
+  .tools { display:flex; gap:10px; margin-bottom:18px; align-items:center; }
+  .tools[hidden] { display:none; }
+  .search { flex:1; max-width:340px; background:rgba(249,248,245,.9); border:1px solid var(--line); border-radius:99px; padding:9px 14px; font:inherit; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink); outline:none; }
+  .search:focus { border-color:var(--ink); }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:16px; }
+  .card { position:relative; display:flex; flex-direction:column; text-align:left; background:rgba(249,248,245,.94); border:1px solid var(--line); border-radius:6px; overflow:hidden; cursor:pointer; color:inherit; font:inherit; transition:border-color .15s, transform .15s; }
+  .card:hover { border-color:var(--ink); transform:translateY(-2px); }
+  .card:active { transform:scale(.99); }
+  .thumb { position:relative; aspect-ratio:16/10; border-bottom:1px solid var(--line); background:var(--paper); overflow:hidden; }
+  .thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  .thumb svg { position:absolute; inset:0; width:100%; height:100%; }
+  .thumb .no { position:absolute; top:10px; left:10px; font-size:10px; letter-spacing:.12em; padding:2px 7px; border:1px solid rgba(24,24,26,.25); background:rgba(249,248,245,.92); border-radius:3px; }
+  .thumb .new { position:absolute; top:10px; right:10px; font-size:10px; padding:2px 7px; background:var(--ink); color:var(--paper); border-radius:3px; letter-spacing:.1em; }
+  .meta { padding:12px 14px 14px; }
+  .meta h2 { font-family:'Instrument Serif',serif; font-weight:400; font-size:26px; line-height:1.05; }
+  .meta p { font-family:'Instrument Serif',serif; font-style:italic; color:#4A4A48; font-size:16px; margin-top:2px; }
+  .meta .row { display:flex; justify-content:space-between; margin-top:12px; padding-top:9px; border-top:1px dashed var(--line); font-size:10.5px; color:var(--muted); letter-spacing:.04em; }
+
+  .empty { text-align:center; padding:60px 20px; color:var(--muted); font-size:12px; border:1px dashed var(--line); border-radius:6px; background:rgba(249,248,245,.9); }
+  .empty b { display:block; font-family:'Instrument Serif',serif; font-weight:400; color:var(--ink); font-size:30px; margin-bottom:6px; }
+
+  /* Visionneuse plein écran */
+  #viewer { position:fixed; inset:0; z-index:50; background:var(--paper); display:none; }
+  #viewer.open { display:block; }
+  #viewer iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .vbar { position:absolute; z-index:2; top:max(10px, env(safe-area-inset-top)); right:max(10px, env(safe-area-inset-right)); display:flex; gap:6px; }
+  .vbtn { display:inline-flex; align-items:center; gap:6px; background:rgba(249,248,245,.94); border:1px solid rgba(24,24,26,.3); color:var(--ink); padding:7px 12px; border-radius:99px; font-family:'JetBrains Mono',monospace; font-size:11px; cursor:pointer; text-decoration:none; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+  .vbtn:hover { background:var(--ink); color:var(--paper); }
+  .vbtn.nav { padding:7px 10px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="kicker mono">Atelier · planches techniques interactives</div>
+      <h1>CAO <i>3D</i></h1>
+    </div>
+    <div class="stats mono">
+      <div><b id="st-models">–</b>planches</div>
+      <div><b id="st-parts">–</b>pièces tracées</div>
+    </div>
+  </header>
+
+  <div class="tools" id="tools" hidden>
+    <input class="search" id="search" type="search" placeholder="Chercher une machine…" autocomplete="off">
+  </div>
+
+  <main class="grid" id="grid"></main>
+</div>
+
+<div id="viewer" aria-hidden="true">
+  <div class="vbar">
+    <button class="vbtn nav" id="v-prev" title="Planche précédente">‹</button>
+    <button class="vbtn nav" id="v-next" title="Planche suivante">›</button>
+    <a class="vbtn" id="v-tab" target="_blank" rel="noopener" title="Ouvrir dans un onglet">↗</a>
+    <button class="vbtn" id="v-close">✕ Planches</button>
+  </div>
+  <iframe id="v-frame" title="Planche 3D" allow="fullscreen"></iframe>
+</div>
+
+<script>
+(() => {
+  const KEY = 'cao-3d:vus';
+  let models = [];
+  let current = -1;
+  let seen = {};
+  try { seen = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fmtDate = d => { try { return new Date(d + 'T12:00:00').toLocaleDateString('fr-FR', { day:'numeric', month:'short', year:'numeric' }); } catch (e) { return d; } };
+
+  // Vignette de secours : petit cube isométrique tracé façon CAO, varié selon l'id
+  function fallbackThumb(m) {
+    const h = [...m.id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+    const n = 3 + (h % 4), lines = [];
+    for (let i = 0; i < n; i++) {
+      const s = 26 + ((h >> (i * 3)) % 5) * 9, cx = 200 + (i - (n - 1) / 2) * 70, cy = 128 + ((h >> i) % 3 - 1) * 14;
+      const t = `${cx},${cy - s} ${cx + s * .87},${cy - s / 2} ${cx},${cy} ${cx - s * .87},${cy - s / 2}`;
+      lines.push(`<polygon points="${t}"/><path d="M${cx - s * .87} ${cy - s / 2}V${cy + s / 2}L${cx} ${cy + s}L${cx + s * .87} ${cy + s / 2}V${cy - s / 2}M${cx} ${cy}V${cy + s}"/>`);
+    }
+    return `<svg viewBox="0 0 400 250" fill="none" stroke="#18181A" stroke-width="1.4" stroke-linejoin="round">
+      <g opacity=".14" stroke-width="1">${Array.from({length: 9}, (_, i) => `<path d="M0 ${i * 31}H400"/>`).join('')}</g>
+      ${lines.join('')}</svg>`;
+  }
+
+  function render(filter = '') {
+    const q = filter.trim().toLowerCase();
+    const list = models.map((m, i) => ({ m, i })).filter(({ m }) =>
+      !q || [m.title, m.subtitle, m.number].join(' ').toLowerCase().includes(q));
+    const grid = $('grid');
+    if (!models.length) {
+      grid.innerHTML = `<div class="empty mono" style="grid-column:1/-1"><b>Aucune planche</b>Les prochains modèles 3D apparaîtront ici.</div>`;
+      return;
+    }
+    if (!list.length) {
+      grid.innerHTML = `<div class="empty mono" style="grid-column:1/-1"><b>Rien trouvé</b>Aucune planche ne correspond à « ${esc(filter)} ».</div>`;
+      return;
+    }
+    grid.innerHTML = list.map(({ m, i }) => `
+      <button class="card" data-i="${i}">
+        <div class="thumb">
+          ${m.thumb ? `<img src="${esc(m.thumb)}" alt="" loading="lazy">` : fallbackThumb(m)}
+          <span class="no mono">${esc(m.number)}</span>
+          ${seen[m.id] ? '' : '<span class="new mono">NOUVEAU</span>'}
+        </div>
+        <div class="meta">
+          <h2>${esc(m.title)}</h2>
+          <p>${esc(m.subtitle)}</p>
+          <div class="row mono"><span>${m.parts ? esc(m.parts) + ' pièces' : '—'}</span><span>${esc(fmtDate(m.added))}</span></div>
+        </div>
+      </button>`).join('');
+  }
+
+  function open(i, push = true) {
+    const m = models[i]; if (!m) return;
+    current = i;
+    $('v-frame').src = m.file;
+    $('v-tab').href = m.file;
+    $('viewer').classList.add('open');
+    $('viewer').setAttribute('aria-hidden', 'false');
+    document.title = `${m.title} — CAO 3D`;
+    $('v-prev').disabled = models.length < 2; $('v-next').disabled = models.length < 2;
+    if (!seen[m.id]) { seen[m.id] = 1; try { localStorage.setItem(KEY, JSON.stringify(seen)); } catch (e) {} }
+    if (push) history.pushState({ id: m.id }, '', '#' + m.id); else history.replaceState({ id: m.id }, '', '#' + m.id);
+  }
+
+  function close(push = true) {
+    $('viewer').classList.remove('open');
+    $('viewer').setAttribute('aria-hidden', 'true');
+    $('v-frame').src = 'about:blank';
+    document.title = 'CAO 3D — Planches techniques';
+    current = -1;
+    render($('search').value);
+    if (push) history.pushState({}, '', location.pathname + location.search);
+  }
+
+  function fromHash() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const i = models.findIndex(m => m.id === id);
+    if (i >= 0) { if (i !== current) open(i, false); }
+    else if (current >= 0) close(false);
+  }
+
+  $('grid').addEventListener('click', e => { const c = e.target.closest('.card'); if (c) open(+c.dataset.i); });
+  $('v-close').onclick = () => close();
+  $('v-prev').onclick = () => open((current - 1 + models.length) % models.length, false);
+  $('v-next').onclick = () => open((current + 1) % models.length, false);
+  $('search').addEventListener('input', e => render(e.target.value));
+  window.addEventListener('popstate', fromHash);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && current >= 0) close(); });
+
+  fetch('./models.json', { cache: 'no-cache' })
+    .then(r => r.json())
+    .then(data => {
+      // Plus récentes en premier (numéro décroissant)
+      models = (Array.isArray(data) ? data : []).slice().sort((a, b) =>
+        (parseInt(String(b.number).replace(/\D/g, '')) || 0) - (parseInt(String(a.number).replace(/\D/g, '')) || 0));
+      $('st-models').textContent = models.length;
+      $('st-parts').textContent = models.reduce((s, m) => s + (+m.parts || 0), 0);
+      $('tools').hidden = models.length < 4;
+      render();
+      fromHash();
+    })
+    .catch(() => { $('grid').innerHTML = `<div class="empty mono" style="grid-column:1/-1"><b>Hors ligne</b>Impossible de charger la liste des planches.</div>`; });
+})();
+</script>
+</body>
+</html>

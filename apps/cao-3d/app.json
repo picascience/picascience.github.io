@@ -1,0 +1,9 @@
+{
+  "name": "CAO 3D",
+  "emoji": "🧊",
+  "colors": ["#0f172a", "#2563eb"],
+  "category": "Labo",
+  "added": "2026-11-14",
+  "description": "Mes planches techniques 3D interactives : tracé CAO, vue éclatée, pièces qui bougent",
+  "icon": "icon.svg"
+}

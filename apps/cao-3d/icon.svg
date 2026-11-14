@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0f172a"/><stop offset=".55" stop-color="#1e3a8a"/><stop offset="1" stop-color="#2563eb"/></linearGradient>
+<radialGradient id="hl" cx=".3" cy=".15" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".28"/></filter>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<rect width="512" height="512" fill="url(#hl)"/>
+<g filter="url(#sh)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<!-- couvercle éclaté (doré) -->
+<path d="M256 84L376 150L256 216L136 150Z" stroke="#fde68a" stroke-width="18"/>
+<path d="M256 216V240" stroke="#fde68a" stroke-width="10" stroke-dasharray="2 16"/>
+<!-- corps du cube -->
+<path d="M136 214L256 280L376 214" stroke="#ffffff" stroke-width="20"/>
+<path d="M136 214V350L256 416L376 350V214" stroke="#ffffff" stroke-width="20"/>
+<path d="M256 280V416" stroke="#ffffff" stroke-width="20"/>
+<path d="M136 214L256 148L376 214" stroke="#ffffff" stroke-opacity=".7" stroke-width="14"/>
+<!-- arêtes cachées (pointillés) -->
+<path d="M136 350L256 284M376 350L256 284" stroke="#ffffff" stroke-opacity=".45" stroke-width="10" stroke-dasharray="4 18"/>
+</g>
+</svg>

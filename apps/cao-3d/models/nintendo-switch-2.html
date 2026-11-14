@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Anatomy — 3D CAD Figure | Nintendo Switch 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --paper: #F9F8F5;
+      --ink: #18181A;
+      --ink-muted: #5C5B57;
+      --ink-faint: #D4D2CB;
+      --panel-bg: rgba(249, 248, 245, 0.88);
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Subtle archival blueprint dot-grid background */
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: var(--paper);
+      background-image: radial-gradient(rgba(24, 24, 26, 0.11) 1px, transparent 1px);
+      background-size: 24px 24px;
+      cursor: grab;
+    }
+
+    #canvas-container:active {
+      cursor: grabbing;
+    }
+
+    .font-mono-tech {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Custom Precision Sliders */
+    input[type="range"].cad-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 2px;
+      background: var(--ink-faint);
+      outline: none;
+      border-radius: 1px;
+      cursor: pointer;
+    }
+
+    input[type="range"].cad-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 11px;
+      height: 11px;
+      background: var(--paper);
+      border: 1.5px solid var(--ink);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: transform 0.12s ease, background-color 0.12s ease;
+    }
+
+    input[type="range"].cad-slider::-webkit-slider-thumb:hover {
+      background: var(--ink);
+      transform: scale(1.15);
+    }
+
+    input[type="range"].cad-slider::-moz-range-thumb {
+      width: 11px;
+      height: 11px;
+      background: var(--paper);
+      border: 1.5px solid var(--ink);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: transform 0.12s ease, background-color 0.12s ease;
+    }
+
+    input[type="range"].cad-slider::-moz-range-thumb:hover {
+      background: var(--ink);
+      transform: scale(1.15);
+    }
+
+    .glass-panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(24, 24, 26, 0.16);
+    }
+
+    .corner-tick {
+      position: fixed;
+      width: 14px;
+      height: 14px;
+      pointer-events: none;
+      z-index: 20;
+    }
+    /* MK Apps : dégager la barre de retour du launcher */
+    body > footer { bottom: calc(36px + env(safe-area-inset-bottom)) !important; }
+    body > header { top: max(1.25rem, env(safe-area-inset-top)) !important; }
+  </style>
+  <!-- Import Three.js r128 & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+  <!-- Technical Corner Registration Marks -->
+  <div class="corner-tick top-3 left-3 border-t border-l border-[#18181A]/40"></div>
+  <div class="corner-tick top-3 right-3 border-t border-r border-[#18181A]/40"></div>
+  <div class="corner-tick bottom-3 left-3 border-b border-l border-[#18181A]/40"></div>
+  <div class="corner-tick bottom-3 right-3 border-b border-r border-[#18181A]/40"></div>
+
+  <!-- 3D Viewport Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Top-Left Technical Blueprint Header -->
+  <header class="fixed top-5 left-5 sm:top-7 sm:left-7 z-30 pointer-events-none max-w-[calc(100vw-2.5rem)]">
+    <div class="inline-flex items-center gap-2 px-2 py-0.5 mb-2 border border-[#18181A]/25 bg-[#F9F8F5]/90 rounded text-[10px] font-mono-tech tracking-widest uppercase">
+      <span class="font-semibold">No. 01</span>
+      <span class="opacity-40">|</span>
+      <span>ANATOMY — 3D CAD FIGURE</span>
+    </div>
+    <h1 class="text-xl sm:text-3xl font-semibold tracking-tight text-[#18181A] leading-none">
+      Nintendo Switch 2
+    </h1>
+    <p class="mt-1 text-xs sm:text-sm text-[#5C5B57] font-normal tracking-tight">
+      architecture hybride &amp; Joy-Con 2
+    </p>
+    <div class="mt-2.5 flex flex-wrap items-center gap-2 text-[10px] font-mono-tech text-[#5C5B57]">
+      <span class="px-1.5 py-0.5 bg-[#18181A] text-[#F9F8F5] rounded-sm">/anatomy nintendo switch 2</span>
+      <span id="part-counter" class="px-1.5 py-0.5 border border-[#18181A]/20 rounded-sm bg-[#F9F8F5]/80">PIÈCES CAO: 0</span>
+    </div>
+  </header>
+
+  <!-- Top-Right Telemetry & Subsystem Legend (Desktop/Tablet) -->
+  <aside class="hidden md:flex flex-col gap-1.5 fixed top-7 right-7 z-30 glass-panel rounded-md p-3 text-[10px] font-mono-tech w-60">
+    <div class="flex items-center justify-between border-b border-[#18181A]/15 pb-1.5 mb-0.5">
+      <span class="font-semibold tracking-wider uppercase">SPÉCIFICATIONS CAO</span>
+      <span id="kinematics-badge" class="px-1.5 py-0.2 bg-[#18181A]/10 rounded text-[9px]">ACTIF</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-[#5C5B57]">SOC PROCESSEUR</span>
+      <span class="font-medium">NVIDIA T239 ARM</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-[#5C5B57]">MÉMOIRE / STOCKAGE</span>
+      <span class="font-medium">12GB LPDDR5X / 256GB</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-[#5C5B57]">ÉCRAN TACTILE</span>
+      <span class="font-medium">7.9" LCD 1080P 120HZ</span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-[#5C5B57]">COUPLAGE JOY-CON 2</span>
+      <span class="font-medium">ÉLECTROMAGNÉTIQUE</span>
+    </div>
+    <div class="flex justify-between border-t border-[#18181A]/15 pt-1.5 mt-0.5">
+      <span class="text-[#5C5B57]">PROJECTION</span>
+      <span class="font-medium">ISO ORTHOGRAPHIQUE</span>
+    </div>
+  </aside>
+
+  <!-- Active Hover / Inspection Callout Tag -->
+  <div id="inspector-tooltip" class="fixed bottom-32 sm:bottom-24 left-1/2 -translate-x-1/2 z-30 pointer-events-none opacity-0 transition-opacity duration-150">
+    <div class="glass-panel px-3 py-1.5 rounded text-[11px] font-mono-tech flex items-center gap-2 shadow-sm">
+      <span class="w-1.5 h-1.5 rounded-full bg-[#18181A]"></span>
+      <span id="inspector-label" class="font-semibold uppercase tracking-wide">SOUS-ENSEMBLE</span>
+      <span id="inspector-sub" class="text-[#5C5B57]">—</span>
+    </div>
+  </div>
+
+  <!-- Bottom Control Console -->
+  <footer class="fixed bottom-4 left-4 right-4 sm:bottom-6 sm:left-7 sm:right-7 z-30 flex flex-col lg:flex-row items-stretch lg:items-end justify-between gap-3 pointer-events-none">
+    <!-- Camera Presets & Kinematics Controls -->
+    <div class="glass-panel rounded-md p-2.5 flex flex-wrap items-center gap-1.5 pointer-events-auto self-start">
+      <button id="btn-replay" class="px-2.5 py-1.5 bg-[#18181A] text-[#F9F8F5] hover:bg-[#323236] active:scale-[0.98] transition rounded text-[11px] font-mono-tech font-medium flex items-center gap-1.5 cursor-pointer">
+        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+        <span>Replay Draw</span>
+      </button>
+
+      <div class="h-4 w-[1px] bg-[#18181A]/20 mx-0.5"></div>
+
+      <button data-view="iso" class="view-btn px-2 py-1.5 border border-[#18181A]/20 hover:border-[#18181A] bg-[#F9F8F5]/70 rounded text-[10px] font-mono-tech uppercase transition cursor-pointer">
+        Iso
+      </button>
+      <button data-view="front" class="view-btn px-2 py-1.5 border border-[#18181A]/20 hover:border-[#18181A] bg-[#F9F8F5]/70 rounded text-[10px] font-mono-tech uppercase transition cursor-pointer">
+        Face
+      </button>
+      <button data-view="rear" class="view-btn px-2 py-1.5 border border-[#18181A]/20 hover:border-[#18181A] bg-[#F9F8F5]/70 rounded text-[10px] font-mono-tech uppercase transition cursor-pointer">
+        Dos
+      </button>
+      <button data-view="top" class="view-btn px-2 py-1.5 border border-[#18181A]/20 hover:border-[#18181A] bg-[#F9F8F5]/70 rounded text-[10px] font-mono-tech uppercase transition cursor-pointer">
+        Dessus
+      </button>
+    </div>
+
+    <!-- Primary CAD Sliders Panel -->
+    <div class="glass-panel rounded-md p-3 sm:px-4 sm:py-3 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5 w-full lg:w-[600px] pointer-events-auto">
+      <!-- Explode Slider -->
+      <div class="flex flex-col gap-1.5">
+        <div class="flex justify-between items-center text-[10px] font-mono-tech">
+          <label for="slider-explode" class="uppercase font-semibold tracking-wider">Vue Éclatée (Explode)</label>
+          <span id="val-explode" class="text-[#5C5B57]">0%</span>
+        </div>
+        <input id="slider-explode" type="range" min="0" max="100" value="0" step="0.5" class="cad-slider" />
+      </div>
+
+      <!-- Draw Scrubber Slider -->
+      <div class="flex flex-col gap-1.5">
+        <div class="flex justify-between items-center text-[10px] font-mono-tech">
+          <label for="slider-draw" class="uppercase font-semibold tracking-wider">Tracé CAO (Draw)</label>
+          <span id="val-draw" class="text-[#5C5B57]">0%</span>
+        </div>
+        <input id="slider-draw" type="range" min="0" max="100" value="0" step="0.5" class="cad-slider" />
+      </div>
+
+      <!-- Speed Slider -->
+      <div class="flex flex-col gap-1.5">
+        <div class="flex justify-between items-center text-[10px] font-mono-tech">
+          <label for="slider-speed" class="uppercase font-semibold tracking-wider">Vitesse (Speed)</label>
+          <span id="val-speed" class="text-[#5C5B57]">1.0×</span>
+        </div>
+        <input id="slider-speed" type="range" min="0.2" max="3.0" value="1.0" step="0.1" class="cad-slider" />
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /**
+     * ============================================================================
+     * ANATOMY ENGINE — 3D CAD VECTOR BLUEPRINT ARCHITECTURE
+     * Nintendo Switch 2 Hybrid Console & Magnetic Joy-Con 2 Controllers
+     * Hidden-line archival paper (#F9F8F5) + technical ink (#18181A) rendering
+     * ============================================================================
+     */
+
+    const PALETTE = {
+      paper: 0xF9F8F5,
+      ink: 0x18181A,
+      inkMuted: 0x6A6965
+    };
+
+    class AnatomyEngine {
+      constructor(container) {
+        this.container = container;
+        this.parts = [];
+        this.updatables = [];
+        this.interactables = [];
+
+        // Simulation & Animation State
+        this.drawProgress = 0;        // 0.0 -> 1.0 progressive line drawing
+        this.isDrawing = true;
+        this.drawSpeed = 1.0;         // Speed multiplier
+        this.explodeFactor = 0;       // Current smoothed explode factor (0.0 -> 1.0)
+        this.targetExplode = 0;       // Target explode factor from slider
+        this.userTouchedExplode = false;
+        this.autoExplodeTriggered = false;
+        this.clock = new THREE.Clock();
+        this.elapsedTime = 0;
+
+        this._initScene();
+        this._initMaterials();
+        this._initControls();
+        this._initRaycaster();
+        this._bindEvents();
+      }
+
+      _initScene() {
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(PALETTE.paper);
+
+        const aspect = window.innerWidth / window.innerHeight;
+        // Responsive frustum size so the console + exploded Joy-Cons always fit cleanly
+        this.frustumSize = aspect < 0.85 ? 26 : 19;
+
+        this.camera = new THREE.OrthographicCamera(
+          (-this.frustumSize * aspect) / 2,
+          (this.frustumSize * aspect) / 2,
+          this.frustumSize / 2,
+          -this.frustumSize / 2,
+          -100,
+          200
+        );
+
+        // Classic technical isometric angle
+        this.camera.position.set(18, 13.5, 22);
+        this.camera.lookAt(0, 0, 0);
+
+        this.renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          powerPreference: 'high-performance'
+        });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.renderer.sortObjects = true;
+        this.container.appendChild(this.renderer.domElement);
+
+        this.rootGroup = new THREE.Group();
+        this.scene.add(this.rootGroup);
+      }
+
+      _initMaterials() {
+        // Occluder material matches paper color and pushes depth slightly back so edge lines render crisply
+        this.occluderMat = new THREE.MeshBasicMaterial({
+          color: PALETTE.paper,
+          polygonOffset: true,
+          polygonOffsetFactor: 1.25,
+          polygonOffsetUnits: 1.25,
+          side: THREE.DoubleSide
+        });
+
+        // Primary technical ink line material
+        this.inkMat = new THREE.LineBasicMaterial({
+          color: PALETTE.ink,
+          transparent: true,
+          opacity: 0.96
+        });
+
+        // Secondary fine detail ink line material (for grids, vents, PCB traces)
+        this.fineInkMat = new THREE.LineBasicMaterial({
+          color: PALETTE.inkMuted,
+          transparent: true,
+          opacity: 0.72
+        });
+      }
+
+      _initControls() {
+        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.06;
+        this.controls.rotateSpeed = 0.75;
+        this.controls.zoomSpeed = 0.9;
+        this.controls.panSpeed = 0.75;
+        this.controls.minZoom = 0.45;
+        this.controls.maxZoom = 4.2;
+      }
+
+      _initRaycaster() {
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2(-999, -999);
+        this.hoveredPart = null;
+      }
+
+      /**
+       * Registers a CAD part with occluder mesh + EdgesGeometry line segments,
+       * progressive draw range support, and exploded view trajectory vector.
+       */
+      addPart(geometry, options = {}) {
+        const {
+          parent = this.rootGroup,
+          position = [0, 0, 0],
+          rotation = [0, 0, 0],
+          scale = [1, 1, 1],
+          explodeVec = [0, 0, 0],
+          edgeAngle = 22,
+          fine = false,
+          occlude = true,
+          name = 'Composant CAO',
+          subsystem = 'Nintendo Switch 2',
+          drawOrder = 0
+        } = options;
+
+        const group = new THREE.Group();
+        const basePos = new THREE.Vector3(...position);
+        group.position.copy(basePos);
+        group.rotation.set(...rotation);
+        group.scale.set(...scale);
+
+        let occluderMesh = null;
+        if (occlude) {
+          occluderMesh = new THREE.Mesh(geometry, this.occluderMat);
+          occluderMesh.userData = { name, subsystem, parentGroup: group };
+          group.add(occluderMesh);
+          this.interactables.push(occluderMesh);
+        }
+
+        const edgesGeo = new THREE.EdgesGeometry(geometry, edgeAngle);
+        const lineMat = fine ? this.fineInkMat : this.inkMat;
+        const lines = new THREE.LineSegments(edgesGeo, lineMat);
+        const totalVertices = edgesGeo.attributes.position.count;
+        edgesGeo.setDrawRange(0, 0);
+        group.add(lines);
+
+        parent.add(group);
+
+        const partRecord = {
+          group,
+          occluderMesh,
+          lines,
+          edgesGeo,
+          totalVertices,
+          basePos,
+          explodeVec: new THREE.Vector3(...explodeVec),
+          drawOrder,
+          name,
+          subsystem
+        };
+
+        this.parts.push(partRecord);
+        return partRecord;
+      }
+
+      /**
+       * Adds pure technical vector lines (e.g., PCB traces, LCD scanlines, flex cable ribs)
+       */
+      addWireLines(pointsArray, options = {}) {
+        const {
+          parent = this.rootGroup,
+          position = [0, 0, 0],
+          rotation = [0, 0, 0],
+          explodeVec = [0, 0, 0],
+          fine = true,
+          name = 'Tracé Technique',
+          subsystem = 'Circuit / Grille',
+          drawOrder = 0.2
+        } = options;
+
+        const group = new THREE.Group();
+        const basePos = new THREE.Vector3(...position);
+        group.position.copy(basePos);
+        group.rotation.set(...rotation);
+
+        const geo = new THREE.BufferGeometry().setFromPoints(pointsArray);
+        const totalVertices = geo.attributes.position.count;
+        geo.setDrawRange(0, 0);
+
+        const lines = new THREE.LineSegments(geo, fine ? this.fineInkMat : this.inkMat);
+        group.add(lines);
+        parent.add(group);
+
+        const partRecord = {
+          group,
+          occluderMesh: null,
+          lines,
+          edgesGeo: geo,
+          totalVertices,
+          basePos,
+          explodeVec: new THREE.Vector3(...explodeVec),
+          drawOrder,
+          name,
+          subsystem
+        };
+
+        this.parts.push(partRecord);
+        return partRecord;
+      }
+
+      registerUpdatable(fn) {
+        this.updatables.push(fn);
+      }
+
+      setDrawProgress(value) {
+        this.drawProgress = Math.max(0, Math.min(1, value));
+        const count = this.parts.length;
+
+        for (let i = 0; i < count; i++) {
+          const p = this.parts[i];
+          // Staggered progressive line drawing across all parts
+          const staggerOffset = p.drawOrder * 0.28;
+          const localProgress = Math.max(
+            0,
+            Math.min(1, (this.drawProgress - staggerOffset) / (1 - staggerOffset * 0.75))
+          );
+
+          const drawCount = Math.floor(localProgress * p.totalVertices);
+          // Ensure even vertex count for LineSegments
+          const evenCount = drawCount - (drawCount % 2);
+          p.edgesGeo.setDrawRange(0, evenCount);
+
+          if (p.occluderMesh) {
+            p.occluderMesh.visible = localProgress > 0.08;
+          }
+        }
+      }
+
+      replayDraw() {
+        this.drawProgress = 0;
+        this.isDrawing = true;
+        this.setDrawProgress(0);
+      }
+
+      setCameraPreset(preset) {
+        const dist = 24;
+        switch (preset) {
+          case 'front':
+            this.camera.position.set(0, 0.5, dist);
+            break;
+          case 'rear':
+            this.camera.position.set(0, 0.5, -dist);
+            break;
+          case 'top':
+            this.camera.position.set(0, dist, 0.01);
+            break;
+          case 'iso':
+          default:
+            this.camera.position.set(18, 13.5, 22);
+            break;
+        }
+        this.camera.lookAt(0, 0, 0);
+        this.controls.target.set(0, 0, 0);
+        this.controls.update();
+      }
+
+      _bindEvents() {
+        window.addEventListener('resize', () => {
+          const aspect = window.innerWidth / window.innerHeight;
+          this.frustumSize = aspect < 0.85 ? 26 : 19;
+          this.camera.left = (-this.frustumSize * aspect) / 2;
+          this.camera.right = (this.frustumSize * aspect) / 2;
+          this.camera.top = this.frustumSize / 2;
+          this.camera.bottom = -this.frustumSize / 2;
+          this.camera.updateProjectionMatrix();
+          this.renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        this.renderer.domElement.addEventListener('pointermove', (e) => {
+          const rect = this.renderer.domElement.getBoundingClientRect();
+          this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        });
+      }
+
+      _updateHoverInspection() {
+        if (this.drawProgress < 0.25) return;
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        const intersects = this.raycaster.intersectObjects(this.interactables, false);
+
+        const tooltip = document.getElementById('inspector-tooltip');
+        const labelEl = document.getElementById('inspector-label');
+        const subEl = document.getElementById('inspector-sub');
+
+        if (intersects.length > 0) {
+          const hit = intersects[0].object;
+          if (hit.visible && hit.userData) {
+            labelEl.textContent = hit.userData.name;
+            subEl.textContent = `— ${hit.userData.subsystem}`;
+            tooltip.style.opacity = '1';
+            return;
+          }
+        }
+        tooltip.style.opacity = '0';
+      }
+
+      start() {
+        const animate = () => {
+          requestAnimationFrame(animate);
+          const dt = Math.min(this.clock.getDelta(), 0.05);
+          this.elapsedTime += dt * this.drawSpeed;
+
+          // 1. Progressive Line Drawing Animation
+          if (this.isDrawing) {
+            this.drawProgress += dt * 0.42 * this.drawSpeed;
+            if (this.drawProgress >= 1) {
+              this.drawProgress = 1;
+              this.isDrawing = false;
+
+              // Automatically demonstrate a gentle exploded view once drawing finishes if untouched
+              if (!this.userTouchedExplode && !this.autoExplodeTriggered) {
+                this.autoExplodeTriggered = true;
+                this.targetExplode = 0.68;
+                const expSlider = document.getElementById('slider-explode');
+                const expVal = document.getElementById('val-explode');
+                if (expSlider && expVal) {
+                  expSlider.value = '68';
+                  expVal.textContent = '68%';
+                }
+              }
+            }
+            this.setDrawProgress(this.drawProgress);
+
+            const drawSlider = document.getElementById('slider-draw');
+            const drawVal = document.getElementById('val-draw');
+            if (drawSlider && drawVal) {
+              const pct = Math.round(this.drawProgress * 100);
+              drawSlider.value = pct;
+              drawVal.textContent = `${pct}%`;
+            }
+          }
+
+          // 2. Smooth Exploded View Interpolation
+          this.explodeFactor += (this.targetExplode - this.explodeFactor) * Math.min(1, dt * 8.5);
+          for (let i = 0; i < this.parts.length; i++) {
+            const p = this.parts[i];
+            p.group.position.copy(p.basePos).addScaledVector(p.explodeVec, this.explodeFactor);
+          }
+
+          // 3. Real-time Mechanical & Electronic Kinematics (onUpdate)
+          for (let i = 0; i < this.updatables.length; i++) {
+            this.updatables[i](this.elapsedTime, dt * this.drawSpeed, this.explodeFactor);
+          }
+
+          // 4. Inspection Raycast & OrbitControls
+          this._updateHoverInspection();
+          this.controls.update();
+          this.renderer.render(this.scene, this.camera);
+        };
+
+        animate();
+      }
+    }
+
+    /**
+     * ============================================================================
+     * PROCEDURAL CAD GEOMETRY HELPERS (ROUNDED EXTRUSIONS, CAPSULES, CHAMFERS)
+     * ============================================================================
+     */
+    function createRoundedRectShape(w, h, r) {
+      const shape = new THREE.Shape();
+      const x = -w / 2;
+      const y = -h / 2;
+      const radius = Math.min(r, w / 2, h / 2);
+
+      shape.moveTo(x + radius, y);
+      shape.lineTo(x + w - radius, y);
+      shape.quadraticCurveTo(x + w, y, x + w, y + radius);
+      shape.lineTo(x + w, y + h - radius);
+      shape.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+      shape.lineTo(x + radius, y + h);
+      shape.quadraticCurveTo(x, y + h, x, y + h - radius);
+      shape.lineTo(x, y + radius);
+      shape.quadraticCurveTo(x, y, x + radius, y);
+      return shape;
+    }
+
+    function createRoundedBoxGeometry(w, h, d, r = 0.2, bevel = 0.03) {
+      const shape = createRoundedRectShape(w, h, r);
+      const geo = new THREE.ExtrudeGeometry(shape, {
+        depth: Math.max(0.01, d - bevel * 2),
+        bevelEnabled: bevel > 0,
+        bevelSegments: 2,
+        steps: 1,
+        bevelSize: bevel,
+        bevelThickness: bevel,
+        curveSegments: 14
+      });
+      geo.center();
+      return geo;
+    }
+
+    /**
+     * Builds the ergonomic asymmetrical Joy-Con 2 silhouette (left or right)
+     */
+    function createJoyConShellGeometry(w, h, d, isLeft = true) {
+      const shape = new THREE.Shape();
+      const hw = w / 2;
+      const hh = h / 2;
+      const outerR = 0.95;
+      const innerR = 0.14;
+
+      if (isLeft) {
+        // Left Joy-Con: rounded outer left edge, flat inner right magnetic rail edge
+        shape.moveTo(-hw + outerR, -hh);
+        shape.lineTo(hw - innerR, -hh);
+        shape.quadraticCurveTo(hw, -hh, hw, -hh + innerR);
+        shape.lineTo(hw, hh - innerR);
+        shape.quadraticCurveTo(hw, hh, hw - innerR, hh);
+        shape.lineTo(-hw + outerR, hh);
+        shape.quadraticCurveTo(-hw, hh, -hw, hh - outerR);
+        shape.lineTo(-hw, -hh + outerR);
+        shape.quadraticCurveTo(-hw, -hh, -hw + outerR, -hh);
+      } else {
+        // Right Joy-Con: flat inner left magnetic rail edge, rounded outer right edge
+        shape.moveTo(-hw + innerR, -hh);
+        shape.lineTo(hw - outerR, -hh);
+        shape.quadraticCurveTo(hw, -hh, hw, -hh + outerR);
+        shape.lineTo(hw, hh - outerR);
+        shape.quadraticCurveTo(hw, hh, hw - outerR, hh);
+        shape.lineTo(-hw + innerR, hh);
+        shape.quadraticCurveTo(-hw, hh, -hw, hh - innerR);
+        shape.lineTo(-hw, -hh + innerR);
+        shape.quadraticCurveTo(-hw, -hh, -hw + innerR, -hh);
+      }
+
+      const geo = new THREE.ExtrudeGeometry(shape, {
+        depth: d - 0.12,
+        bevelEnabled: true,
+        bevelSegments: 3,
+        steps: 1,
+        bevelSize: 0.06,
+        bevelThickness: 0.06,
+        curveSegments: 18
+      });
+      geo.center();
+      return geo;
+    }
+
+    /**
+     * Builds the U-shaped wide kickstand of the Nintendo Switch 2
+     */
+    function createUSKickstandGeometry(width, height, armWidth, thickness) {
+      const shape = new THREE.Shape();
+      const hw = width / 2;
+      const hh = height / 2;
+      const r = 0.25;
+
+      // Outer U contour
+      shape.moveTo(-hw, hh);
+      shape.lineTo(-hw + armWidth, hh);
+      shape.lineTo(-hw + armWidth, -hh + armWidth);
+      shape.lineTo(hw - armWidth, -hh + armWidth);
+      shape.lineTo(hw - armWidth, hh);
+      shape.lineTo(hw, hh);
+      shape.lineTo(hw, -hh + r);
+      shape.quadraticCurveTo(hw, -hh, hw - r, -hh);
+      shape.lineTo(-hw + r, -hh);
+      shape.quadraticCurveTo(-hw, -hh, -hw, -hh + r);
+      shape.closePath();
+
+      const geo = new THREE.ExtrudeGeometry(shape, {
+        depth: thickness,
+        bevelEnabled: true,
+        bevelSegments: 1,
+        steps: 1,
+        bevelSize: 0.015,
+        bevelThickness: 0.015
+      });
+      geo.center();
+      return geo;
+    }
+
+    /**
+     * ============================================================================
+     * BUILD NINTENDO SWITCH 2 ASSEMBLY (135+ PROCEDURAL CAD PARTS)
+     * ============================================================================
+     */
+    function buildNintendoSwitch2(engine) {
+      // Main Tablet Dimensions (Switch 2 enlarged 7.9" chassis proportions)
+      const BODY_W = 9.4;
+      const BODY_H = 5.4;
+      const BODY_D = 0.72;
+      const JC_W = 1.65;
+      const JC_H = 5.4;
+      const JC_D = 0.74;
+
+      // --------------------------------------------------------------------------
+      // 1. MAIN CONSOLE CHASSIS, MIDFRAME & REAR SHELL (Z-axis backward explode)
+      // --------------------------------------------------------------------------
+      const Z_REAR_SHELL = -4.2;
+      const Z_MIDFRAME = -0.35;
+
+      // Internal Structural Magnesium-Alloy Midframe
+      engine.addPart(createRoundedBoxGeometry(BODY_W - 0.16, BODY_H - 0.16, 0.12, 0.32, 0.015), {
+        position: [0, 0, -0.02],
+        explodeVec: [0, 0, Z_MIDFRAME],
+        name: 'Châssis Interne Magnésium',
+        subsystem: '1. Châssis & Coque Arrière',
+        drawOrder: 0.1
+      });
+
+      // Top & Bottom Aluminum Rail Channels (Magnetic Docking Guides)
+      [-1, 1].forEach((side) => {
+        const xRail = side * (BODY_W / 2 - 0.06);
+        engine.addPart(new THREE.BoxGeometry(0.14, BODY_H - 0.55, 0.56), {
+          position: [xRail, 0, 0],
+          explodeVec: [side * 0.45, 0, Z_MIDFRAME],
+          name: side < 0 ? 'Rail Magnétique Console Gauche' : 'Rail Magnétique Console Droit',
+          subsystem: '1. Châssis & Couplage Magnétique',
+          drawOrder: 0.12
+        });
+
+        // 2 Electromagnetic Coupler Coils & Steel Pogo-Pin Plates per side
+        [-1.35, 1.35].forEach((yOff, idx) => {
+          engine.addPart(new THREE.CylinderGeometry(0.18, 0.18, 0.08, 16), {
+            position: [side * (BODY_W / 2 - 0.15), yOff, 0],
+            rotation: [0, 0, Math.PI / 2],
+            explodeVec: [side * 0.65, 0, Z_MIDFRAME],
+            name: `Électroaimant Verrouillage #${idx + 1}`,
+            subsystem: '6. Système Magnétique Joy-Con 2',
+            drawOrder: 0.22
+          });
+
+          // 8-Pin Data/Power Spring Contact Connector
+          engine.addPart(new THREE.BoxGeometry(0.08, 0.48, 0.18), {
+            position: [side * (BODY_W / 2 - 0.03), yOff * 0.35, 0],
+            explodeVec: [side * 0.55, 0, Z_MIDFRAME],
+            name: 'Connecteur Pogo-Pin 8 Broches',
+            subsystem: '6. Système Magnétique Joy-Con 2',
+            drawOrder: 0.25
+          });
+        });
+      });
+
+      // Rear Polycarbonate Backplate Shell (with cutaway window to reveal internals even partially exploded)
+      const backShape = createRoundedRectShape(BODY_W, BODY_H, 0.36);
+      // Cutaway technical inspection aperture over SoC & Fan zone
+      const cutawayHole = new THREE.Path();
+      cutawayHole.moveTo(-2.7, -0.35);
+      cutawayHole.lineTo(1.75, -0.35);
+      cutawayHole.lineTo(1.75, 1.95);
+      cutawayHole.lineTo(-2.7, 1.95);
+      cutawayHole.closePath();
+      backShape.holes.push(cutawayHole);
+
+      const backGeo = new THREE.ExtrudeGeometry(backShape, {
+        depth: 0.12,
+        bevelEnabled: true,
+        bevelSegments: 2,
+        steps: 1,
+        bevelSize: 0.03,
+        bevelThickness: 0.03,
+        curveSegments: 16
+      });
+      backGeo.center();
+
+      engine.addPart(backGeo, {
+        position: [0, 0, -BODY_D / 2 + 0.06],
+        explodeVec: [0, 0, Z_REAR_SHELL],
+        name: 'Coque Arrière (Coupe Technique)',
+        subsystem: '1. Châssis & Coque Arrière',
+        drawOrder: 0.05
+      });
+
+      // Rear Intake Louver Grilles (2 banks of 7 louvers)
+      for (let bank = 0; bank < 2; bank++) {
+        const bx = bank === 0 ? -2.35 : 1.35;
+        for (let i = 0; i < 6; i++) {
+          engine.addPart(new THREE.BoxGeometry(0.11, 0.62, 0.05), {
+            position: [bx + i * 0.2, -1.15, -BODY_D / 2 - 0.01],
+            explodeVec: [0, 0, Z_REAR_SHELL - 0.15],
+            fine: true,
+            name: 'Grille d’Admission d’Air Inférieure',
+            subsystem: '1. Châssis & Coque Arrière',
+            drawOrder: 0.3
+          });
+        }
+      }
+
+      // Top Exhaust Vent Slots (10 exhaust fins on top edge)
+      for (let i = 0; i < 10; i++) {
+        engine.addPart(new THREE.BoxGeometry(0.11, 0.08, 0.34), {
+          position: [0.15 + i * 0.21, BODY_H / 2 - 0.02, -0.05],
+          explodeVec: [0, 0.75, Z_MIDFRAME],
+          fine: true,
+          name: 'Évent d’Extraction Thermique Supérieur',
+          subsystem: '1. Châssis & Coque Arrière',
+          drawOrder: 0.28
+        });
+      }
+
+      // Articulating U-Shaped Kickstand + Left/Right Metal Hinges (Kinematic Opening!)
+      const kickstandPivot = new THREE.Group();
+      kickstandPivot.position.set(0, 0.45, -BODY_D / 2 - 0.02);
+      engine.rootGroup.add(kickstandPivot);
+
+      const uStandPart = engine.addPart(createUSKickstandGeometry(7.6, 2.35, 0.56, 0.06), {
+        parent: kickstandPivot,
+        position: [0, -1.15, 0],
+        explodeVec: [0, -0.45, Z_REAR_SHELL - 0.85],
+        name: 'Béquille Large en U (Kickstand)',
+        subsystem: '1. Châssis & Coque Arrière',
+        drawOrder: 0.18
+      });
+
+      // Left & Right Articulating Hinge Brackets
+      [-3.52, 3.52].forEach((hx, idx) => {
+        engine.addPart(new THREE.BoxGeometry(0.32, 0.48, 0.14), {
+          position: [hx, 0.42, -BODY_D / 2 + 0.04],
+          explodeVec: [0, 0, Z_REAR_SHELL - 0.35],
+          name: `Charnière Métallique Béquille ${idx === 0 ? 'G' : 'D'}`,
+          subsystem: '1. Châssis & Coque Arrière',
+          drawOrder: 0.2
+        });
+      });
+
+      // microSD Express Slot & Ejectable Card (under kickstand)
+      engine.addPart(new THREE.BoxGeometry(0.86, 0.68, 0.08), {
+        position: [2.35, -1.65, -BODY_D / 2 + 0.12],
+        explodeVec: [0, 0, Z_REAR_SHELL + 0.65],
+        name: 'Lecteur Carte microSD Express',
+        subsystem: '1. Châssis & Coque Arrière',
+        drawOrder: 0.32
+      });
+      const sdCardPart = engine.addPart(new THREE.BoxGeometry(0.58, 0.76, 0.04), {
+        position: [2.35, -1.78, -BODY_D / 2 + 0.12],
+        explodeVec: [0, -0.95, Z_REAR_SHELL - 0.45],
+        name: 'Carte microSD Express 256 Go',
+        subsystem: '1. Châssis & Coque Arrière',
+        drawOrder: 0.38
+      });
+
+      // Top & Bottom USB-C Ports (New Switch 2 Dual USB-C Architecture!)
+      // Top USB-C Port
+      engine.addPart(createRoundedBoxGeometry(0.54, 0.18, 0.44, 0.08, 0.01), {
+        position: [-1.45, BODY_H / 2 - 0.08, 0],
+        explodeVec: [0, 0.85, -1.2],
+        name: 'Port USB-C Supérieur (Accessoires/Charge)',
+        subsystem: '1. Châssis & Connectivité',
+        drawOrder: 0.25
+      });
+      // Bottom USB-C Port (Docking)
+      engine.addPart(createRoundedBoxGeometry(0.58, 0.2, 0.48, 0.08, 0.01), {
+        position: [0, -BODY_H / 2 + 0.08, 0],
+        explodeVec: [0, -0.85, -1.2],
+        name: 'Port USB-C Inférieur (Station d’Accueil)',
+        subsystem: '1. Châssis & Connectivité',
+        drawOrder: 0.25
+      });
+
+      // Game Card Slot & Ejectable Switch 2 Cartridge
+      engine.addPart(new THREE.BoxGeometry(1.18, 0.24, 0.92), {
+        position: [3.15, BODY_H / 2 - 0.14, -0.05],
+        explodeVec: [0, 0.95, -1.4],
+        name: 'Lecteur Cartouche Switch 2',
+        subsystem: '1. Châssis & Connectivité',
+        drawOrder: 0.26
+      });
+      engine.addPart(createRoundedBoxGeometry(0.96, 1.15, 0.12, 0.08, 0.01), {
+        position: [3.15, BODY_H / 2 + 0.12, -0.05],
+        explodeVec: [0, 1.95, -1.4],
+        name: 'Cartouche de Jeu Nintendo Switch 2',
+        subsystem: '1. Châssis & Connectivité',
+        drawOrder: 0.35
+      });
+
+      // Power Button, Volume +/- Buttons, and 3.5mm Audio Jack
+      engine.addPart(new THREE.BoxGeometry(0.36, 0.12, 0.22), {
+        position: [-3.75, BODY_H / 2 + 0.02, 0],
+        explodeVec: [0, 0.9, Z_REAR_SHELL * 0.4],
+        name: 'Bouton Alimentation (Power)',
+        subsystem: '1. Châssis & Commandes',
+        drawOrder: 0.3
+      });
+      engine.addPart(new THREE.BoxGeometry(0.68, 0.12, 0.22), {
+        position: [-2.95, BODY_H / 2 + 0.02, 0],
+        explodeVec: [0, 0.9, Z_REAR_SHELL * 0.4],
+        name: 'Boutons Volume (+ / -)',
+        subsystem: '1. Châssis & Commandes',
+        drawOrder: 0.3
+      });
+      engine.addPart(new THREE.CylinderGeometry(0.14, 0.14, 0.35, 16), {
+        position: [2.25, BODY_H / 2 - 0.12, 0],
+        explodeVec: [0, 0.9, -1.2],
+        name: 'Prise Jack Audio 3.5 mm',
+        subsystem: '1. Châssis & Connectivité',
+        drawOrder: 0.3
+      });
+
+      // 8 Perimeter Tri-Wing Chassis Screws
+      const screwCoords = [
+        [-4.35, 2.35], [4.35, 2.35],
+        [-4.35, -2.35], [4.35, -2.35],
+        [-1.8, 2.48], [1.8, 2.48],
+        [-1.8, -2.48], [1.8, -2.48]
+      ];
+      screwCoords.forEach(([sx, sy], idx) => {
+        engine.addPart(new THREE.CylinderGeometry(0.065, 0.065, 0.18, 8), {
+          position: [sx, sy, -BODY_D / 2 - 0.02],
+          rotation: [Math.PI / 2, 0, 0],
+          explodeVec: [0, 0, Z_REAR_SHELL - 0.75],
+          fine: true,
+          name: `Vis Tri-Wing Châssis #${idx + 1}`,
+          subsystem: '1. Visserie & Fixations',
+          drawOrder: 0.4
+        });
+      });
+
+      // --------------------------------------------------------------------------
+      // 2. COOLING & THERMAL SUBSYSTEM (Z-axis backward / Y-axis upward explode)
+      // --------------------------------------------------------------------------
+      const Z_THERMAL = -2.45;
+
+      // Copper Heatpipe Routing (from Nvidia T239 SoC at [-0.65, 0.65] to Top Heatsink Fin Stack [1.1, 2.15])
+      const pipeCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-0.65, 0.65, -0.14),
+        new THREE.Vector3(-0.65, 1.45, -0.14),
+        new THREE.Vector3(-0.15, 2.05, -0.14),
+        new THREE.Vector3(1.85, 2.05, -0.14)
+      ]);
+      const heatpipeGeo = new THREE.TubeGeometry(pipeCurve, 28, 0.095, 10, false);
+      engine.addPart(heatpipeGeo, {
+        position: [0, 0, 0],
+        explodeVec: [0, 0.35, Z_THERMAL],
+        name: 'Caloduc Cuivre (Heatpipe)',
+        subsystem: '2. Refroidissement & Thermique',
+        drawOrder: 0.22
+      });
+
+      // Copper Coldplate Block over SoC
+      engine.addPart(new THREE.BoxGeometry(1.18, 1.18, 0.08), {
+        position: [-0.65, 0.65, -0.14],
+        explodeVec: [0, 0.35, Z_THERMAL],
+        name: 'Plaque Froide Cuivre SoC',
+        subsystem: '2. Refroidissement & Thermique',
+        drawOrder: 0.24
+      });
+
+      // Dense Array of 28 Aluminum Heatsink Fins
+      const FIN_COUNT = 28;
+      for (let i = 0; i < FIN_COUNT; i++) {
+        const fx = 0.12 + i * 0.072;
+        engine.addPart(new THREE.BoxGeometry(0.022, 0.42, 0.32), {
+          position: [fx, 2.12, -0.1],
+          explodeVec: [0, 0.65, Z_THERMAL - 0.15],
+          fine: i % 2 === 1,
+          name: `Ailette Dissipateur Aluminium (${i + 1}/${FIN_COUNT})`,
+          subsystem: '2. Refroidissement & Thermique',
+          drawOrder: 0.26 + (i / FIN_COUNT) * 0.1
+        });
+      }
+
+      // Centrifugal Blower Fan Shroud Housing (Cutaway Open Top Arc to show spinning impeller)
+      const fanCenter = [1.05, 0.88, -0.12];
+      const shroudRingGeo = new THREE.RingGeometry(0.74, 0.92, 28, 1, 0.35, Math.PI * 1.65);
+      const shroudExtrude = new THREE.ExtrudeGeometry(
+        (() => {
+          const s = new THREE.Shape();
+          s.absarc(0, 0, 0.92, 0.35, Math.PI * 1.95, false);
+          s.absarc(0, 0, 0.74, Math.PI * 1.95, 0.35, true);
+          return s;
+        })(),
+        { depth: 0.24, bevelEnabled: false, curveSegments: 24 }
+      );
+      shroudExtrude.center();
+
+      engine.addPart(shroudExtrude, {
+        position: fanCenter,
+        explodeVec: [0, 0.25, Z_THERMAL - 0.2],
+        name: 'Carter Turbine Centrifuge (Coupe)',
+        subsystem: '2. Refroidissement & Thermique',
+        drawOrder: 0.24
+      });
+
+      // Fan Base Plate & Exhaust Duct
+      engine.addPart(new THREE.CylinderGeometry(0.88, 0.88, 0.04, 24), {
+        position: [fanCenter[0], fanCenter[1], fanCenter[2] + 0.12],
+        rotation: [Math.PI / 2, 0, 0],
+        explodeVec: [0, 0.25, Z_THERMAL - 0.1],
+        fine: true,
+        name: 'Platine Moteur Brushless Ventilateur',
+        subsystem: '2. Refroidissement & Thermique',
+        drawOrder: 0.25
+      });
+
+      // Rotating Fan Impeller Hub + 19 Curved Blades (onUpdate real-time spin)
+      const fanRotorGroup = new THREE.Group();
+      fanRotorGroup.position.set(...fanCenter);
+      engine.rootGroup.add(fanRotorGroup);
+
+      const fanHubPart = engine.addPart(new THREE.CylinderGeometry(0.28, 0.28, 0.18, 18), {
+        parent: fanRotorGroup,
+        position: [0, 0, 0],
+        rotation: [Math.PI / 2, 0, 0],
+        explodeVec: [0, 0.25, Z_THERMAL - 0.35],
+        name: 'Moyeu Turbine PWM',
+        subsystem: '2. Refroidissement & Thermique',
+        drawOrder: 0.28
+      });
+
+      const BLADE_COUNT = 19;
+      for (let b = 0; b < BLADE_COUNT; b++) {
+        const angle = (b / BLADE_COUNT) * Math.PI * 2;
+        const bx = Math.cos(angle) * 0.49;
+        const by = Math.sin(angle) * 0.49;
+        engine.addPart(new THREE.BoxGeometry(0.36, 0.035, 0.15), {
+          parent: fanRotorGroup,
+          position: [bx, by, 0],
+          rotation: [0, 0, angle + 0.42],
+          explodeVec: [0, 0.25, Z_THERMAL - 0.35],
+          fine: true,
+          name: `Pale Turbine Centrifuge #${b + 1}`,
+          subsystem: '2. Refroidissement & Thermique',
+          drawOrder: 0.3
+        });
+      }
+
+      // --------------------------------------------------------------------------
+      // 3. MAIN MOTHERBOARD & NVIDIA T239 SOC ASSEMBLY (Z-axis backward explode)
+      // --------------------------------------------------------------------------
+      const Z_PCB = -1.25;
+
+      // Custom L-Shaped Main Motherboard PCB
+      const pcbShape = new THREE.Shape();
+      pcbShape.moveTo(-4.15, -0.35);
+      pcbShape.lineTo(-0.35, -0.35);
+      pcbShape.lineTo(-0.35, 0.15);
+      pcbShape.lineTo(2.45, 0.15);
+      pcbShape.lineTo(2.45, 2.25);
+      pcbShape.lineTo(-4.15, 2.25);
+      pcbShape.closePath();
+
+      const pcbGeo = new THREE.ExtrudeGeometry(pcbShape, {
+        depth: 0.07,
+        bevelEnabled: false
+      });
+      pcbGeo.center();
+
+      engine.addPart(pcbGeo, {
+        position: [-0.85, 0.95, 0.02],
+        explodeVec: [0, 0, Z_PCB],
+        name: 'Carte Mère Principale Multicouche (PCB)',
+        subsystem: '3. Carte Mère & Nvidia T239',
+        drawOrder: 0.14
+      });
+
+      // Custom Nvidia T239 SoC Silicon Die & EMI Shielding Frame
+      engine.addPart(new THREE.BoxGeometry(1.12, 1.12, 0.09), {
+        position: [-0.65, 0.65, -0.04],
+        explodeVec: [0, 0, Z_PCB - 0.32],
+        name: 'Processeur NVIDIA T239 (8-Core Cortex-A78C + Ampere)',
+        subsystem: '3. Carte Mère & Nvidia T239',
+        drawOrder: 0.2
+      });
+      // Silicon Die Inner Core
+      engine.addPart(new THREE.BoxGeometry(0.68, 0.68, 0.05), {
+        position: [-0.65, 0.65, -0.09],
+        explodeVec: [0, 0, Z_PCB - 0.48],
+        name: 'Puce Silicium NVIDIA T239 (Die)',
+        subsystem: '3. Carte Mère & Nvidia T239',
+        drawOrder: 0.25
+      });
+
+      // Dual LPDDR5X 12GB Memory Packages (2x 6GB modules adjacent to SoC)
+      [-1.55, -1.55].forEach((mx, idx) => {
+        const my = idx === 0 ? 1.15 : 0.25;
+        engine.addPart(new THREE.BoxGeometry(0.62, 0.72, 0.07), {
+          position: [mx, my, -0.04],
+          explodeVec: [0, 0, Z_PCB - 0.38],
+          name: `Module RAM LPDDR5X 6 Go (#${idx + 1} — Total 12 Go)`,
+          subsystem: '3. Carte Mère & Nvidia T239',
+          drawOrder: 0.23
+        });
+      });
+
+      // 256GB UFS 3.1 High-Speed Flash Storage Chip
+      engine.addPart(new THREE.BoxGeometry(0.74, 0.64, 0.07), {
+        position: [-2.65, 1.45, -0.04],
+        explodeVec: [0, 0, Z_PCB - 0.38],
+        name: 'Mémoire Flash UFS 3.1 256 Go',
+        subsystem: '3. Carte Mère & Nvidia T239',
+        drawOrder: 0.24
+      });
+
+      // Power Management IC (PMIC) + Inductors + SMD Capacitor Bank
+      engine.addPart(new THREE.BoxGeometry(0.56, 0.56, 0.07), {
+        position: [-2.65, 0.42, -0.04],
+        explodeVec: [0, 0, Z_PCB - 0.32],
+        name: 'Contrôleur Alimentation PMIC & USB-PD',
+        subsystem: '3. Carte Mère & Nvidia T239',
+        drawOrder: 0.26
+      });
+
+      for (let c = 0; c < 6; c++) {
+        engine.addPart(new THREE.BoxGeometry(0.18, 0.18, 0.08), {
+          position: [-3.45 + (c % 2) * 0.26, 0.35 + Math.floor(c / 2) * 0.28, -0.04],
+          explodeVec: [0, 0, Z_PCB - 0.28],
+          fine: true,
+          name: `Inductance Puissance VRM #${c + 1}`,
+          subsystem: '3. Carte Mère & Nvidia T239',
+          drawOrder: 0.32
+        });
+      }
+
+      // Wi-Fi 6E / Bluetooth 5.3 RF Shielded Module & Dual Coaxial Antennas
+      engine.addPart(new THREE.BoxGeometry(0.84, 0.66, 0.08), {
+        position: [-3.55, 1.68, -0.04],
+        explodeVec: [0, 0, Z_PCB - 0.35],
+        name: 'Module Sans-Fil Wi-Fi 6E & Bluetooth 5.3',
+        subsystem: '3. Carte Mère & Nvidia T239',
+        drawOrder: 0.27
+      });
+
+      // PCB Bus Trace Vector Lines
+      const pcbTraces = [
+        new THREE.Vector3(-1.24, 1.15, -0.03), new THREE.Vector3(-0.98, 0.95, -0.03),
+        new THREE.Vector3(-1.24, 0.25, -0.03), new THREE.Vector3(-0.98, 0.45, -0.03),
+        new THREE.Vector3(-2.28, 1.45, -0.03), new THREE.Vector3(-1.22, 0.85, -0.03),
+        new THREE.Vector3(-2.35, 0.42, -0.03), new THREE.Vector3(-1.22, 0.55, -0.03)
+      ];
+      engine.addWireLines(pcbTraces, {
+        explodeVec: [0, 0, Z_PCB - 0.05],
+        name: 'Bus Données Haute Vitesse PCB',
+        subsystem: '3. Carte Mère & Nvidia T239',
+        drawOrder: 0.35
+      });
+
+      // --------------------------------------------------------------------------
+      // 4. INTERNAL BATTERY & STEREO ACOUSTIC MODULES
+      // --------------------------------------------------------------------------
+      const Z_BATTERY = -0.85;
+
+      // High-Capacity 5220mAh Li-Ion Pouch Battery Pack
+      engine.addPart(createRoundedBoxGeometry(3.65, 1.72, 0.26, 0.14, 0.015), {
+        position: [0.45, -1.32, 0.04],
+        explodeVec: [0, -0.35, Z_BATTERY],
+        name: 'Batterie Li-Ion Haute Capacité (5220 mAh)',
+        subsystem: '4. Batterie & Acoustique Stéréo',
+        drawOrder: 0.16
+      });
+
+      // Battery BMS Protection Board & Flex Ribbon Cable
+      engine.addPart(new THREE.BoxGeometry(1.45, 0.18, 0.14), {
+        position: [-0.45, -0.42, 0.04],
+        explodeVec: [0, -0.35, Z_BATTERY - 0.15],
+        name: 'Circuit Gestion Batterie (BMS)',
+        subsystem: '4. Batterie & Acoustique Stéréo',
+        drawOrder: 0.24
+      });
+
+      // Left & Right Stereo Speaker Enclosures with Vibrating Acoustic Cones (onUpdate)
+      const speakerCones = [];
+      [-1, 1].forEach((side, idx) => {
+        const sx = side * 3.35;
+        const sy = -1.65;
+
+        // Acoustic Resonance Chamber
+        engine.addPart(createRoundedBoxGeometry(1.48, 0.92, 0.26, 0.12, 0.015), {
+          position: [sx, sy, 0.04],
+          explodeVec: [side * 0.45, -0.45, Z_BATTERY],
+          name: `Caisson Acoustique Stéréo ${side < 0 ? 'Gauche' : 'Droit'}`,
+          subsystem: '4. Batterie & Acoustique Stéréo',
+          drawOrder: 0.2
+        });
+
+        // Vibrating Oval Speaker Diaphragm Cone
+        const conePart = engine.addPart(new THREE.CylinderGeometry(0.32, 0.16, 0.09, 20), {
+          position: [sx, sy, 0.17],
+          rotation: [Math.PI / 2, 0, 0],
+          explodeVec: [side * 0.45, -0.45, Z_BATTERY + 0.15],
+          name: `Membrane Haut-Parleur ${side < 0 ? 'Gauche' : 'Droit'}`,
+          subsystem: '4. Batterie & Acoustique Stéréo',
+          drawOrder: 0.3
+        });
+        speakerCones.push({ part: conePart, baseZ: 0.17, phase: idx * Math.PI });
+      });
+
+      // Dual Array Noise-Canceling Microphone Module (for GameChat)
+      engine.addPart(new THREE.BoxGeometry(0.46, 0.22, 0.12), {
+        position: [-0.85, 2.38, 0.08],
+        explodeVec: [0, 0.55, 0.45],
+        name: 'Microphone MEMS Annulation de Bruit (GameChat)',
+        subsystem: '4. Batterie & Acoustique Stéréo',
+        drawOrder: 0.28
+      });
+
+      // --------------------------------------------------------------------------
+      // 5. 7.9-INCH 1080P 120HZ LCD DISPLAY ASSEMBLY (Z-axis forward explode)
+      // --------------------------------------------------------------------------
+      const Z_BACKLIGHT = 1.35;
+      const Z_LCD = 2.55;
+      const Z_GLASS = 3.75;
+
+      // Backlight Diffuser & Optical Prism Layer
+      engine.addPart(createRoundedBoxGeometry(8.65, 4.92, 0.06, 0.18, 0.005), {
+        position: [0, 0, 0.22],
+        explodeVec: [0, 0, Z_BACKLIGHT],
+        name: 'Diffuseur Rétroéclairage & Films Optiques',
+        subsystem: '5. Écran LCD 7.9" 1080p 120Hz',
+        drawOrder: 0.16
+      });
+
+      // 7.9-inch 1080p 120Hz Active TFT/LCD Matrix Panel
+      engine.addPart(createRoundedBoxGeometry(8.62, 4.88, 0.06, 0.16, 0.005), {
+        position: [0, 0, 0.28],
+        explodeVec: [0, 0, Z_LCD],
+        name: 'Dalle LCD 7.9 Pouces 1080p 120Hz HDR',
+        subsystem: '5. Écran LCD 7.9" 1080p 120Hz',
+        drawOrder: 0.12
+      });
+
+      // Subtle Technical Pixel/Scanline Grid on LCD Panel
+      const lcdGridPts = [];
+      const gw = 8.2;
+      const gh = 4.55;
+      for (let gx = -gw / 2; gx <= gw / 2; gx += 0.82) {
+        lcdGridPts.push(new THREE.Vector3(gx, -gh / 2, 0.32), new THREE.Vector3(gx, gh / 2, 0.32));
+      }
+      for (let gy = -gh / 2; gy <= gh / 2; gy += 0.758) {
+        lcdGridPts.push(new THREE.Vector3(-gw / 2, gy, 0.32), new THREE.Vector3(gw / 2, gy, 0.32));
+      }
+      engine.addWireLines(lcdGridPts, {
+        explodeVec: [0, 0, Z_LCD + 0.02],
+        name: 'Matrice Active 1920×1080 Pixels',
+        subsystem: '5. Écran LCD 7.9" 1080p 120Hz',
+        drawOrder: 0.36
+      });
+
+      // Display MIPI-DSI Ribbon Flex Cable
+      engine.addPart(new THREE.BoxGeometry(0.95, 0.85, 0.03), {
+        position: [-1.15, -1.85, 0.16],
+        explodeVec: [0, 0, Z_BACKLIGHT - 0.35],
+        name: 'Nappe Flex MIPI-DSI Écran',
+        subsystem: '5. Écran LCD 7.9" 1080p 120Hz',
+        drawOrder: 0.28
+      });
+
+      // Front Capacitive Digitizer Glass & Slim Bezel Frame
+      const bezelShape = createRoundedRectShape(BODY_W, BODY_H, 0.36);
+      const screenWindow = new THREE.Path();
+      const sw = 8.55 / 2;
+      const sh = 4.82 / 2;
+      screenWindow.moveTo(-sw, -sh);
+      screenWindow.lineTo(sw, -sh);
+      screenWindow.lineTo(sw, sh);
+      screenWindow.lineTo(-sw, sh);
+      screenWindow.closePath();
+      bezelShape.holes.push(screenWindow);
+
+      const bezelGeo = new THREE.ExtrudeGeometry(bezelShape, {
+        depth: 0.06,
+        bevelEnabled: true,
+        bevelSegments: 2,
+        steps: 1,
+        bevelSize: 0.015,
+        bevelThickness: 0.015,
+        curveSegments: 16
+      });
+      bezelGeo.center();
+
+      engine.addPart(bezelGeo, {
+        position: [0, 0, BODY_D / 2 - 0.02],
+        explodeVec: [0, 0, Z_GLASS],
+        name: 'Vitre Tactile Capacitive & Cadre Fin',
+        subsystem: '5. Écran LCD 7.9" 1080p 120Hz',
+        drawOrder: 0.06
+      });
+
+      // Ambient Light Sensor Window on Top Bezel
+      engine.addPart(new THREE.CylinderGeometry(0.06, 0.06, 0.04, 12), {
+        position: [0.65, 2.54, BODY_D / 2 + 0.01],
+        rotation: [Math.PI / 2, 0, 0],
+        explodeVec: [0, 0, Z_GLASS + 0.1],
+        fine: true,
+        name: 'Capteur Luminosité Ambiante',
+        subsystem: '5. Écran LCD 7.9" 1080p 120Hz',
+        drawOrder: 0.34
+      });
+
+      // --------------------------------------------------------------------------
+      // 6. LEFT & RIGHT MAGNETIC JOY-CON 2 CONTROLLERS (X-axis outward explode ±dx)
+      // --------------------------------------------------------------------------
+      const JC_OFFSET_X = BODY_W / 2 + JC_W / 2 + 0.04;
+      const DX_JOYCON = 3.15;
+
+      // Helper to build each Joy-Con 2 controller
+      const stickTilts = [];
+      let hdRumblePart = null;
+
+      [-1, 1].forEach((side) => {
+        const isLeft = side === -1;
+        const baseX = side * JC_OFFSET_X;
+        const explodeX = side * DX_JOYCON;
+        const labelSide = isLeft ? 'Joy-Con 2 Gauche (L)' : 'Joy-Con 2 Droit (R)';
+
+        // Main Ergonomic Joy-Con 2 Shell
+        engine.addPart(createJoyConShellGeometry(JC_W, JC_H, JC_D, isLeft), {
+          position: [baseX, 0, 0],
+          explodeVec: [explodeX, 0, 0],
+          name: `Coque Ergonomique ${labelSide}`,
+          subsystem: `6. ${labelSide}`,
+          drawOrder: 0.08
+        });
+
+        // Inner Magnetic Coupling Rail & Locking Latches
+        const railX = baseX - side * (JC_W / 2 - 0.05);
+        engine.addPart(new THREE.BoxGeometry(0.12, JC_H - 0.55, 0.52), {
+          position: [railX, 0, 0],
+          explodeVec: [explodeX - side * 0.45, 0, 0],
+          name: `Rail Magnétique Intérieur ${labelSide}`,
+          subsystem: `6. ${labelSide}`,
+          drawOrder: 0.16
+        });
+
+        // SL & SR Rail Buttons + Quick-Release Mechanical Lever
+        [-1.15, 1.15].forEach((ry, idx) => {
+          engine.addPart(new THREE.BoxGeometry(0.11, 0.52, 0.18), {
+            position: [railX - side * 0.04, ry, 0],
+            explodeVec: [explodeX - side * 0.65, 0, 0],
+            name: `Bouton Rail ${idx === 0 ? 'SR' : 'SL'} (${isLeft ? 'G' : 'D'})`,
+            subsystem: `6. ${labelSide}`,
+            drawOrder: 0.25
+          });
+        });
+
+        // Magnetic Release Trigger Lever on Upper Rear Shoulder
+        engine.addPart(new THREE.BoxGeometry(0.28, 0.44, 0.16), {
+          position: [railX + side * 0.16, 2.05, -JC_D / 2 + 0.05],
+          explodeVec: [explodeX - side * 0.35, 0.2, -0.45],
+          name: `Gâchette Déverrouillage Magnétique (${isLeft ? 'G' : 'D'})`,
+          subsystem: `6. ${labelSide}`,
+          drawOrder: 0.27
+        });
+
+        // Shoulder L/R & Curved ZL/ZR Triggers
+        engine.addPart(createRoundedBoxGeometry(1.18, 0.22, 0.48, 0.1, 0.02), {
+          position: [baseX + side * 0.08, JC_H / 2 + 0.04, 0.02],
+          explodeVec: [explodeX, 0.55, 0],
+          name: `Bouton Tranche ${isLeft ? 'L' : 'R'}`,
+          subsystem: `6. ${labelSide}`,
+          drawOrder: 0.22
+        });
+        engine.addPart(createRoundedBoxGeometry(1.08, 0.42, 0.34, 0.14, 0.02), {
+          position: [baseX + side * 0.06, JC_H / 2 - 0.12, -JC_D / 2 - 0.06],
+          rotation: [0.22, 0, 0],
+          explodeVec: [explodeX, 0.55, -0.55],
+          name: `Gâchette Analogique ${isLeft ? 'ZL' : 'ZR'}`,
+          subsystem: `6. ${labelSide}`,
+          drawOrder: 0.24
+        });
+
+        // Bottom Optical Mouse Sensor Lens (Signature Switch 2 Joy-Con 2 Feature!)
+        engine.addPart(new THREE.CylinderGeometry(0.18, 0.18, 0.08, 16), {
+          position: [baseX, -JC_H / 2 + 0.02, 0],
+          explodeVec: [explodeX, -0.55, 0],
+          name: `Capteur Optique Mode Souris (${isLeft ? 'G' : 'D'})`,
+          subsystem: `6. ${labelSide}`,
+          drawOrder: 0.29
+        });
+
+        // Hall-Effect Electromagnetic Analog Thumbstick Assembly (with onUpdate circular test tilt)
+        const stickY = isLeft ? 1.18 : -0.25;
+        const stickBaseGroup = new THREE.Group();
+        stickBaseGroup.position.set(baseX, stickY, JC_D / 2 - 0.02);
+        engine.rootGroup.add(stickBaseGroup);
+
+        // Hall-Effect Sensor Gimbal Housing
+        engine.addPart(new THREE.CylinderGeometry(0.42, 0.42, 0.16, 20), {
+          parent: stickBaseGroup,
+          position: [0, 0, -0.06],
+          rotation: [Math.PI / 2, 0, 0],
+          explodeVec: [explodeX, 0, 0.55],
+          name: `Module Capteur Effet Hall (${isLeft ? 'G' : 'D'})`,
+          subsystem: `6. ${labelSide}`,
+          drawOrder: 0.22
+        });
+
+        // Articulating Thumbstick Shaft & Concave Cap
+        const stickPivot = new THREE.Group();
+        stickBaseGroup.add(stickPivot);
+
+        engine.addPart(new THREE.CylinderGeometry(0.11, 0.13, 0.28, 14), {
+          parent: stickPivot,
+          position: [0, 0, 0.12],
+          rotation: [Math.PI / 2, 0, 0],
+          explodeVec: [explodeX, 0, 0.95],
+          name: `Axe Joystick Effet Hall (${isLeft ? 'G' : 'D'})`,
+          subsystem: `6. ${labelSide}`,
+          drawOrder: 0.26
+        });
+
+        engine.addPart(new THREE.CylinderGeometry(0.39, 0.35, 0.11, 24), {
+          parent: stickPivot,
+          position: [0, 0, 0.28],
+          rotation: [Math.PI / 2, 0, 0],
+          explodeVec: [explodeX, 0, 1.15],
+          name: `Capuchon Joystick Analogique (${isLeft ? 'G' : 'D'})`,
+          subsystem: `6. ${labelSide}`,
+          drawOrder: 0.28
+        });
+
+        stickTilts.push({ pivot: stickPivot, phase: isLeft ? 0 : Math.PI * 0.75 });
+
+        if (isLeft) {
+          // LEFT JOY-CON 2 SPECIFIC CONTROLS:
+          // 4 Directional Buttons (Up, Down, Left, Right)
+          const dpadOffsets = [
+            [0, 0.44, 'Haut'],
+            [0, -0.44, 'Bas'],
+            [-0.44, 0, 'Gauche'],
+            [0.44, 0, 'Droite']
+          ];
+          dpadOffsets.forEach(([dx, dy, dirName]) => {
+            engine.addPart(new THREE.CylinderGeometry(0.18, 0.18, 0.11, 18), {
+              position: [baseX + dx, -0.35 + dy, JC_D / 2 + 0.02],
+              rotation: [Math.PI / 2, 0, 0],
+              explodeVec: [explodeX, 0, 0.85],
+              name: `Bouton Directionnel ${dirName}`,
+              subsystem: `6. ${labelSide}`,
+              drawOrder: 0.28
+            });
+          });
+
+          // Minus (-) Button
+          engine.addPart(new THREE.BoxGeometry(0.28, 0.08, 0.1), {
+            position: [baseX + 0.38, 2.02, JC_D / 2 + 0.02],
+            explodeVec: [explodeX, 0, 0.85],
+            name: 'Bouton Moins (-)',
+            subsystem: `6. ${labelSide}`,
+            drawOrder: 0.3
+          });
+
+          // Square Capture Button
+          engine.addPart(createRoundedBoxGeometry(0.26, 0.26, 0.1, 0.04, 0.01), {
+            position: [baseX + 0.24, -1.55, JC_D / 2 + 0.02],
+            explodeVec: [explodeX, 0, 0.85],
+            name: 'Bouton Capture d’Écran',
+            subsystem: `6. ${labelSide}`,
+            drawOrder: 0.3
+          });
+
+          // Internal Joy-Con Battery Cell
+          engine.addPart(createRoundedBoxGeometry(0.95, 2.15, 0.18, 0.08, 0.01), {
+            position: [baseX, -0.15, -0.05],
+            explodeVec: [explodeX * 1.18, 0, -0.55],
+            fine: true,
+            name: 'Batterie Interne Joy-Con 2 (G)',
+            subsystem: `6. ${labelSide}`,
+            drawOrder: 0.32
+          });
+        } else {
+          // RIGHT JOY-CON 2 SPECIFIC CONTROLS:
+          // ABXY Action Face Buttons
+          const abxyOffsets = [
+            [0, 0.46, 'X'],
+            [0, -0.46, 'B'],
+            [-0.46, 0, 'Y'],
+            [0.46, 0, 'A']
+          ];
+          abxyOffsets.forEach(([dx, dy, btnName]) => {
+            engine.addPart(new THREE.CylinderGeometry(0.19, 0.19, 0.11, 18), {
+              position: [baseX + dx, 1.18 + dy, JC_D / 2 + 0.02],
+              rotation: [Math.PI / 2, 0, 0],
+              explodeVec: [explodeX, 0, 0.85],
+              name: `Bouton Action [${btnName}]`,
+              subsystem: `6. ${labelSide}`,
+              drawOrder: 0.28
+            });
+          });
+
+          // Plus (+) Button (2 intersecting bars)
+          engine.addPart(new THREE.BoxGeometry(0.28, 0.08, 0.1), {
+            position: [baseX - 0.38, 2.02, JC_D / 2 + 0.02],
+            explodeVec: [explodeX, 0, 0.85],
+            name: 'Bouton Plus (+)',
+            subsystem: `6. ${labelSide}`,
+            drawOrder: 0.3
+          });
+          engine.addPart(new THREE.BoxGeometry(0.08, 0.28, 0.1), {
+            position: [baseX - 0.38, 2.02, JC_D / 2 + 0.02],
+            explodeVec: [explodeX, 0, 0.85],
+            name: 'Bouton Plus (+)',
+            subsystem: `6. ${labelSide}`,
+            drawOrder: 0.3
+          });
+
+          // Home Button
+          engine.addPart(new THREE.CylinderGeometry(0.16, 0.16, 0.1, 18), {
+            position: [baseX - 0.22, -1.28, JC_D / 2 + 0.02],
+            rotation: [Math.PI / 2, 0, 0],
+            explodeVec: [explodeX, 0, 0.85],
+            name: 'Bouton Accueil (HOME)',
+            subsystem: `6. ${labelSide}`,
+            drawOrder: 0.3
+          });
+
+          // New C-Button (GameChat Dedicated Key on Right Joy-Con 2)
+          engine.addPart(createRoundedBoxGeometry(0.28, 0.28, 0.11, 0.06, 0.01), {
+            position: [baseX - 0.22, -1.78, JC_D / 2 + 0.02],
+            explodeVec: [explodeX, 0, 0.92],
+            name: 'Bouton C (Nouvelle Touche GameChat)',
+            subsystem: `6. ${labelSide}`,
+            drawOrder: 0.31
+          });
+
+          // HD Rumble 2 Linear Resonant Actuator Motor (onUpdate haptic vibration)
+          hdRumblePart = engine.addPart(new THREE.CylinderGeometry(0.24, 0.24, 0.78, 16), {
+            position: [baseX + 0.15, -1.45, -0.04],
+            explodeVec: [explodeX * 1.22, 0, -0.65],
+            name: 'Actionneur Linéaire HD Rumble 2',
+            subsystem: `6. ${labelSide}`,
+            drawOrder: 0.33
+          });
+        }
+      });
+
+      // --------------------------------------------------------------------------
+      // REAL-TIME KINEMATICS CALLBACK (onUpdate)
+      // --------------------------------------------------------------------------
+      engine.registerUpdatable((time, dt, explodeFactor) => {
+        // 1. Centrifugal Blower Fan Impeller High-Speed Spin
+        fanRotorGroup.rotation.z -= dt * 11.5;
+
+        // 2. U-Shaped Kickstand Articulating Hinge Opening / Closing
+        // Opens smoothly when exploded or gently breathes in assembled mode
+        const standAngle = explodeFactor * 0.58 + Math.sin(time * 1.4) * 0.06;
+        kickstandPivot.rotation.x = standAngle;
+
+        // 3. Stereo Acoustic Speaker Cones Subtle Audio Resonance Pulse
+        for (let i = 0; i < speakerCones.length; i++) {
+          const sc = speakerCones[i];
+          const pulse = Math.sin(time * 16 + sc.phase) * 0.014;
+          sc.part.basePos.z = sc.baseZ + pulse;
+        }
+
+        // 4. Hall-Effect Analog Thumbsticks Circular Calibration Tilt
+        for (let i = 0; i < stickTilts.length; i++) {
+          const st = stickTilts[i];
+          st.pivot.rotation.x = Math.sin(time * 2.4 + st.phase) * 0.22;
+          st.pivot.rotation.y = Math.cos(time * 2.4 + st.phase) * 0.22;
+        }
+
+        // 5. HD Rumble 2 Linear Resonant Actuator Periodic Haptic Burst
+        if (hdRumblePart) {
+          const burst = Math.max(0, Math.sin(time * 2.2)) > 0.65 ? Math.sin(time * 58) * 0.022 : 0;
+          hdRumblePart.group.position.y += burst;
+        }
+      });
+
+      // Update Part Counter Badge
+      const counterEl = document.getElementById('part-counter');
+      if (counterEl) {
+        counterEl.textContent = `PIÈCES CAO: ${engine.parts.length}`;
+      }
+    }
+
+    /**
+     * ============================================================================
+     * INITIALIZATION & UI EVENT WIRING
+     * ============================================================================
+     */
+    window.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('canvas-container');
+      const engine = new AnatomyEngine(container);
+      buildNintendoSwitch2(engine);
+
+      // Sliders & Buttons
+      const sliderExplode = document.getElementById('slider-explode');
+      const valExplode = document.getElementById('val-explode');
+
+      const sliderDraw = document.getElementById('slider-draw');
+      const valDraw = document.getElementById('val-draw');
+
+      const sliderSpeed = document.getElementById('slider-speed');
+      const valSpeed = document.getElementById('val-speed');
+
+      const btnReplay = document.getElementById('btn-replay');
+
+      sliderExplode.addEventListener('input', (e) => {
+        engine.userTouchedExplode = true;
+        const pct = parseFloat(e.target.value);
+        engine.targetExplode = pct / 100;
+        valExplode.textContent = `${Math.round(pct)}%`;
+      });
+
+      sliderDraw.addEventListener('input', (e) => {
+        engine.isDrawing = false;
+        const pct = parseFloat(e.target.value);
+        engine.setDrawProgress(pct / 100);
+        valDraw.textContent = `${Math.round(pct)}%`;
+      });
+
+      sliderSpeed.addEventListener('input', (e) => {
+        const spd = parseFloat(e.target.value);
+        engine.drawSpeed = spd;
+        valSpeed.textContent = `${spd.toFixed(1)}×`;
+      });
+
+      btnReplay.addEventListener('click', () => {
+        engine.replayDraw();
+      });
+
+      document.querySelectorAll('.view-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const view = btn.getAttribute('data-view');
+          engine.setCameraPreset(view);
+        });
+      });
+
+      engine.start();
+    });
+  </script>
+</body>
+</html>

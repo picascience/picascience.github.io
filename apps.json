@@ -1,7 +1,20 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-14T21:31:24.273Z",
+  "generated": "2026-11-14T21:48:08.370Z",
   "apps": [
+    {
+      "name": "CAO 3D",
+      "emoji": "🧊",
+      "colors": [
+        "#0f172a",
+        "#2563eb"
+      ],
+      "category": "Labo",
+      "added": "2026-11-14",
+      "description": "Mes planches techniques 3D interactives : tracé CAO, vue éclatée, pièces qui bougent",
+      "icon": "apps/cao-3d/icon.svg",
+      "id": "cao-3d"
+    },
     {
       "name": "Raisonner",
       "emoji": "∀",
