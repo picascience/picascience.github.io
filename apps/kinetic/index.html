@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KINETIC">
+<meta name="format-detection" content="telephone=no">
+<title>KINETIC</title>
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<main class="app" id="app">
+  <header class="top">
+    <div class="brand">
+      <span class="brand-mark" data-icon="logo"></span>
+      <span class="brand-name">KINETIC</span>
+      <span class="brand-sep"></span>
+      <span class="brand-date" id="date">—</span>
+    </div>
+    <button class="icon-btn press" id="mute" type="button" aria-label="Couper le son"></button>
+  </header>
+
+  <section class="bento" aria-label="Télémétrie">
+    <div class="tile tile-vel">
+      <div class="t-label"><span class="led"></span>VÉLOCITÉ · JOUR</div>
+      <div class="t-row"><span class="t-big" id="vel">00</span><span class="t-unit">TÂCHES</span></div>
+      <div class="t-foot"><span class="t-sub" id="velSub">0 MIN · 0 SPRINT</span><span class="spark" id="spark" aria-hidden="true"></span></div>
+    </div>
+    <div class="tile tile-streak">
+      <div class="t-label">STREAK</div>
+      <span class="t-ic" data-icon="flame"></span>
+      <div class="t-mid"><span id="streak">00</span><span class="t-unit">J</span></div>
+    </div>
+    <div class="tile tile-energy">
+      <div class="t-label">ÉNERGIE</div>
+      <svg class="gauge" viewBox="0 0 64 64" aria-hidden="true">
+        <circle class="g-bg" cx="32" cy="32" r="24" transform="rotate(135 32 32)" stroke-dasharray="113.10 150.80"/>
+        <circle class="g-val" id="gVal" cx="32" cy="32" r="24" transform="rotate(135 32 32)" stroke-dasharray="0 150.80"/>
+        <text class="g-pct" x="32" y="35.5" id="gPct">00</text>
+        <text class="g-unit" x="32" y="47">%</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="deck-wrap" aria-label="Deck de triage">
+    <div class="deck" id="deck"></div>
+    <div class="hints" id="hints">
+      <button type="button" class="hint press" data-dir="l" aria-label="Reporter"><span data-icon="left"></span>REPORTER</button>
+      <button type="button" class="hint hint-up press" data-dir="u" aria-label="Valider"><span data-icon="up"></span>VALIDER</button>
+      <button type="button" class="hint press" data-dir="r" aria-label="Focus">FOCUS<span data-icon="right"></span></button>
+    </div>
+  </section>
+
+  <section class="queue" aria-label="File d'attente">
+    <div class="q-head">
+      <span class="t-label">FILE MAGNÉTIQUE</span>
+      <span class="q-help">MAINTENIR · GLISSER</span>
+      <span class="q-count" id="qcount">00</span>
+    </div>
+    <ul class="q-list" id="qlist"></ul>
+  </section>
+
+  <form class="capture" id="capture" autocomplete="off">
+    <span class="cap-prompt" aria-hidden="true">&gt;</span>
+    <input id="capIn" type="text" placeholder="Capturer une action  #tag 25m !" enterkeyhint="send" maxlength="90" autocapitalize="sentences" spellcheck="false" aria-label="Nouvelle tâche">
+    <button class="cap-btn press" id="capBtn" type="submit" aria-label="Ajouter"><span data-icon="plus"></span></button>
+  </form>
+</main>
+
+<div class="focus" id="focus" aria-hidden="true" data-mode="idle">
+  <div class="focus-panel">
+    <div class="f-top">
+      <div class="f-mode"><span class="led"></span><span id="fMode">MODE FOCUS</span></div>
+      <button class="icon-btn press" id="fClose" type="button" aria-label="Fermer"><span data-icon="close"></span></button>
+    </div>
+    <div class="f-task">
+      <span class="f-tag" id="fTag"></span>
+      <h2 class="f-title" id="fTitle"></h2>
+    </div>
+    <div class="wheel-wrap">
+      <svg id="wheel" class="wheel" viewBox="0 0 344 344" role="slider" aria-label="Durée du sprint" aria-valuemin="5" aria-valuemax="60"></svg>
+      <div class="readout" aria-live="polite">
+        <div class="w-time" id="wTime">25:00</div>
+        <div class="w-sub" id="wSub"></div>
+      </div>
+    </div>
+    <div class="f-info">
+      <div><span class="t-label">FIN PRÉVUE</span><b id="fEnd">--:--</b></div>
+      <div><span class="t-label">FOCUS AUJOURD'HUI</span><b id="fToday">000 MIN</b></div>
+    </div>
+    <div class="f-actions" id="fActions"></div>
+  </div>
+</div>
+
+<div class="menu-layer" id="menuLayer" hidden>
+  <div class="menu" id="menu" role="menu"></div>
+</div>
+
+<svg class="lp-ring" id="lpRing" viewBox="0 0 80 80" aria-hidden="true">
+  <circle class="lp-track" cx="40" cy="40" r="30"/>
+  <circle class="lp-prog" cx="40" cy="40" r="30" transform="rotate(-90 40 40)"/>
+</svg>
+<div class="toast" id="toast" role="status"></div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>

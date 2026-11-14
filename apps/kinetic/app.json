@@ -1,0 +1,9 @@
+{
+  "name": "KINETIC",
+  "emoji": "⚡",
+  "colors": ["#052e16", "#10b981"],
+  "category": "Labo",
+  "added": "2026-11-14",
+  "description": "Triage tactile et sprints de focus haute vélocité",
+  "icon": "icon.svg"
+}

@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-14T21:52:39.421Z",
+  "generated": "2026-11-14T22:39:22.572Z",
   "apps": [
     {
       "name": "CAD 3D",
@@ -14,6 +14,19 @@
       "description": "Mes planches techniques 3D interactives : tracé CAO, vue éclatée, pièces qui bougent",
       "icon": "apps/cao-3d/icon.svg",
       "id": "cao-3d"
+    },
+    {
+      "name": "KINETIC",
+      "emoji": "⚡",
+      "colors": [
+        "#052e16",
+        "#10b981"
+      ],
+      "category": "Labo",
+      "added": "2026-11-14",
+      "description": "Triage tactile et sprints de focus haute vélocité",
+      "icon": "apps/kinetic/icon.svg",
+      "id": "kinetic"
     },
     {
       "name": "Raisonner",
