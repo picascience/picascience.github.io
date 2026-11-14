@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>RTX 2070 Super — Schéma CAO 3D</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #F9F8F5; --ink: #18181A; --muted: #8E8D8A; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; height: 100vh; }
+    #canvas-container { width: 100vw; height: 100vh; position: absolute; inset: 0; }
+    .top-bar { position: absolute; top: max(20px, env(safe-area-inset-top)); left: 24px; right: 24px; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); pointer-events: none; }
+    .hud { position: absolute; right: 6vw; top: 50%; transform: translateY(-50%); width: 290px; pointer-events: none; }
+    .fig-no { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .title { font-family: 'Instrument Serif', serif; font-size: 46px; line-height: 1.02; margin-bottom: 24px; }
+    .title i { font-style: italic; font-weight: 400; color: #4A4A48; display: block; }
+    .status { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .counter { font-family: 'Instrument Serif', serif; font-size: 72px; line-height: 0.9; }
+    .counter span { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+    .counter #ui-parts { font-size: inherit; }
+    .bar-bg { width: 100%; height: 3px; background: #E2E0D8; margin: 12px 0 6px; }
+    .bar-fill { height: 100%; background: var(--ink); width: 0%; }
+    .lines-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+    .specs { margin-top: 18px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--muted); line-height: 1.7; border-top: 1px solid #DEDCD3; padding-top: 10px; }
+    .specs b { color: var(--ink); font-weight: 600; }
+    .controls { position: absolute; bottom: calc(36px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); display: flex; gap: 14px; background: rgba(249,248,245,0.92); border: 1px solid #DEDCD3; padding: 10px 18px; border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 11px; align-items: center; max-width: calc(100vw - 24px); overflow-x: auto; }
+    .btn { background: none; border: 1px solid var(--ink); padding: 5px 12px; border-radius: 99px; cursor: pointer; font-family: inherit; font-size: 11px; white-space: nowrap; color: var(--ink); }
+    .btn:hover { background: var(--ink); color: var(--bg); }
+    label { white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+    input[type="range"] { accent-color: var(--ink); cursor: pointer; width: 80px; }
+    @media (max-width: 768px) {
+      .hud { right: 16px; left: 16px; top: calc(48px + env(safe-area-inset-top)); transform: none; width: auto; }
+      .title { font-size: 32px; margin-bottom: 10px; }
+      .counter { font-size: 44px; }
+      .specs { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div class="top-bar">
+    <div id="ui-prompt">/anatomy une 2070 super</div>
+    <div>● WebGL · CAO orthographique</div>
+  </div>
+  <div class="hud">
+    <div class="fig-no" id="ui-no">No. 03</div>
+    <div class="title"><span id="ui-title">Carte</span><i id="ui-sub">vue éclatée</i></div>
+    <div class="status">Tracé · <strong id="ui-group" style="color:var(--ink)">Assemblage</strong></div>
+    <div class="counter"><span id="ui-parts" style="font-family:'Instrument Serif';color:var(--ink)">0</span> <span id="ui-total-parts">sur 0 pièces</span></div>
+    <div class="bar-bg"><div class="bar-fill" id="ui-bar"></div></div>
+    <div class="lines-count"><span id="ui-lines">0</span> sur <span id="ui-total-lines">0</span> traits</div>
+    <div class="specs">
+      <b>GPU</b> TU104 · 12 nm · 2 560 cœurs CUDA<br>
+      <b>Mémoire</b> 8 Go GDDR6 · 256 bits · 14 Gb/s<br>
+      <b>Alim.</b> 215 W · 8 broches + 6 broches<br>
+      <b>Bus</b> PCIe 3.0 x16 · NVLink
+    </div>
+  </div>
+  <div class="controls">
+    <button class="btn" id="btn-replay">↻ Rejouer</button>
+    <label>Tracé <input type="range" id="slider-draw" min="0" max="1" step="0.005" value="1"></label>
+    <label>Éclaté <input type="range" id="slider-explode" min="0" max="1" step="0.01" value="0"></label>
+    <label>Vitesse <input type="range" id="slider-speed" min="0" max="2.5" step="0.1" value="1"></label>
+  </div>
+  <script>
+    class AnatomyEngine {
+      constructor(containerId, config = {}) {
+        this.container = document.getElementById(containerId);
+        this.parts = [];
+        this.totalSegments = 0;
+        this.drawProgress = 0;
+        this.isDrawing = true;
+        this.explodeFactor = 0;
+        this.autoExplode = true;
+        this.speed = 1.0;
+        this.clock = new THREE.Clock();
+        this.frustum = config.frustum || 12;
+        this.target = config.target || [1.5, 0, 0];
+        document.getElementById('ui-no').textContent = config.number || 'No. 01';
+        document.getElementById('ui-title').textContent = config.title || 'Mechanism';
+        document.getElementById('ui-sub').textContent = config.subtitle || 'kinematic view';
+        if (config.prompt) document.getElementById('ui-prompt').textContent = config.prompt;
+        this.initScene();
+        this.bindUI();
+        this.animate();
+      }
+      initScene() {
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0xF9F8F5);
+        const aspect = window.innerWidth / window.innerHeight;
+        const f = this.frustum;
+        this.camera = new THREE.OrthographicCamera(-f * aspect / 2, f * aspect / 2, f / 2, -f / 2, 0.1, 1000);
+        this.camera.position.set(16, 13, 18);
+        this.scene.add(this.camera);
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.container.appendChild(this.renderer.domElement);
+        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.target.set(...this.target);
+        this.controls.enableDamping = true;
+        this.occluderMat = new THREE.MeshBasicMaterial({ color: 0xF9F8F5, polygonOffset: true, polygonOffsetFactor: 1.5, polygonOffsetUnits: 2.0 });
+        this.fitMobile();
+        window.addEventListener('resize', () => {
+          const a = window.innerWidth / window.innerHeight;
+          this.camera.left = -this.frustum * a / 2;
+          this.camera.right = this.frustum * a / 2;
+          this.fitMobile();
+          this.camera.updateProjectionMatrix();
+          this.renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+      }
+      fitMobile() {
+        const a = window.innerWidth / window.innerHeight;
+        this.camera.zoom = a < 0.8 ? Math.max(0.42, a * 0.95) : 1;
+        this.camera.updateProjectionMatrix();
+      }
+      addPart(geometry, opts = {}) {
+        const group = new THREE.Group();
+        const basePos = opts.position ? new THREE.Vector3(...opts.position) : new THREE.Vector3();
+        const explodeVec = opts.explodeVec ? new THREE.Vector3(...opts.explodeVec) : new THREE.Vector3();
+        group.position.copy(basePos);
+        if (opts.rotation) group.rotation.set(...opts.rotation);
+        const mesh = new THREE.Mesh(geometry, this.occluderMat);
+        group.add(mesh);
+        const edgesGeo = new THREE.EdgesGeometry(geometry, opts.edgeThreshold || 18);
+        const lineMat = new THREE.LineBasicMaterial({ color: opts.color || 0x18181A, transparent: true, opacity: opts.opacity || 0.88 });
+        const lines = new THREE.LineSegments(edgesGeo, lineMat);
+        const vertexCount = edgesGeo.attributes.position.count;
+        edgesGeo.setDrawRange(0, 0);
+        group.add(lines);
+        (opts.parent || this.scene).add(group);
+        this.parts.push({ group, mesh, lines, edgesGeo, vertexCount, name: opts.name || 'Composant', basePos, explodeVec, onUpdate: opts.onUpdate || null });
+        this.totalSegments += Math.floor(vertexCount / 2);
+        document.getElementById('ui-total-parts').textContent = `sur ${this.parts.length} pièces`;
+        document.getElementById('ui-total-lines').textContent = this.totalSegments;
+        return group;
+      }
+      bindUI() {
+        document.getElementById('btn-replay').onclick = () => { this.drawProgress = 0; this.isDrawing = true; };
+        document.getElementById('slider-draw').oninput = (e) => { this.isDrawing = false; this.drawProgress = parseFloat(e.target.value); };
+        document.getElementById('slider-explode').oninput = (e) => { this.autoExplode = false; this.explodeFactor = parseFloat(e.target.value); };
+        document.getElementById('slider-speed').oninput = (e) => { this.speed = parseFloat(e.target.value); };
+      }
+      animate() {
+        requestAnimationFrame(() => this.animate());
+        const dt = Math.min(this.clock.getDelta(), 0.1);
+        const elapsed = this.clock.getElapsedTime();
+        if (this.isDrawing) {
+          this.drawProgress += dt * 0.28;
+          if (this.drawProgress >= 1) { this.drawProgress = 1; this.isDrawing = false; }
+          document.getElementById('slider-draw').value = this.drawProgress;
+        } else if (this.autoExplode && this.drawProgress >= 1) {
+          this.explodeFactor += (0.75 - this.explodeFactor) * Math.min(1, dt * 1.6);
+          if (Math.abs(this.explodeFactor - 0.75) < 0.002) { this.explodeFactor = 0.75; this.autoExplode = false; }
+          document.getElementById('slider-explode').value = this.explodeFactor;
+        }
+        const totalParts = this.parts.length;
+        const exactPart = this.drawProgress * totalParts;
+        let drawnSegments = 0;
+        let currentGroupName = 'Assemblage complet';
+        this.parts.forEach((p, idx) => {
+          if (idx < Math.floor(exactPart)) {
+            p.mesh.visible = true;
+            p.edgesGeo.setDrawRange(0, p.vertexCount);
+            drawnSegments += Math.floor(p.vertexCount / 2);
+          } else if (idx === Math.floor(exactPart)) {
+            const localProg = exactPart - Math.floor(exactPart);
+            const count = Math.floor((p.vertexCount * localProg) / 2) * 2;
+            p.mesh.visible = localProg > 0.2;
+            p.edgesGeo.setDrawRange(0, count);
+            drawnSegments += Math.floor(count / 2);
+            currentGroupName = p.name;
+          } else {
+            p.mesh.visible = false;
+            p.edgesGeo.setDrawRange(0, 0);
+          }
+          p.group.position.lerpVectors(p.basePos, p.basePos.clone().add(p.explodeVec), this.explodeFactor);
+          if (p.onUpdate) p.onUpdate(p.group, elapsed * this.speed, dt * this.speed);
+        });
+        document.getElementById('ui-parts').textContent = Math.min(totalParts, Math.ceil(exactPart));
+        document.getElementById('ui-lines').textContent = drawnSegments;
+        document.getElementById('ui-bar').style.width = `${this.drawProgress * 100}%`;
+        document.getElementById('ui-group').textContent = currentGroupName;
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+      }
+    }
+
+    // ───────────── RTX 2070 SUPER — CONSTRUCTION ─────────────
+    const E = new AnatomyEngine('canvas-container', {
+      number: 'No. 03',
+      title: 'RTX 2070 Super',
+      subtitle: 'TU104 · 8 Go GDDR6',
+      prompt: '/anatomy une 2070 super',
+      frustum: 15,
+      target: [0.8, 1.2, 0]
+    });
+    const B = (x, y, z) => new THREE.BoxGeometry(x, y, z);
+    const C = (r, h, s = 24) => new THREE.CylinderGeometry(r, r, h, s);
+    const PCB_T = 0.1, TOP = PCB_T / 2;   // surface supérieure du PCB
+    const GPU_X = 0.4;
+
+    // 1 — Circuit imprimé
+    E.addPart(B(9.4, PCB_T, 3.8), { name: 'PCB 8 couches', position: [-0.1, 0, 0] });
+
+    // 2 — Connecteur PCIe x16 (contacts dorés)
+    E.addPart(B(4.4, 0.06, 0.38), { name: 'Connecteur PCIe 3.0 x16', position: [-1.5, 0, 2.08] });
+    for (let i = 0; i < 30; i++) {
+      const x = -3.55 + i * 0.142 + (i >= 6 ? 0.12 : 0);   // détrompeur après la 6e broche
+      E.addPart(B(0.07, 0.075, 0.3), { name: 'Contacts PCIe', position: [x, 0, 2.1] });
+    }
+
+    // 3 — Puce graphique TU104
+    E.addPart(B(1.7, 0.06, 1.7), { name: 'Substrat BGA TU104', position: [GPU_X, TOP + 0.03, 0], explodeVec: [0, 0.7, 0] });
+    E.addPart(B(1.05, 0.06, 1.0), { name: 'Die TU104 · 545 mm²', position: [GPU_X, TOP + 0.09, 0], explodeVec: [0, 0.95, 0] });
+    E.addPart(B(1.9, 0.02, 1.9).translate(0, 0, 0), { name: 'Cadre de renfort', position: [GPU_X, TOP + 0.01, 0], explodeVec: [0, 0.45, 0], opacity: 0.5 });
+    // condensateurs de découplage autour du GPU
+    for (let i = 0; i < 16; i++) {
+      const side = i % 4, k = Math.floor(i / 4);
+      const off = -0.6 + k * 0.4;
+      const pos = side === 0 ? [GPU_X + off, TOP + 0.02, -1.05] : side === 1 ? [GPU_X + off, TOP + 0.02, 1.05]
+                : side === 2 ? [GPU_X - 1.05, TOP + 0.02, off] : [GPU_X + 1.05, TOP + 0.02, off];
+      E.addPart(B(0.1, 0.04, 0.06), { name: 'Condensateurs MLCC', position: pos, explodeVec: [0, 0.3, 0] });
+    }
+
+    // 4 — 8 modules GDDR6 (bus 256 bits = 8 × 32 bits)
+    const vram = [[-0.95, -0.85], [-0.95, 0], [-0.95, 0.85], [1.75, -0.85], [1.75, 0], [1.75, 0.85], [0.0, -1.5], [0.8, -1.5]];
+    vram.forEach(([x, z], i) => {
+      const rot = i >= 6 ? [0, Math.PI / 2, 0] : [0, 0, 0];
+      E.addPart(B(0.5, 0.05, 0.62), { name: `GDDR6 · module ${i + 1}/8`, position: [x + GPU_X - 0.4, TOP + 0.025, z], rotation: rot, explodeVec: [(x - 0.4) * 0.15, 0.55, z * 0.15] });
+    });
+
+    // 5 — Étage d'alimentation VRM 8+2 phases
+    for (let i = 0; i < 10; i++) {
+      const col = i < 6 ? 0 : 1, row = i < 6 ? i : i - 6;
+      const x = col === 0 ? 3.0 : 3.65, z = col === 0 ? -1.25 + row * 0.5 : -0.75 + row * 0.5;
+      E.addPart(B(0.38, 0.32, 0.38), { name: i < 8 ? 'Selfs VRM · GPU (8 phases)' : 'Selfs VRM · mémoire (2 phases)', position: [x, TOP + 0.16, z], explodeVec: [0, 0.75, 0] });
+      E.addPart(B(0.2, 0.05, 0.22), { name: 'MOSFET DrMOS', position: [x - 0.33, TOP + 0.025, z], explodeVec: [0, 0.5, 0] });
+    }
+    for (let i = 0; i < 8; i++) {
+      E.addPart(C(0.1, 0.32, 16), { name: 'Condensateurs polymère', position: [4.25, TOP + 0.16, -1.4 + i * 0.4], explodeVec: [0, 0.65, 0] });
+    }
+    E.addPart(B(0.5, 0.05, 0.5), { name: 'Contrôleur PWM', position: [2.3, TOP + 0.025, 1.45], explodeVec: [0, 0.4, 0] });
+
+    // 6 — Connecteurs d'alimentation 8 + 6 broches
+    const pwr = [[3.95, 4, '8 broches'], [3.05, 3, '6 broches']];
+    pwr.forEach(([x, cols, label]) => {
+      const w = cols * 0.2 + 0.1;
+      E.addPart(B(w, 0.42, 0.42), { name: `Connecteur ${label}`, position: [x, TOP + 0.21, -1.62], explodeVec: [0, 0.6, -0.5] });
+      for (let c = 0; c < cols; c++) for (let r = 0; r < 2; r++) {
+        E.addPart(B(0.12, 0.05, 0.12), { name: `Broches ${label}`, position: [x - w / 2 + 0.15 + c * 0.2, TOP + 0.445, -1.72 + r * 0.2], explodeVec: [0, 0.6, -0.5] });
+      }
+    });
+
+    // 7 — Connecteur NVLink
+    E.addPart(B(1.2, 0.06, 0.25), { name: 'Pont NVLink', position: [-1.6, 0, -2.0] });
+    for (let i = 0; i < 9; i++) E.addPart(B(0.06, 0.075, 0.2), { name: 'Contacts NVLink', position: [-2.08 + i * 0.12, 0, -2.0] });
+
+    // 8 — Équerre d'E/S et sorties vidéo
+    E.addPart(B(0.05, 1.7, 4.5), { name: 'Équerre PCI', position: [-5.0, 0.6, 0.05], explodeVec: [-1.4, 0, 0] });
+    E.addPart(B(0.05, 0.08, 0.6), { name: 'Patte de fixation', position: [-5.0, 1.49, -1.9], explodeVec: [-1.4, 0, 0] });
+    const ports = [['DisplayPort 1.4a', -1.5, 0.5, 0.22], ['DisplayPort 1.4a', -0.85, 0.5, 0.22], ['DisplayPort 1.4a', -0.2, 0.5, 0.22], ['HDMI 2.0b', 0.5, 0.55, 0.2], ['USB-C VirtualLink', 1.2, 0.36, 0.13]];
+    ports.forEach(([n, z, w, h]) => {
+      E.addPart(B(0.7, h, w), { name: n, position: [-4.62, TOP + h / 2 + 0.02, z], explodeVec: [-0.9, 0.2, 0] });
+    });
+    for (let i = 0; i < 14; i++) E.addPart(B(0.05, 0.08, 0.16), { name: 'Grille d\'aération', position: [-5.0, 0.95, -1.6 + i * 0.23], explodeVec: [-1.4, 0, 0], opacity: 0.6 });
+
+    // 9 — Backplate + vis
+    E.addPart(B(9.6, 0.05, 3.9), { name: 'Backplate aluminium', position: [-0.05, -0.2, 0], explodeVec: [0, -1.7, 0] });
+    [[-0.45, -0.75], [1.25, -0.75], [-0.45, 0.75], [1.25, 0.75], [-4.2, -1.6], [-4.2, 1.6], [4.3, -1.6], [4.3, 1.6]].forEach(([x, z], i) => {
+      E.addPart(C(0.07, 0.25, 10), { name: i < 4 ? 'Vis à ressort du radiateur' : 'Vis de backplate', position: [x, -0.32, z], explodeVec: [0, -2.4, 0], edgeThreshold: 1 });
+    });
+
+    // 10 — Pads thermiques
+    vram.forEach(([x, z], i) => {
+      const rot = i >= 6 ? [0, Math.PI / 2, 0] : [0, 0, 0];
+      E.addPart(B(0.52, 0.03, 0.64), { name: 'Pads thermiques mémoire', position: [x + GPU_X - 0.4, TOP + 0.07, z], rotation: rot, explodeVec: [0, 1.15, 0], opacity: 0.55 });
+    });
+    E.addPart(B(1.3, 0.03, 2.9), { name: 'Pads thermiques VRM', position: [3.3, TOP + 0.36, 0.0], explodeVec: [0, 1.15, 0], opacity: 0.55 });
+
+    // 11 — Cadre de refroidissement & plaque de contact cuivre
+    E.addPart(B(8.8, 0.06, 3.6), { name: 'Cadre de refroidissement', position: [-0.2, 0.52, 0], explodeVec: [0, 1.45, 0], opacity: 0.45 });
+    E.addPart(B(1.9, 0.14, 1.9), { name: 'Plaque de contact cuivre', position: [GPU_X, 0.28, 0], explodeVec: [0, 1.4, 0] });
+
+    // 12 — Caloducs (5 × Ø6 mm)
+    for (let i = 0; i < 5; i++) {
+      const z = -1.2 + i * 0.6;
+      E.addPart(new THREE.CylinderGeometry(0.075, 0.075, 8.4, 8).rotateZ(Math.PI / 2), { name: `Caloduc ${i + 1}/5`, position: [-0.2, 0.42, z], explodeVec: [0, 1.75, 0], edgeThreshold: 30 });
+    }
+
+    // 13 — Radiateur : empilement d'ailettes
+    const N_FINS = 62;
+    for (let i = 0; i < N_FINS; i++) {
+      const x = -4.3 + i * (8.4 / (N_FINS - 1));
+      E.addPart(B(0.025, 0.8, 3.6), { name: 'Ailettes aluminium', position: [x, 0.98, 0], explodeVec: [0, 2.3, 0], opacity: 0.7 });
+    }
+
+    // 14 — Carénage (shroud) avec ouïes de ventilateurs
+    const FAN_X = [-2.3, 2.1], FAN_R = 1.62;
+    const shape = new THREE.Shape();
+    shape.moveTo(-4.85, -1.95); shape.lineTo(4.85, -1.95); shape.lineTo(4.85, 1.95); shape.lineTo(-4.85, 1.95); shape.lineTo(-4.85, -1.95);
+    FAN_X.forEach(fx => { const h = new THREE.Path(); h.absarc(fx, 0, FAN_R, 0, Math.PI * 2, true); shape.holes.push(h); });
+    const shroudGeo = new THREE.ExtrudeGeometry(shape, { depth: 0.08, bevelEnabled: false, curveSegments: 48 }).rotateX(Math.PI / 2);
+    E.addPart(shroudGeo, { name: 'Carénage supérieur', position: [0, 1.5, 0], explodeVec: [0, 3.1, 0] });
+    E.addPart(B(9.7, 1.2, 0.05), { name: 'Flanc du carénage', position: [0, 0.9, -1.93], explodeVec: [0, 3.1, -0.3] });
+    E.addPart(B(0.05, 1.2, 3.9), { name: 'Embout du carénage', position: [4.83, 0.9, 0], explodeVec: [0.4, 3.1, 0] });
+    FAN_X.forEach(fx => {
+      E.addPart(new THREE.CylinderGeometry(FAN_R, FAN_R, 0.3, 48, 1, true), { name: 'Buse de ventilateur', position: [fx, 1.3, 0], explodeVec: [0, 3.1, 0], opacity: 0.6 });
+    });
+
+    // 15 — Ventilateurs axiaux 90 mm (2 × 11 pales)
+    FAN_X.forEach((fx, f) => {
+      const dir = f === 0 ? 1 : -1;
+      const hub = E.addPart(C(0.38, 0.2, 32), { name: `Moyeu ventilateur ${f + 1}`, position: [fx, 1.45, 0], explodeVec: [0, 3.9, 0],
+        onUpdate: (g, t) => { g.rotation.y = t * 5 * dir; } });
+      E.addPart(C(0.24, 0.03, 32), { name: `Moyeu ventilateur ${f + 1}`, position: [0, 0.115, 0], parent: hub });
+      for (let b = 0; b < 11; b++) {
+        const a = (b / 11) * Math.PI * 2;
+        const g = B(1.12, 0.02, 0.42).rotateX(0.5 * dir).translate(0.95, 0, 0).rotateY(a);
+        E.addPart(g, { name: `Pales ventilateur ${f + 1}`, position: [0, 0, 0], parent: hub });
+      }
+    });
+  </script>
+</body>
+</html>

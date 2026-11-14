@@ -18,5 +18,15 @@
     "added": "2026-11-14",
     "file": "models/fusee-orbitale.html",
     "thumb": "thumbs/fusee-orbitale.webp"
+  },
+  {
+    "id": "rtx-2070-super",
+    "number": "No. 03",
+    "title": "RTX 2070 Super",
+    "subtitle": "TU104 · 8 Go GDDR6",
+    "parts": 253,
+    "added": "2026-11-14",
+    "file": "models/rtx-2070-super.html",
+    "thumb": "thumbs/rtx-2070-super.webp"
   }
 ]
