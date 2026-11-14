@@ -51,16 +51,22 @@
   .empty { text-align:center; padding:60px 20px; color:var(--muted); font-size:12px; border:1px dashed var(--line); border-radius:6px; background:rgba(249,248,245,.9); }
   .empty b { display:block; font-family:'Instrument Serif',serif; font-weight:400; color:var(--ink); font-size:30px; margin-bottom:6px; }
 
-  /* Visionneuse plein écran */
+  /* Visionneuse plein écran : barre fixe en haut, la planche en dessous (rien ne se chevauche) */
   #viewer { position:fixed; inset:0; z-index:50; background:var(--paper); display:none; }
   #viewer.open { display:block; }
-  #viewer iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
-  .vbar { position:absolute; z-index:2; top:max(10px, env(safe-area-inset-top)); right:max(10px, env(safe-area-inset-right)); display:flex; gap:6px; }
-  .vbtn { display:inline-flex; align-items:center; gap:6px; background:rgba(249,248,245,.94); border:1px solid rgba(24,24,26,.3); color:var(--ink); padding:7px 12px; border-radius:99px; font-family:'JetBrains Mono',monospace; font-size:11px; cursor:pointer; text-decoration:none; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
-  .vbtn:hover { background:var(--ink); color:var(--paper); }
-  .vbtn.nav { padding:7px 10px; }
+  .vtop { position:absolute; z-index:2; top:0; left:0; right:0; height:calc(52px + env(safe-area-inset-top)); padding:env(safe-area-inset-top) max(10px, env(safe-area-inset-right)) 0 max(10px, env(safe-area-inset-left));
+    display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:10px; background:var(--paper); border-bottom:1px solid var(--line); }
+  .vinfo { min-width:0; text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .vinfo b { color:var(--ink); font-weight:600; }
+  .vgrp { display:flex; gap:6px; }
+  .vbtn { display:inline-flex; align-items:center; justify-content:center; gap:6px; height:36px; min-width:36px; padding:0 12px; background:transparent; border:1px solid rgba(24,24,26,.22);
+    color:var(--ink); border-radius:99px; font-family:'JetBrains Mono',monospace; font-size:12px; cursor:pointer; text-decoration:none; }
+  .vbtn.nav { padding:0; width:36px; font-size:16px; }
+  .vbtn:active { background:var(--ink); color:var(--paper); }
+  @media (hover:hover) { .vbtn:hover { background:var(--ink); color:var(--paper); } }
+  .vbtn:disabled { opacity:.35; pointer-events:none; }
+  #viewer iframe { position:absolute; left:0; right:0; bottom:0; top:calc(52px + env(safe-area-inset-top)); width:100%; height:calc(100% - 52px - env(safe-area-inset-top)); border:0; }
   @media (max-width:640px) { .vbtn .lbl, #v-tab { display:none; } }
-}
 </style>
 </head>
 <body>
@@ -84,11 +90,14 @@
 </div>
 
 <div id="viewer" aria-hidden="true">
-  <div class="vbar">
-    <button class="vbtn nav" id="v-prev" title="Planche précédente">‹</button>
-    <button class="vbtn nav" id="v-next" title="Planche suivante">›</button>
-    <a class="vbtn" id="v-tab" target="_blank" rel="noopener" title="Ouvrir dans un onglet">↗</a>
-    <button class="vbtn" id="v-close">✕ <span class="lbl">Planches</span></button>
+  <div class="vtop">
+    <button class="vbtn" id="v-close" title="Retour aux planches">← <span class="lbl">Planches</span></button>
+    <div class="vinfo" id="v-info"></div>
+    <div class="vgrp">
+      <a class="vbtn nav" id="v-tab" target="_blank" rel="noopener" title="Ouvrir dans un onglet">↗</a>
+      <button class="vbtn nav" id="v-prev" title="Planche précédente">‹</button>
+      <button class="vbtn nav" id="v-next" title="Planche suivante">›</button>
+    </div>
   </div>
   <iframe id="v-frame" title="Planche 3D" allow="fullscreen"></iframe>
 </div>
@@ -155,6 +164,7 @@
     $('viewer').classList.add('open');
     $('viewer').setAttribute('aria-hidden', 'false');
     document.title = `${m.title} — CAD 3D`;
+    $('v-info').innerHTML = `Planche <b>${i + 1}</b> / ${models.length}`;
     $('v-prev').disabled = models.length < 2; $('v-next').disabled = models.length < 2;
     if (!seen[m.id]) { seen[m.id] = 1; try { localStorage.setItem(KEY, JSON.stringify(seen)); } catch (e) {} }
     if (push) history.pushState({ id: m.id }, '', '#' + m.id); else history.replaceState({ id: m.id }, '', '#' + m.id);

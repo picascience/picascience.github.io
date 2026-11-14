@@ -5,538 +5,248 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Fusée Orbitale — Schéma CAO 3D Interactif</title>
 
-  <!-- Google Fonts: Instrument Serif, JetBrains Mono, Plus Jakarta Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
   <!-- Three.js r128 & OrbitControls -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
-  <style>
-    :root {
-      --paper: #F9F8F5;
-      --paper-panel: rgba(249, 248, 245, 0.86);
-      --ink: #18181A;
-      --ink-muted: #5C5C63;
-      --ink-subtle: rgba(24, 24, 26, 0.14);
-      --ink-faint: rgba(24, 24, 26, 0.06);
-      --accent: #18181A;
-    }
+<!-- CAD:HEAD · gabarit CAD 3D v2 — bloc commun à toutes les planches, ne pas modifier -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style id="cad-gabarit">
+  :root {
+    --paper:#F9F8F5; --ink:#18181A; --muted:#8E8D8A; --soft:#4A4A48; --line:#DEDCD3; --track:#E2E0D8;
+    --gap:16px;
+    --safe-t:max(14px, env(safe-area-inset-top));
+    --safe-b:max(60px, calc(env(safe-area-inset-bottom) + 28px)); /* barre de retour MK Apps */
+    --stage-t:0px; --stage-r:0px; --stage-b:0px; --stage-l:0px;
+    --serif:'Instrument Serif', Georgia, 'Times New Roman', serif;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
+    --cad-mode:col;
+  }
+  *, *::before, *::after { box-sizing:border-box; }
+  html, body { margin:0; padding:0; height:100%; overflow:hidden; overscroll-behavior:none; background:var(--paper); color:var(--ink);
+    font-family:var(--mono); -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%; -webkit-tap-highlight-color:transparent; }
+  #canvas-container { position:fixed; top:var(--stage-t); right:var(--stage-r); bottom:var(--stage-b); left:var(--stage-l);
+    touch-action:none; cursor:grab; overflow:hidden; }
+  #canvas-container:active { cursor:grabbing; }
+  #canvas-container canvas { display:block; }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-    }
+  /* ── En-tête : n° · titre · sous-titre · tracé ── */
+  .cad-hud { position:fixed; z-index:10; top:var(--safe-t); left:var(--gap); right:var(--gap); pointer-events:none; user-select:none; -webkit-user-select:none; }
+  .cad-tag { display:flex; align-items:center; gap:8px; min-width:0; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+  .cad-tag b { color:var(--ink); font-weight:600; flex:none; }
+  .cad-tag .cad-prompt { text-transform:none; letter-spacing:0; overflow:hidden; text-overflow:ellipsis; }
+  .cad-title { font-family:var(--serif); font-weight:400; font-size:30px; line-height:1.02; letter-spacing:-.01em; margin:6px 0 0; overflow-wrap:anywhere; }
+  .cad-sub { font-family:var(--serif); font-style:italic; font-size:17px; line-height:1.15; color:var(--soft); margin:2px 0 0; }
+  .cad-status { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:baseline; column-gap:12px;
+    margin-top:10px; padding-top:8px; border-top:1px solid var(--line); font-size:11px; color:var(--muted); }
+  .cad-group { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cad-group strong { color:var(--ink); font-weight:600; }
+  .cad-count { font-family:var(--serif); font-size:28px; line-height:1; color:var(--ink); white-space:nowrap; text-align:right; font-variant-numeric:tabular-nums; }
+  .cad-count small { font-family:var(--mono); font-size:11px; color:var(--muted); margin-left:4px; }
+  .cad-bar { grid-column:1 / -1; height:3px; margin:7px 0 5px; background:var(--track); border-radius:2px; overflow:hidden; }
+  .cad-bar i { display:block; height:100%; width:0; background:var(--ink); }
+  .cad-lines, .cad-pct { font-variant-numeric:tabular-nums; }
+  .cad-pct { text-align:right; }
+  .cad-specs { display:none; margin:16px 0 0; padding-top:10px; border-top:1px solid var(--line); font-size:10.5px; line-height:1.55; }
+  .cad-specs div { display:flex; justify-content:space-between; gap:12px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .cad-specs dt { color:var(--muted); text-transform:uppercase; letter-spacing:.08em; }
+  .cad-specs dd { margin:0; text-align:right; color:var(--ink); }
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: var(--paper);
-      color: var(--ink);
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
+  /* ── Dock de commandes : toujours la même forme ── */
+  .cad-dock { position:fixed; z-index:10; left:var(--gap); right:var(--gap); bottom:var(--safe-b); margin:0 auto; max-width:520px;
+    padding:10px 14px 4px; background:rgba(249,248,245,.95); border:1px solid var(--line); border-radius:16px;
+    box-shadow:0 10px 30px -16px rgba(24,24,26,.35); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    user-select:none; -webkit-user-select:none; }
+  .cad-actions { display:flex; gap:6px; margin-bottom:4px; overflow-x:auto; scrollbar-width:none; }
+  .cad-actions::-webkit-scrollbar { display:none; }
+  .cad-btn { flex:none; height:34px; padding:0 12px; display:inline-flex; align-items:center; gap:6px; border:1px solid rgba(24,24,26,.22);
+    border-radius:9px; background:transparent; color:var(--ink); font:600 11px/1 var(--mono); letter-spacing:.06em; text-transform:uppercase; cursor:pointer; }
+  .cad-btn:active { transform:scale(.97); }
+  .cad-btn.cad-primary { background:var(--ink); border-color:var(--ink); color:var(--paper); }
+  .cad-btn.on { border-color:var(--ink); background:rgba(24,24,26,.07); }
+  .cad-sep { flex:none; width:1px; margin:7px 2px; background:var(--line); }
+  .cad-row { display:grid; grid-template-columns:66px minmax(0,1fr) 50px; align-items:center; column-gap:10px; height:38px; }
+  .cad-row label { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); }
+  .cad-row output { font-size:12px; text-align:right; font-variant-numeric:tabular-nums; color:var(--ink); }
+  .cad-range { -webkit-appearance:none; appearance:none; display:block; width:100%; height:34px; margin:0; background:transparent; cursor:pointer; --p:0%; touch-action:pan-y; }
+  .cad-range:focus { outline:none; }
+  .cad-range::-webkit-slider-runnable-track { height:3px; border-radius:2px; background:linear-gradient(var(--ink),var(--ink)) 0 0 / var(--p) 100% no-repeat, var(--track); }
+  .cad-range::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; margin-top:-9.5px; border-radius:50%; background:var(--paper); border:2px solid var(--ink); box-shadow:0 1px 4px rgba(24,24,26,.2); }
+  .cad-range:active::-webkit-slider-thumb { background:var(--ink); }
+  .cad-range::-moz-range-track { height:3px; border-radius:2px; background:var(--track); }
+  .cad-range::-moz-range-progress { height:3px; border-radius:2px; background:var(--ink); }
+  .cad-range::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:var(--paper); border:2px solid var(--ink); }
 
-    /* Subtle architectural drafting grid background */
-    #canvas-container {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      background-color: var(--paper);
-      background-image:
-        radial-gradient(rgba(24, 24, 26, 0.08) 1px, transparent 1px);
-      background-size: 24px 24px;
-      cursor: grab;
-    }
-
-    #canvas-container:active {
-      cursor: grabbing;
-    }
-
-    /* Corner registration marks */
-    .cad-frame {
-      position: fixed;
-      inset: 14px;
-      border: 1px solid var(--ink-subtle);
-      pointer-events: none;
-      z-index: 5;
-    }
-
-    /* Top Editorial Bar */
-    .top-bar {
-      position: fixed;
-      top: 14px;
-      left: 14px;
-      right: 14px;
-      height: 44px;
-      padding: 0 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--ink-subtle);
-      background: var(--paper-panel);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      z-index: 20;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11.5px;
-      letter-spacing: 0.03em;
-    }
-
-    .top-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--ink);
-      font-weight: 500;
-    }
-
-    .top-left span.slash {
-      font-weight: 600;
-      opacity: 0.9;
-    }
-
-    .top-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--ink-muted);
-      font-size: 11px;
-    }
-
-    .status-dot {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background-color: var(--ink);
-      animation: pulseDot 2.2s infinite ease-in-out;
-    }
-
-    @keyframes pulseDot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.35; transform: scale(0.82); }
-    }
-
-    /* Right-side Editorial HUD */
-    .editorial-hud {
-      position: fixed;
-      top: 78px;
-      right: 34px;
-      width: 340px;
-      max-width: calc(100vw - 48px);
-      padding: 24px 26px;
-      background: var(--paper-panel);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid var(--ink-subtle);
-      border-radius: 14px;
-      z-index: 15;
-      pointer-events: none;
-      box-shadow: 0 12px 36px rgba(24, 24, 26, 0.04);
-    }
-
-    .fig-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--ink-muted);
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .fig-tag::after {
-      content: "ÉCHELLE 1:120 · ISO";
-      font-weight: 400;
-      font-size: 10px;
-      opacity: 0.7;
-    }
-
-    .hud-title {
-      font-family: 'Instrument Serif', Georgia, serif;
-      font-size: 42px;
-      line-height: 0.98;
-      font-weight: 400;
-      color: var(--ink);
-      letter-spacing: -0.01em;
-    }
-
-    .hud-subtitle {
-      font-family: 'Instrument Serif', Georgia, serif;
-      font-style: italic;
-      font-size: 24px;
-      line-height: 1.15;
-      color: var(--ink-muted);
-      margin-top: 2px;
-      margin-bottom: 18px;
-    }
-
-    .divider {
-      height: 1px;
-      background: var(--ink-subtle);
-      margin: 14px 0;
-    }
-
-    .active-assembly {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11.5px;
-      color: var(--ink);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 20px;
-    }
-
-    .active-assembly .prefix {
-      color: var(--ink-muted);
-      font-weight: 500;
-    }
-
-    .active-assembly .name {
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .giant-counter {
-      margin-top: 16px;
-      font-family: 'Instrument Serif', Georgia, serif;
-      font-size: 46px;
-      line-height: 1;
-      color: var(--ink);
-      letter-spacing: -0.02em;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .giant-counter span.unit {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--ink-muted);
-      letter-spacing: 0;
-      margin-left: 4px;
-    }
-
-    .progress-track {
-      width: 100%;
-      height: 4px;
-      background: var(--ink-faint);
-      border-radius: 999px;
-      overflow: hidden;
-      margin: 14px 0 10px 0;
-      border: 1px solid rgba(24, 24, 26, 0.08);
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--ink);
-      border-radius: 999px;
-      transition: width 0.06s linear;
-    }
-
-    .line-counter {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11.5px;
-      color: var(--ink-muted);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .spec-grid {
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px dashed var(--ink-subtle);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10.5px;
-    }
-
-    .spec-item {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .spec-label {
-      color: var(--ink-muted);
-      font-size: 9.5px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .spec-val {
-      color: var(--ink);
-      font-weight: 600;
-    }
-
-    /* Bottom Controls Pill */
-    .controls-pill {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      padding: 10px 20px;
-      background: rgba(249, 248, 245, 0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(24, 24, 26, 0.22);
-      border-radius: 999px;
-      box-shadow: 0 10px 30px rgba(24, 24, 26, 0.08);
-      z-index: 25;
-      max-width: calc(100vw - 32px);
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .btn-replay {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--ink);
-      background: var(--ink);
-      color: var(--paper);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
-      white-space: nowrap;
-    }
-
-    .btn-replay:hover {
-      background: transparent;
-      color: var(--ink);
-    }
-
-    .btn-replay:active {
-      transform: scale(0.96);
-    }
-
-    .pill-sep {
-      width: 1px;
-      height: 22px;
-      background: var(--ink-subtle);
-    }
-
-    .slider-group {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: var(--ink);
-    }
-
-    .slider-group label {
-      font-weight: 500;
-      color: var(--ink-muted);
-      white-space: nowrap;
-    }
-
-    .slider-val {
-      min-width: 34px;
-      text-align: right;
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
-    }
-
-    input[type="range"] {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 86px;
-      height: 3px;
-      background: rgba(24, 24, 26, 0.18);
-      border-radius: 999px;
-      outline: none;
-      cursor: pointer;
-    }
-
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 13px;
-      height: 13px;
-      border-radius: 50%;
-      background: var(--ink);
-      border: 2px solid var(--paper);
-      box-shadow: 0 0 0 1px var(--ink);
-      cursor: pointer;
-      transition: transform 0.12s ease;
-    }
-
-    input[type="range"]::-webkit-slider-thumb:hover {
-      transform: scale(1.18);
-    }
-
-    input[type="range"]::-moz-range-thumb {
-      width: 13px;
-      height: 13px;
-      border-radius: 50%;
-      background: var(--ink);
-      border: 2px solid var(--paper);
-      box-shadow: 0 0 0 1px var(--ink);
-      cursor: pointer;
-    }
-
-    /* Responsive adjustments for smaller screens */
-    @media (max-width: 860px) {
-      .editorial-hud {
-        top: 66px;
-        right: 22px;
-        width: 270px;
-        padding: 16px 18px;
-      }
-      .hud-title { font-size: 32px; }
-      .hud-subtitle { font-size: 19px; margin-bottom: 10px; }
-      .giant-counter { font-size: 34px; margin-top: 10px; }
-      .spec-grid { display: none; }
-      .controls-pill {
-        bottom: 20px;
-        padding: 8px 14px;
-        gap: 10px;
-        border-radius: 18px;
-      }
-      .pill-sep { display: none; }
-      input[type="range"] { width: 70px; }
-    }
-
-    @media (max-width: 560px) {
-      .top-right { display: none; }
-      .editorial-hud {
-        width: calc(100vw - 44px);
-        right: 22px;
-        left: 22px;
-        padding: 12px 14px;
-      }
-      .hud-title { font-size: 26px; }
-      .hud-subtitle { font-size: 16px; margin-bottom: 6px; }
-      .giant-counter { font-size: 28px; margin-top: 6px; }
-      .divider { margin: 8px 0; }
-    }
-    /* MK Apps : dégager la barre de retour du launcher */
-    .controls-pill { bottom: calc(36px + env(safe-area-inset-bottom)) !important; }
-  </style>
+  /* Grand écran : en-tête en colonne à droite, dock en bas à gauche */
+  @media (min-width:1000px) and (min-height:600px) {
+    :root { --cad-mode:wide; --safe-b:max(28px, calc(env(safe-area-inset-bottom) + 28px)); }
+    .cad-hud { left:auto; right:max(36px, 5vw); top:50%; transform:translateY(-50%); width:300px; }
+    .cad-title { font-size:46px; }
+    .cad-sub { font-size:22px; }
+    .cad-status { grid-template-columns:1fr auto; margin-top:22px; padding-top:12px; }
+    .cad-count { grid-column:1 / -1; text-align:left; font-size:68px; line-height:.9; margin-top:6px; }
+    .cad-specs { display:block; }
+    .cad-dock { left:max(28px, 4vw); right:auto; width:460px; margin:0; }
+  }
+  /* Téléphone à l'horizontale : en-tête à gauche, dock à droite */
+  @media (max-height:520px) and (orientation:landscape) {
+    :root { --cad-mode:land; --safe-b:max(14px, env(safe-area-inset-bottom)); }
+    .cad-hud { right:auto; width:min(270px, 34vw); left:max(var(--gap), env(safe-area-inset-left)); }
+    .cad-title { font-size:24px; }
+    .cad-dock { left:auto; right:max(var(--gap), env(safe-area-inset-right)); width:min(330px, 40vw); margin:0; padding-top:6px; }
+    .cad-row { height:32px; }
+  }
+</style>
+<!-- /CAD:HEAD -->
 </head>
 <body>
+<!-- CAD:UI -->
+<div id="canvas-container" aria-label="Vue CAO 3D interactive"></div>
+<header class="cad-hud" aria-live="polite">
+  <div class="cad-tag"><b id="ui-no">No. 00</b><span>·</span><span class="cad-prompt" id="ui-prompt">/anatomy</span></div>
+  <h1 class="cad-title" id="ui-title">Machine</h1>
+  <p class="cad-sub" id="ui-sub">sous-titre</p>
+  <div class="cad-status">
+    <div class="cad-group">Tracé · <strong id="ui-group">Initialisation…</strong></div>
+    <div class="cad-count"><span id="ui-parts">0</span><small>/ <span id="ui-total-parts">0</span> pièces</small></div>
+    <div class="cad-bar"><i id="ui-bar"></i></div>
+    <div class="cad-lines"><span id="ui-lines">0</span> / <span id="ui-total-lines">0</span> traits</div>
+    <div class="cad-pct" id="ui-pct">0%</div>
+  </div>
+  <dl class="cad-specs" id="ui-specs"></dl>
+</header>
+<nav class="cad-dock" aria-label="Commandes de la planche">
+  <div class="cad-actions" id="ui-actions">
+    <button type="button" class="cad-btn cad-primary" id="btn-replay">↻ Rejouer</button>
+  </div>
+  <div class="cad-row"><label for="slider-draw">Tracé</label><input class="cad-range" type="range" id="slider-draw" min="0" max="1" step="0.001" value="0"><output id="val-draw">0%</output></div>
+  <div class="cad-row"><label for="slider-explode">Éclaté</label><input class="cad-range" type="range" id="slider-explode" min="0" max="1" step="0.005" value="0"><output id="val-explode">0%</output></div>
+  <div class="cad-row"><label for="slider-speed">Vitesse</label><input class="cad-range" type="range" id="slider-speed" min="0" max="2.5" step="0.05" value="1" data-unit="x"><output id="val-speed">1.0×</output></div>
+</nav>
+<script>
+/* CADUI — gabarit CAD 3D v2. API :
+   CADUI.mount({ number, title, subtitle, prompt, specs:[[clé, valeur]…], views:[{id,label}…] })
+   CADUI.on('replay'|'draw'|'explode'|'speed'|'view', fn)      → valeurs 0..1 (vitesse 0..2.5)
+   CADUI.set('draw'|'explode'|'speed', v)                      → déplace le curseur (sans déclencher on)
+   CADUI.progress({ group, parts, totalParts, lines, totalLines, p })
+   CADUI.attach({ camera, renderer, controls, object, margin }) → cadre la machine dans la zone libre et gère le redimensionnement */
+const CADUI = (() => {
+  const $ = id => document.getElementById(id);
+  const root = document.documentElement;
+  const fr = n => Math.round(+n || 0).toLocaleString('fr-FR');
+  const handlers = {}, cache = {};
+  let rig = null, fitW = 0, fitH = 0;
+  const emit = (e, v) => (handlers[e] || []).forEach(fn => fn(v));
+  const text = (id, t) => { t = String(t); if (cache[id] !== t) { cache[id] = t; const el = $(id); if (el) el.textContent = t; } };
+  const paint = r => {
+    const p = (r.value - r.min) / (r.max - r.min) * 100;
+    r.style.setProperty('--p', p + '%');
+    text(r.id.replace('slider-', 'val-'), r.dataset.unit === 'x' ? (+r.value).toFixed(1) + '×' : Math.round(p) + '%');
+  };
+  const ranges = () => document.querySelectorAll('.cad-range');
 
-  <!-- Outer technical drafting frame -->
-  <div class="cad-frame"></div>
+  function resize() {
+    if (!rig) return;
+    const el = $('canvas-container'), w = el.clientWidth, h = el.clientHeight;
+    if (!w || !h) return;
+    rig.renderer.setSize(w, h);
+    const c = rig.camera;
+    if (c.isOrthographicCamera && fitW && fitH) {
+      const a = w / h, fh = Math.max(fitH, fitW / a);
+      c.left = -fh * a / 2; c.right = fh * a / 2; c.top = fh / 2; c.bottom = -fh / 2;
+    } else if (c.isPerspectiveCamera) c.aspect = w / h;
+    c.updateProjectionMatrix();
+  }
+  function layout() {
+    const mode = getComputedStyle(root).getPropertyValue('--cad-mode').trim() || 'col';
+    const W = innerWidth, H = innerHeight;
+    const hud = document.querySelector('.cad-hud').getBoundingClientRect();
+    const dock = document.querySelector('.cad-dock').getBoundingClientRect();
+    let t = 0, r = 0, b = 0, l = 0;
+    if (mode === 'wide') { r = W - hud.left + 24; b = H - dock.top + 8; }
+    else if (mode === 'land') { l = hud.right + 8; r = W - dock.left + 8; }
+    else { t = hud.bottom + 6; b = H - dock.top + 6; }
+    [['t', t], ['r', r], ['b', b], ['l', l]].forEach(([k, v]) => root.style.setProperty('--stage-' + k, Math.max(0, Math.round(v)) + 'px'));
+    resize();
+    window.dispatchEvent(new Event('cad:stage'));
+  }
+  let raf = 0;
+  const relayout = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(layout); };
 
-  <!-- Top Editorial Bar -->
-  <header class="top-bar">
-    <div class="top-left">
-      <span class="slash">/anatomy</span>
-      <span>schéma CAO 3D interactif · une fusée</span>
-    </div>
-    <div class="top-right">
-      <span class="status-dot"></span>
-      <span>WebGL · CAO Orthographique</span>
-    </div>
-  </header>
+  // Curseurs : remplissage + valeur toujours à jour, même quand le moteur les bouge lui-même
+  ranges().forEach(r => r.addEventListener('input', () => { paint(r); emit(r.id.replace('slider-', ''), +r.value); }));
+  (function sync() { ranges().forEach(paint); requestAnimationFrame(sync); })();
+  $('btn-replay').addEventListener('click', () => emit('replay'));
+  addEventListener('resize', relayout);
+  addEventListener('orientationchange', relayout);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(relayout);
+  if (window.ResizeObserver) new ResizeObserver(relayout).observe(document.querySelector('.cad-hud'));
+  relayout();
 
-  <!-- WebGL Viewport -->
-  <main id="canvas-container" aria-label="Vue CAO 3D interactive d'une fusée orbitale"></main>
-
-  <!-- Right-side Editorial HUD -->
-  <aside class="editorial-hud" aria-live="polite">
-    <div class="fig-tag">No. 02</div>
-    <h1 class="hud-title">Fusée Orbitale</h1>
-    <div class="hud-subtitle">propulsion cryogénique</div>
-
-    <div class="divider"></div>
-
-    <div class="active-assembly">
-      <span class="prefix">Tracé ·</span>
-      <span class="name" id="hud-assembly">Initialisation CAO…</span>
-    </div>
-
-    <div class="giant-counter">
-      <span id="hud-parts-done">0</span><span class="unit">sur <span id="hud-parts-total">0</span> pièces</span>
-    </div>
-
-    <div class="progress-track">
-      <div class="progress-fill" id="hud-progress-bar"></div>
-    </div>
-
-    <div class="line-counter">
-      <span id="hud-lines-text">0 sur 0 lignes</span>
-      <span id="hud-percent">0%</span>
-    </div>
-
-    <div class="spec-grid">
-      <div class="spec-item">
-        <span class="spec-label">Ergols</span>
-        <span class="spec-val">LOX / LH₂ · RP-1</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-label">Architecture</span>
-        <span class="spec-val">2 Étages + Octaweb</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-label">Propulsion</span>
-        <span class="spec-val">5× Cycle Générateur</span>
-      </div>
-      <div class="spec-item">
-        <span class="spec-label">Contrôle</span>
-        <span class="spec-val">Cardan + Grilles</span>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Bottom Interactive Controls Pill -->
-  <nav class="controls-pill" aria-label="Contrôles du schéma CAO">
-    <button type="button" class="btn-replay" id="btn-replay" title="Rejouer l'animation de tracé CAO">
-      <span>↻</span>
-      <span>Rejouer le tracé</span>
-    </button>
-
-    <div class="pill-sep"></div>
-
-    <div class="slider-group">
-      <label for="slider-trace">Tracé</label>
-      <input type="range" id="slider-trace" min="0" max="1" step="0.002" value="0" />
-      <span class="slider-val" id="val-trace">0%</span>
-    </div>
-
-    <div class="pill-sep"></div>
-
-    <div class="slider-group">
-      <label for="slider-explode">Éclaté</label>
-      <input type="range" id="slider-explode" min="0" max="1" step="0.005" value="0" />
-      <span class="slider-val" id="val-explode">0%</span>
-    </div>
-
-    <div class="pill-sep"></div>
-
-    <div class="slider-group">
-      <label for="slider-speed">Vitesse</label>
-      <input type="range" id="slider-speed" min="0" max="2.5" step="0.05" value="1.0" />
-      <span class="slider-val" id="val-speed">1.0×</span>
-    </div>
-  </nav>
-
+  return {
+    on(e, fn) { (handlers[e] = handlers[e] || []).push(fn); return this; },
+    set(name, v) { const r = $('slider-' + name); if (r) { r.value = v; paint(r); } return this; },
+    get(name) { const r = $('slider-' + name); return r ? +r.value : 0; },
+    mount(cfg = {}) {
+      if (cfg.number) text('ui-no', cfg.number);
+      if (cfg.title) { text('ui-title', cfg.title); document.title = cfg.title + ' — CAD 3D'; }
+      if (cfg.subtitle) text('ui-sub', cfg.subtitle);
+      if (cfg.prompt) text('ui-prompt', cfg.prompt);
+      if (cfg.specs) $('ui-specs').innerHTML = cfg.specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+      if (cfg.views && cfg.views.length) {
+        const bar = $('ui-actions');
+        bar.insertAdjacentHTML('beforeend', '<span class="cad-sep"></span>' +
+          cfg.views.map((v, i) => `<button type="button" class="cad-btn${i ? '' : ' on'}" data-view="${v.id}">${v.label}</button>`).join(''));
+        bar.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
+          bar.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('on', x === b));
+          emit('view', b.dataset.view);
+        }));
+      }
+      relayout();
+      return this;
+    },
+    progress(s) {
+      if (s.group != null) text('ui-group', s.group);
+      if (s.parts != null) text('ui-parts', fr(s.parts));
+      if (s.totalParts != null) text('ui-total-parts', fr(s.totalParts));
+      if (s.lines != null) text('ui-lines', fr(s.lines));
+      if (s.totalLines != null) text('ui-total-lines', fr(s.totalLines));
+      if (s.p != null) {
+        const pct = Math.round(Math.max(0, Math.min(1, s.p)) * 100);
+        text('ui-pct', pct + '%');
+        const bar = $('ui-bar'); if (bar) bar.style.width = (s.p * 100).toFixed(2) + '%';
+      }
+      return this;
+    },
+    attach(o) {
+      rig = o;
+      if (o.object && o.camera.isOrthographicCamera) {
+        o.camera.updateMatrixWorld();
+        const box = new THREE.Box3().setFromObject(o.object);
+        if (o.controls && o.center !== false) {
+          const c = box.getCenter(new THREE.Vector3()), off = c.clone().sub(o.controls.target);
+          o.controls.target.copy(c); o.camera.position.add(off); o.camera.lookAt(c); o.camera.updateMatrixWorld();
+        }
+        const inv = o.camera.matrixWorldInverse;
+        const tc = (o.controls ? o.controls.target.clone() : box.getCenter(new THREE.Vector3())).applyMatrix4(inv);
+        let hx = 0, hy = 0;
+        for (let i = 0; i < 8; i++) {
+          const v = new THREE.Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z).applyMatrix4(inv);
+          hx = Math.max(hx, Math.abs(v.x - tc.x)); hy = Math.max(hy, Math.abs(v.y - tc.y));
+        }
+        const m = o.margin || 1.12;
+        fitW = 2 * hx * m; fitH = 2 * hy * m;
+        o.camera.zoom = 1;
+      }
+      layout();
+      return this;
+    }
+  };
+})();
+</script>
+<!-- /CAD:UI -->
   <script>
     (function () {
       "use strict";
@@ -1388,26 +1098,18 @@
       // =========================================================================
       // 5. HUD & INTERACTIVE CONTROLS STATE
       // =========================================================================
-      const hudAssembly = document.getElementById("hud-assembly");
-      const hudPartsDone = document.getElementById("hud-parts-done");
-      const hudPartsTotal = document.getElementById("hud-parts-total");
-      const hudProgressBar = document.getElementById("hud-progress-bar");
-      const hudLinesText = document.getElementById("hud-lines-text");
-      const hudPercent = document.getElementById("hud-percent");
-
-      const btnReplay = document.getElementById("btn-replay");
-      const sliderTrace = document.getElementById("slider-trace");
-      const sliderExplode = document.getElementById("slider-explode");
-      const sliderSpeed = document.getElementById("slider-speed");
-
-      const valTrace = document.getElementById("val-trace");
-      const valExplode = document.getElementById("val-explode");
-      const valSpeed = document.getElementById("val-speed");
-
       const totalParts = cadParts.length;
       const totalLineSegments = Math.floor(totalVertices / 2);
 
-      hudPartsTotal.textContent = totalParts.toString();
+      CADUI.mount({
+        number: "No. 02",
+        title: "Fusée Orbitale",
+        subtitle: "propulsion cryogénique",
+        prompt: "/anatomy une fusée",
+        views: [{ id: "iso", label: "Iso" }, { id: "face", label: "Face" }, { id: "dessus", label: "Dessus" }],
+        specs: [["Ergols", "LOX / LH₂ · RP-1"], ["Architecture", "2 étages + Octaweb"], ["Propulsion", "5× cycle générateur"], ["Contrôle", "Cardan + grilles"]]
+      });
+      CADUI.progress({ totalParts, totalLines: totalLineSegments });
 
       const state = {
         drawProgress: 0,
@@ -1446,7 +1148,7 @@
         }
 
         if (clamped >= 0.999) {
-          activeAssemblyName = "Ensemble Complet Vérifié";
+          activeAssemblyName = "Assemblage complet";
         } else if (clamped <= 0.001) {
           activeAssemblyName = "En attente de tracé…";
         }
@@ -1454,14 +1156,8 @@
         const drawnLines = Math.floor(targetVertex / 2);
         const pct = Math.round(clamped * 100);
 
-        hudAssembly.textContent = activeAssemblyName;
-        hudPartsDone.textContent = completedParts.toString();
-        hudProgressBar.style.width = `${pct}%`;
-        hudLinesText.textContent = `${drawnLines.toLocaleString("fr-FR")} sur ${totalLineSegments.toLocaleString("fr-FR")} lignes`;
-        hudPercent.textContent = `${pct}%`;
-
-        sliderTrace.value = clamped.toFixed(3);
-        valTrace.textContent = `${pct}%`;
+        CADUI.progress({ group: activeAssemblyName, parts: completedParts, lines: drawnLines, p: clamped });
+        CADUI.set("draw", clamped);
       }
 
       function applyExplodeFactor(factor) {
@@ -1477,51 +1173,25 @@
           part.group.position.copy(part.basePos).addScaledVector(part.explodeVec, eased);
         }
 
-        sliderExplode.value = clamped.toFixed(3);
-        valExplode.textContent = `${Math.round(clamped * 100)}%`;
+        CADUI.set("explode", clamped);
       }
 
-      // Event Listeners for Controls
-      btnReplay.addEventListener("click", () => {
-        state.drawProgress = 0;
-        state.isAutoPlaying = true;
-        applyDrawProgress(0);
-      });
+      // Commandes du gabarit CAD 3D
+      CADUI.on("replay", () => { state.drawProgress = 0; state.isAutoPlaying = true; applyDrawProgress(0); })
+           .on("draw", (v) => { state.isAutoPlaying = false; applyDrawProgress(v); })
+           .on("explode", (v) => applyExplodeFactor(v))
+           .on("speed", (v) => { state.speed = v; })
+           .on("view", (id) => {
+             const t = controls.target, d = camera.position.distanceTo(t);
+             const dir = { iso: [16, 13, 18], face: [0, 0.01, 1], dessus: [0, 1, 0.001] }[id] || [16, 13, 18];
+             camera.position.copy(t).add(new THREE.Vector3(...dir).normalize().multiplyScalar(d));
+             camera.zoom = 1; camera.updateProjectionMatrix();
+           });
 
-      sliderTrace.addEventListener("input", (e) => {
-        state.isAutoPlaying = false;
-        applyDrawProgress(parseFloat(e.target.value));
-      });
-
-      sliderExplode.addEventListener("input", (e) => {
-        applyExplodeFactor(parseFloat(e.target.value));
-      });
-
-      sliderSpeed.addEventListener("input", (e) => {
-        state.speed = parseFloat(e.target.value);
-        valSpeed.textContent = `${state.speed.toFixed(1)}×`;
-      });
-
-      // Responsive window resize handler
-      function onWindowResize() {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        const asp = w / h;
-
-        // Slightly widen frustum on narrow mobile screens so rocket never clips
-        frustumSize = w < 640 ? 16.5 : 14.5;
-
-        camera.left = (-frustumSize * asp) / 2;
-        camera.right = (frustumSize * asp) / 2;
-        camera.top = frustumSize / 2;
-        camera.bottom = -frustumSize / 2;
-        camera.updateProjectionMatrix();
-
-        renderer.setSize(w, h);
-      }
-
-      window.addEventListener("resize", onWindowResize);
-      onWindowResize();
+      // Cadrage automatique dans la zone libre (entre l'en-tête et le dock)
+      applyExplodeFactor(0.15);
+      CADUI.attach({ camera, renderer, controls, object: rocketRoot, margin: 1.04 });
+      applyExplodeFactor(0);
 
       // =========================================================================
       // 6. MAIN ANIMATION LOOP
