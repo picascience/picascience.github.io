@@ -1,7 +1,20 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-15T12:35:28.587Z",
+  "generated": "2026-11-15T14:50:56.915Z",
   "apps": [
+    {
+      "name": "Kinetic Pro",
+      "emoji": "✅",
+      "colors": [
+        "#042f2e",
+        "#0d9488"
+      ],
+      "category": "Labo",
+      "added": "2026-11-15",
+      "description": "KINETIC refait avec le skill UI/UX Pro Max (comparaison de design)",
+      "icon": "apps/kinetic-pro/icon.svg",
+      "id": "kinetic-pro"
+    },
     {
       "name": "Top Skills",
       "emoji": "🏆",

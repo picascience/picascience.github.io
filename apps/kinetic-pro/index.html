@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F0FDFA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#042F2E" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kinetic Pro">
+<title>Kinetic Pro</title>
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div>
+      <h1 class="brand">Kinetic</h1>
+      <p class="date" id="date">—</p>
+    </div>
+    <button class="icon-btn" id="mute" type="button" aria-pressed="false" aria-label="Couper le son"></button>
+  </header>
+
+  <section class="stats" aria-label="Statistiques du jour">
+    <div class="stat">
+      <span class="stat-ic" data-icon="check"></span>
+      <span class="stat-num" id="sDone">0</span>
+      <span class="stat-lbl">terminées</span>
+    </div>
+    <div class="stat">
+      <span class="stat-ic accent" data-icon="flame"></span>
+      <span class="stat-num" id="sStreak">0</span>
+      <span class="stat-lbl">jours de série</span>
+    </div>
+    <div class="stat">
+      <span class="stat-ic" data-icon="timer"></span>
+      <span class="stat-num"><span id="sFocus">0</span><small>/120</small></span>
+      <span class="stat-lbl">min de focus</span>
+      <span class="bar" aria-hidden="true"><i id="sBar"></i></span>
+    </div>
+  </section>
+
+  <section class="now" aria-labelledby="nowTitle">
+    <div class="sec-head">
+      <h2 id="nowTitle">À traiter maintenant</h2>
+      <span class="sec-hint">Glisse ou utilise les boutons</span>
+    </div>
+    <div class="card-zone" id="cardZone"></div>
+    <div class="actions" id="actions">
+      <button class="btn btn-ghost" data-act="defer" type="button"><span data-icon="clock"></span>Reporter</button>
+      <button class="btn btn-soft" data-act="done" type="button"><span data-icon="check"></span>Terminer</button>
+      <button class="btn btn-accent" data-act="focus" type="button"><span data-icon="play"></span>Focus</button>
+    </div>
+  </section>
+
+  <section class="queue" aria-labelledby="qTitle">
+    <div class="sec-head">
+      <h2 id="qTitle">File d'attente</h2>
+      <span class="count" id="qCount">0</span>
+    </div>
+    <ol class="q-list" id="qList"></ol>
+    <p class="empty" id="qEmpty" hidden>File vide. Ajoute une tâche ci-dessous.</p>
+  </section>
+
+  <form class="capture" id="capture" autocomplete="off" novalidate>
+    <label for="capIn">Nouvelle tâche</label>
+    <div class="cap-row">
+      <input id="capIn" type="text" maxlength="90" enterkeyhint="done" autocapitalize="sentences" aria-describedby="capHelp capErr" placeholder="Ex. Réviser le chapitre 5 #maths 30m">
+      <button class="btn btn-primary cap-btn" type="submit" aria-label="Ajouter la tâche"><span data-icon="plus"></span></button>
+    </div>
+    <p class="help" id="capHelp"><code>#tag</code> catégorie · <code>30m</code> durée · <code>!</code> urgent · <code>!!</code> critique</p>
+    <p class="err" id="capErr" role="alert"></p>
+  </form>
+</main>
+
+<!-- Focus -->
+<div class="sheet-layer" id="focus" hidden>
+  <section class="focus" role="dialog" aria-modal="true" aria-labelledby="fTitle">
+    <div class="f-top">
+      <span class="chip" id="fTag"></span>
+      <button class="icon-btn" id="fClose" type="button" aria-label="Fermer le mode focus"><span data-icon="x"></span></button>
+    </div>
+    <h2 class="f-title" id="fTitle"></h2>
+    <p class="f-state" id="fState">Choisis la durée du sprint</p>
+    <div class="dial-wrap">
+      <svg class="dial" id="dial" viewBox="0 0 280 280" role="slider" tabindex="0" aria-label="Durée du sprint en minutes" aria-valuemin="5" aria-valuemax="60">
+        <circle class="d-track" cx="140" cy="140" r="116"/>
+        <g id="dTicks"></g>
+        <circle class="d-val" id="dVal" cx="140" cy="140" r="116" transform="rotate(-90 140 140)"/>
+        <circle class="d-knob" id="dKnob" r="15" cx="140" cy="24"/>
+      </svg>
+      <div class="readout">
+        <span class="time" id="fTime">25:00</span>
+        <span class="time-sub" id="fSub">minutes</span>
+      </div>
+    </div>
+    <div class="f-info">
+      <div><span>Fin prévue</span><b id="fEnd">--:--</b></div>
+      <div><span>Focus aujourd'hui</span><b id="fToday">0 min</b></div>
+    </div>
+    <div class="f-actions" id="fActions"></div>
+    <p class="sr" role="status" aria-live="polite" id="fLive"></p>
+  </section>
+</div>
+
+<!-- Feuille d'actions -->
+<div class="sheet-layer" id="menu" hidden>
+  <section class="menu" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <span class="grab" aria-hidden="true"></span>
+    <p class="m-meta" id="mMeta"></p>
+    <h2 class="m-title" id="mTitle"></h2>
+    <div class="m-list">
+      <button class="m-item" data-m="crit" type="button"><span data-icon="alert"></span><span id="mCrit">Passer en critique</span></button>
+      <button class="m-item" data-m="split" type="button"><span data-icon="split"></span><span>Diviser en 2 sous-tâches</span></button>
+      <button class="m-item danger" data-m="del" type="button"><span data-icon="trash"></span><span>Supprimer</span></button>
+    </div>
+    <button class="btn btn-ghost m-cancel" data-m="cancel" type="button">Annuler</button>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>
