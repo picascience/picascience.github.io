@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Machine — CAD 3D</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<!-- CAD:HEAD · gabarit CAD 3D v2 — bloc commun à toutes les planches, ne pas modifier -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style id="cad-gabarit">
+  :root {
+    --paper:#F9F8F5; --ink:#18181A; --muted:#8E8D8A; --soft:#4A4A48; --line:#DEDCD3; --track:#E2E0D8;
+    --gap:16px;
+    --safe-t:max(14px, env(safe-area-inset-top));
+    --safe-b:max(60px, calc(env(safe-area-inset-bottom) + 28px)); /* barre de retour MK Apps */
+    --stage-t:0px; --stage-r:0px; --stage-b:0px; --stage-l:0px;
+    --serif:'Instrument Serif', Georgia, 'Times New Roman', serif;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
+    --cad-mode:col;
+  }
+  *, *::before, *::after { box-sizing:border-box; }
+  html, body { margin:0; padding:0; height:100%; overflow:hidden; overscroll-behavior:none; background:var(--paper); color:var(--ink);
+    font-family:var(--mono); -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%; -webkit-tap-highlight-color:transparent; }
+  #canvas-container { position:fixed; top:var(--stage-t); right:var(--stage-r); bottom:var(--stage-b); left:var(--stage-l);
+    touch-action:none; cursor:grab; overflow:hidden; }
+  #canvas-container:active { cursor:grabbing; }
+  #canvas-container canvas { display:block; }
+
+  /* ── En-tête : n° · titre · sous-titre · tracé ── */
+  .cad-hud { position:fixed; z-index:10; top:var(--safe-t); left:var(--gap); right:var(--gap); pointer-events:none; user-select:none; -webkit-user-select:none; }
+  .cad-tag { display:flex; align-items:center; gap:8px; min-width:0; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+  .cad-tag b { color:var(--ink); font-weight:600; flex:none; }
+  .cad-tag .cad-prompt { text-transform:none; letter-spacing:0; overflow:hidden; text-overflow:ellipsis; }
+  .cad-title { font-family:var(--serif); font-weight:400; font-size:30px; line-height:1.02; letter-spacing:-.01em; margin:6px 0 0; overflow-wrap:anywhere; }
+  .cad-sub { font-family:var(--serif); font-style:italic; font-size:17px; line-height:1.15; color:var(--soft); margin:2px 0 0; }
+  .cad-status { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:baseline; column-gap:12px;
+    margin-top:10px; padding-top:8px; border-top:1px solid var(--line); font-size:11px; color:var(--muted); }
+  .cad-group { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cad-group strong { color:var(--ink); font-weight:600; }
+  .cad-count { font-family:var(--serif); font-size:28px; line-height:1; color:var(--ink); white-space:nowrap; text-align:right; font-variant-numeric:tabular-nums; }
+  .cad-count small { font-family:var(--mono); font-size:11px; color:var(--muted); margin-left:4px; }
+  .cad-bar { grid-column:1 / -1; height:3px; margin:7px 0 5px; background:var(--track); border-radius:2px; overflow:hidden; }
+  .cad-bar i { display:block; height:100%; width:0; background:var(--ink); }
+  .cad-lines, .cad-pct { font-variant-numeric:tabular-nums; }
+  .cad-pct { text-align:right; }
+  .cad-specs { display:none; margin:16px 0 0; padding-top:10px; border-top:1px solid var(--line); font-size:10.5px; line-height:1.55; }
+  .cad-specs div { display:flex; justify-content:space-between; gap:12px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .cad-specs dt { color:var(--muted); text-transform:uppercase; letter-spacing:.08em; }
+  .cad-specs dd { margin:0; text-align:right; color:var(--ink); }
+
+  /* ── Dock de commandes : toujours la même forme ── */
+  .cad-dock { position:fixed; z-index:10; left:var(--gap); right:var(--gap); bottom:var(--safe-b); margin:0 auto; max-width:520px;
+    padding:10px 14px 4px; background:rgba(249,248,245,.95); border:1px solid var(--line); border-radius:16px;
+    box-shadow:0 10px 30px -16px rgba(24,24,26,.35); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    user-select:none; -webkit-user-select:none; }
+  .cad-actions { display:flex; gap:6px; margin-bottom:4px; overflow-x:auto; scrollbar-width:none; }
+  .cad-actions::-webkit-scrollbar { display:none; }
+  .cad-btn { flex:none; height:34px; padding:0 12px; display:inline-flex; align-items:center; gap:6px; border:1px solid rgba(24,24,26,.22);
+    border-radius:9px; background:transparent; color:var(--ink); font:600 11px/1 var(--mono); letter-spacing:.06em; text-transform:uppercase; cursor:pointer; }
+  .cad-btn:active { transform:scale(.97); }
+  .cad-btn.cad-primary { background:var(--ink); border-color:var(--ink); color:var(--paper); }
+  .cad-btn.on { border-color:var(--ink); background:rgba(24,24,26,.07); }
+  .cad-sep { flex:none; width:1px; margin:7px 2px; background:var(--line); }
+  .cad-row { display:grid; grid-template-columns:66px minmax(0,1fr) 50px; align-items:center; column-gap:10px; height:38px; }
+  .cad-row label { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); }
+  .cad-row output { font-size:12px; text-align:right; font-variant-numeric:tabular-nums; color:var(--ink); }
+  .cad-range { -webkit-appearance:none; appearance:none; display:block; width:100%; height:34px; margin:0; background:transparent; cursor:pointer; --p:0%; touch-action:pan-y; }
+  .cad-range:focus { outline:none; }
+  .cad-range::-webkit-slider-runnable-track { height:3px; border-radius:2px; background:linear-gradient(var(--ink),var(--ink)) 0 0 / var(--p) 100% no-repeat, var(--track); }
+  .cad-range::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; margin-top:-9.5px; border-radius:50%; background:var(--paper); border:2px solid var(--ink); box-shadow:0 1px 4px rgba(24,24,26,.2); }
+  .cad-range:active::-webkit-slider-thumb { background:var(--ink); }
+  .cad-range::-moz-range-track { height:3px; border-radius:2px; background:var(--track); }
+  .cad-range::-moz-range-progress { height:3px; border-radius:2px; background:var(--ink); }
+  .cad-range::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:var(--paper); border:2px solid var(--ink); }
+
+  /* Grand écran : en-tête en colonne à droite, dock en bas à gauche */
+  @media (min-width:1000px) and (min-height:600px) {
+    :root { --cad-mode:wide; --safe-b:max(28px, calc(env(safe-area-inset-bottom) + 28px)); }
+    .cad-hud { left:auto; right:max(36px, 5vw); top:50%; transform:translateY(-50%); width:300px; }
+    .cad-title { font-size:46px; }
+    .cad-sub { font-size:22px; }
+    .cad-status { grid-template-columns:1fr auto; margin-top:22px; padding-top:12px; }
+    .cad-count { grid-column:1 / -1; text-align:left; font-size:68px; line-height:.9; margin-top:6px; }
+    .cad-specs { display:block; }
+    .cad-dock { left:max(28px, 4vw); right:auto; width:460px; margin:0; }
+  }
+  /* Téléphone à l'horizontale : en-tête à gauche, dock à droite */
+  @media (max-height:520px) and (orientation:landscape) {
+    :root { --cad-mode:land; --safe-b:max(14px, env(safe-area-inset-bottom)); }
+    .cad-hud { right:auto; width:min(270px, 34vw); left:max(var(--gap), env(safe-area-inset-left)); }
+    .cad-title { font-size:24px; }
+    .cad-dock { left:auto; right:max(var(--gap), env(safe-area-inset-right)); width:min(330px, 40vw); margin:0; padding-top:6px; }
+    .cad-row { height:32px; }
+  }
+</style>
+<!-- /CAD:HEAD -->
+</head>
+<body>
+<!-- CAD:UI -->
+<div id="canvas-container" aria-label="Vue CAO 3D interactive"></div>
+<header class="cad-hud" aria-live="polite">
+  <div class="cad-tag"><b id="ui-no">No. 00</b><span>·</span><span class="cad-prompt" id="ui-prompt">/anatomy</span></div>
+  <h1 class="cad-title" id="ui-title">Machine</h1>
+  <p class="cad-sub" id="ui-sub">sous-titre</p>
+  <div class="cad-status">
+    <div class="cad-group">Tracé · <strong id="ui-group">Initialisation…</strong></div>
+    <div class="cad-count"><span id="ui-parts">0</span><small>/ <span id="ui-total-parts">0</span> pièces</small></div>
+    <div class="cad-bar"><i id="ui-bar"></i></div>
+    <div class="cad-lines"><span id="ui-lines">0</span> / <span id="ui-total-lines">0</span> traits</div>
+    <div class="cad-pct" id="ui-pct">0%</div>
+  </div>
+  <dl class="cad-specs" id="ui-specs"></dl>
+</header>
+<nav class="cad-dock" aria-label="Commandes de la planche">
+  <div class="cad-actions" id="ui-actions">
+    <button type="button" class="cad-btn cad-primary" id="btn-replay">↻ Rejouer</button>
+  </div>
+  <div class="cad-row"><label for="slider-draw">Tracé</label><input class="cad-range" type="range" id="slider-draw" min="0" max="1" step="0.001" value="0"><output id="val-draw">0%</output></div>
+  <div class="cad-row"><label for="slider-explode">Éclaté</label><input class="cad-range" type="range" id="slider-explode" min="0" max="1" step="0.005" value="0"><output id="val-explode">0%</output></div>
+  <div class="cad-row"><label for="slider-speed">Vitesse</label><input class="cad-range" type="range" id="slider-speed" min="0" max="2.5" step="0.05" value="1" data-unit="x"><output id="val-speed">1.0×</output></div>
+</nav>
+<script>
+/* CADUI — gabarit CAD 3D v2. API :
+   CADUI.mount({ number, title, subtitle, prompt, specs:[[clé, valeur]…], views:[{id,label}…] })
+   CADUI.on('replay'|'draw'|'explode'|'speed'|'view', fn)      → valeurs 0..1 (vitesse 0..2.5)
+   CADUI.set('draw'|'explode'|'speed', v)                      → déplace le curseur (sans déclencher on)
+   CADUI.progress({ group, parts, totalParts, lines, totalLines, p })
+   CADUI.attach({ camera, renderer, controls, object, margin }) → cadre la machine dans la zone libre et gère le redimensionnement */
+const CADUI = (() => {
+  const $ = id => document.getElementById(id);
+  const root = document.documentElement;
+  const fr = n => Math.round(+n || 0).toLocaleString('fr-FR');
+  const handlers = {}, cache = {};
+  let rig = null, fitW = 0, fitH = 0;
+  const emit = (e, v) => (handlers[e] || []).forEach(fn => fn(v));
+  const text = (id, t) => { t = String(t); if (cache[id] !== t) { cache[id] = t; const el = $(id); if (el) el.textContent = t; } };
+  const paint = r => {
+    const p = (r.value - r.min) / (r.max - r.min) * 100;
+    r.style.setProperty('--p', p + '%');
+    text(r.id.replace('slider-', 'val-'), r.dataset.unit === 'x' ? (+r.value).toFixed(1) + '×' : Math.round(p) + '%');
+  };
+  const ranges = () => document.querySelectorAll('.cad-range');
+
+  function resize() {
+    if (!rig) return;
+    const el = $('canvas-container'), w = el.clientWidth, h = el.clientHeight;
+    if (!w || !h) return;
+    rig.renderer.setSize(w, h);
+    const c = rig.camera;
+    if (c.isOrthographicCamera && fitW && fitH) {
+      const a = w / h, fh = Math.max(fitH, fitW / a);
+      c.left = -fh * a / 2; c.right = fh * a / 2; c.top = fh / 2; c.bottom = -fh / 2;
+    } else if (c.isPerspectiveCamera) c.aspect = w / h;
+    c.updateProjectionMatrix();
+  }
+  function layout() {
+    const mode = getComputedStyle(root).getPropertyValue('--cad-mode').trim() || 'col';
+    const W = innerWidth, H = innerHeight;
+    const hud = document.querySelector('.cad-hud').getBoundingClientRect();
+    const dock = document.querySelector('.cad-dock').getBoundingClientRect();
+    let t = 0, r = 0, b = 0, l = 0;
+    if (mode === 'wide') { r = W - hud.left + 24; b = H - dock.top + 8; }
+    else if (mode === 'land') { l = hud.right + 8; r = W - dock.left + 8; }
+    else { t = hud.bottom + 6; b = H - dock.top + 6; }
+    [['t', t], ['r', r], ['b', b], ['l', l]].forEach(([k, v]) => root.style.setProperty('--stage-' + k, Math.max(0, Math.round(v)) + 'px'));
+    resize();
+    window.dispatchEvent(new Event('cad:stage'));
+  }
+  let raf = 0;
+  const relayout = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(layout); };
+
+  // Curseurs : remplissage + valeur toujours à jour, même quand le moteur les bouge lui-même
+  ranges().forEach(r => r.addEventListener('input', () => { paint(r); emit(r.id.replace('slider-', ''), +r.value); }));
+  (function sync() { ranges().forEach(paint); requestAnimationFrame(sync); })();
+  $('btn-replay').addEventListener('click', () => emit('replay'));
+  addEventListener('resize', relayout);
+  addEventListener('orientationchange', relayout);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(relayout);
+  if (window.ResizeObserver) new ResizeObserver(relayout).observe(document.querySelector('.cad-hud'));
+  relayout();
+
+  return {
+    on(e, fn) { (handlers[e] = handlers[e] || []).push(fn); return this; },
+    set(name, v) { const r = $('slider-' + name); if (r) { r.value = v; paint(r); } return this; },
+    get(name) { const r = $('slider-' + name); return r ? +r.value : 0; },
+    mount(cfg = {}) {
+      if (cfg.number) text('ui-no', cfg.number);
+      if (cfg.title) { text('ui-title', cfg.title); document.title = cfg.title + ' — CAD 3D'; }
+      if (cfg.subtitle) text('ui-sub', cfg.subtitle);
+      if (cfg.prompt) text('ui-prompt', cfg.prompt);
+      if (cfg.specs) $('ui-specs').innerHTML = cfg.specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+      if (cfg.views && cfg.views.length) {
+        const bar = $('ui-actions');
+        bar.insertAdjacentHTML('beforeend', '<span class="cad-sep"></span>' +
+          cfg.views.map((v, i) => `<button type="button" class="cad-btn${i ? '' : ' on'}" data-view="${v.id}">${v.label}</button>`).join(''));
+        bar.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
+          bar.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('on', x === b));
+          emit('view', b.dataset.view);
+        }));
+      }
+      relayout();
+      return this;
+    },
+    progress(s) {
+      if (s.group != null) text('ui-group', s.group);
+      if (s.parts != null) text('ui-parts', fr(s.parts));
+      if (s.totalParts != null) text('ui-total-parts', fr(s.totalParts));
+      if (s.lines != null) text('ui-lines', fr(s.lines));
+      if (s.totalLines != null) text('ui-total-lines', fr(s.totalLines));
+      if (s.p != null) {
+        const pct = Math.round(Math.max(0, Math.min(1, s.p)) * 100);
+        text('ui-pct', pct + '%');
+        const bar = $('ui-bar'); if (bar) bar.style.width = (s.p * 100).toFixed(2) + '%';
+      }
+      return this;
+    },
+    attach(o) {
+      rig = o;
+      if (o.object && o.camera.isOrthographicCamera) {
+        o.camera.updateMatrixWorld();
+        const box = new THREE.Box3().setFromObject(o.object);
+        if (o.controls && o.center !== false) {
+          const c = box.getCenter(new THREE.Vector3()), off = c.clone().sub(o.controls.target);
+          o.controls.target.copy(c); o.camera.position.add(off); o.camera.lookAt(c); o.camera.updateMatrixWorld();
+        }
+        const inv = o.camera.matrixWorldInverse;
+        const tc = (o.controls ? o.controls.target.clone() : box.getCenter(new THREE.Vector3())).applyMatrix4(inv);
+        let hx = 0, hy = 0;
+        for (let i = 0; i < 8; i++) {
+          const v = new THREE.Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z).applyMatrix4(inv);
+          hx = Math.max(hx, Math.abs(v.x - tc.x)); hy = Math.max(hy, Math.abs(v.y - tc.y));
+        }
+        const m = o.margin || 1.12;
+        fitW = 2 * hx * m; fitH = 2 * hy * m;
+        o.camera.zoom = 1;
+      }
+      layout();
+      return this;
+    }
+  };
+})();
+</script>
+<!-- /CAD:UI -->
+<script>
+/* ═══ Moteur de base (à garder tel quel) ═══ */
+class AnatomyEngine {
+  constructor(config = {}) {
+    this.parts = []; this.totalSegments = 0;
+    this.drawProgress = 0; this.isDrawing = true;
+    this.explodeFactor = 0; this.targetExplode = 0; this.autoExplode = config.autoExplode ?? 0.6; this.userExplode = false;
+    this.speed = 1; this.clock = new THREE.Clock(); this.elapsed = 0;
+    this.config = config;
+    CADUI.mount({ views: AnatomyEngine.VIEWS, ...config });
+    this.initScene();
+    CADUI.on('replay', () => { this.drawProgress = 0; this.isDrawing = true; })
+         .on('draw', v => { this.isDrawing = false; this.drawProgress = v; })
+         .on('explode', v => { this.userExplode = true; this.targetExplode = v; })
+         .on('speed', v => { this.speed = v; })
+         .on('view', id => this.setView(id));
+  }
+  initScene() {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0xF9F8F5);
+    this.camera = new THREE.OrthographicCamera(-10, 10, 10, -10, -200, 400);
+    this.camera.position.set(16, 13, 18);
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    document.getElementById('canvas-container').appendChild(this.renderer.domElement);
+    this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.enableDamping = true; this.controls.minZoom = 0.4; this.controls.maxZoom = 5;
+    this.occluderMat = new THREE.MeshBasicMaterial({ color: 0xF9F8F5, polygonOffset: true, polygonOffsetFactor: 1.5, polygonOffsetUnits: 2.0, side: THREE.DoubleSide });
+    this.root = new THREE.Group(); this.scene.add(this.root);
+  }
+  addPart(geometry, opts = {}) {
+    const group = new THREE.Group();
+    const basePos = new THREE.Vector3(...(opts.position || [0, 0, 0]));
+    const explodeVec = new THREE.Vector3(...(opts.explodeVec || [0, 0, 0]));
+    group.position.copy(basePos);
+    if (opts.rotation) group.rotation.set(...opts.rotation);
+    const mesh = new THREE.Mesh(geometry, this.occluderMat);
+    group.add(mesh);
+    const edgesGeo = new THREE.EdgesGeometry(geometry, opts.edgeThreshold || 18);
+    const lines = new THREE.LineSegments(edgesGeo, new THREE.LineBasicMaterial({ color: opts.color || 0x18181A, transparent: true, opacity: opts.opacity || 0.88 }));
+    const vertexCount = edgesGeo.attributes.position.count;
+    edgesGeo.setDrawRange(0, 0);
+    group.add(lines);
+    (opts.parent || this.root).add(group);
+    this.parts.push({ group, mesh, edgesGeo, vertexCount, name: opts.name || 'Composant', basePos, explodeVec, onUpdate: opts.onUpdate || null });
+    this.totalSegments += vertexCount / 2;
+    return group;
+  }
+  static VIEWS = [{ id: 'iso', label: 'Iso' }, { id: 'face', label: 'Face' }, { id: 'dessus', label: 'Dessus' }];
+  setView(id) {
+    const d = this.camera.position.distanceTo(this.controls.target), t = this.controls.target;
+    const dir = { iso: [16, 13, 18], face: [0, 0.01, 1], dessus: [0, 1, 0.001], cote: [1, 0.01, 0] }[id] || [16, 13, 18];
+    this.camera.position.copy(t).add(new THREE.Vector3(...dir).normalize().multiplyScalar(d));
+    this.camera.zoom = 1; this.camera.updateProjectionMatrix();
+  }
+  start() {
+    CADUI.progress({ totalParts: this.parts.length, totalLines: this.totalSegments });
+    // Cadrage calculé sur la vue éclatée automatique, pour que rien ne sorte de la zone libre
+    this.parts.forEach(p => p.group.position.copy(p.basePos).addScaledVector(p.explodeVec, this.autoExplode || 0));
+    CADUI.attach({ camera: this.camera, renderer: this.renderer, controls: this.controls, object: this.root, margin: this.config.margin || 1.08 });
+    this.parts.forEach(p => p.group.position.copy(p.basePos));
+    const loop = () => {
+      requestAnimationFrame(loop);
+      const dt = Math.min(this.clock.getDelta(), 0.05);
+      this.elapsed += dt * this.speed;
+      if (this.isDrawing) {
+        this.drawProgress += dt * 0.28;
+        if (this.drawProgress >= 1) {
+          this.drawProgress = 1; this.isDrawing = false;
+          if (!this.userExplode && this.autoExplode) this.targetExplode = this.autoExplode;
+        }
+        CADUI.set('draw', this.drawProgress);
+      }
+      this.explodeFactor += (this.targetExplode - this.explodeFactor) * Math.min(1, dt * 3);
+      if (!this.userExplode) CADUI.set('explode', this.explodeFactor);
+      const n = this.parts.length, exact = this.drawProgress * n, idx = Math.floor(exact);
+      let drawn = 0, group = 'Assemblage complet';
+      this.parts.forEach((p, i) => {
+        if (i < idx) { p.mesh.visible = true; p.edgesGeo.setDrawRange(0, p.vertexCount); drawn += p.vertexCount / 2; }
+        else if (i === idx) { const k = exact - idx, c = Math.floor(p.vertexCount * k / 2) * 2; p.mesh.visible = k > 0.2; p.edgesGeo.setDrawRange(0, c); drawn += c / 2; group = p.name; }
+        else { p.mesh.visible = false; p.edgesGeo.setDrawRange(0, 0); }
+        p.group.position.copy(p.basePos).addScaledVector(p.explodeVec, this.explodeFactor);
+        if (p.onUpdate) p.onUpdate(p.group, this.elapsed, dt * this.speed);
+      });
+      CADUI.progress({ group, parts: Math.min(n, Math.ceil(exact)), lines: drawn, p: this.drawProgress });
+      this.controls.update();
+      this.renderer.render(this.scene, this.camera);
+    };
+    loop();
+  }
+}
+
+/* ═══ Machine — Climatiseur split mural (unité intérieure + unité extérieure) ═══ */
+const engine = new AnatomyEngine({
+  number: 'No. 04', title: 'Climatiseur', subtitle: 'split mural · cycle frigorifique',
+  prompt: '/anatomy climatiseur',
+  views: [...AnatomyEngine.VIEWS, { id: 'cote', label: 'Côté' }],
+  specs: [['Type', 'split mural inverter'], ['Fluide', 'R32'], ['Puissance', '2,5 kW froid / chaud'], ['Cycle', 'compression → détente'], ['Unités', 'intérieure + extérieure']],
+  autoExplode: 0.6, margin: 1.08
+});
+
+const PI = Math.PI, cos = Math.cos, sin = Math.sin;
+const IU = [2.4, 6.2, 0], OU = [-2.4, 0, 0];
+const at = (b, x, y, z) => [b[0] + x, b[1] + y, b[2] + z];
+const iu = (x, y, z) => at(IU, x, y, z);
+const ou = (x, y, z) => at(OU, x, y, z);
+const add = (g, o) => engine.addPart(g, o);
+
+/* ── Géométries utilitaires ── */
+function rectRing(w, h, t, depth) {                       // cadre rectangulaire dans le plan XY
+  const s = new THREE.Shape();
+  s.moveTo(-w / 2, -h / 2); s.lineTo(w / 2, -h / 2); s.lineTo(w / 2, h / 2); s.lineTo(-w / 2, h / 2); s.closePath();
+  const hole = new THREE.Path();
+  hole.moveTo(-w / 2 + t, -h / 2 + t); hole.lineTo(-w / 2 + t, h / 2 - t); hole.lineTo(w / 2 - t, h / 2 - t); hole.lineTo(w / 2 - t, -h / 2 + t); hole.closePath();
+  s.holes.push(hole);
+  const g = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: false });
+  g.translate(0, 0, -depth / 2);
+  return g;
+}
+function ringZ(ro, ri, depth) {                           // anneau d'axe Z
+  const s = new THREE.Shape(); s.absarc(0, 0, ro, 0, PI * 2, false);
+  const h = new THREE.Path(); h.absarc(0, 0, ri, 0, PI * 2, true); s.holes.push(h);
+  const g = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: false, curveSegments: 24 });
+  g.translate(0, 0, -depth / 2);
+  return g;
+}
+const ringX = (ro, ri, d) => ringZ(ro, ri, d).rotateY(PI / 2);   // anneau d'axe X
+
+/* Flasque d'extrémité (profil latéral évidé) */
+const flasqueGeo = (() => {
+  const s = new THREE.Shape();
+  [[-1.2, -1.4], [0.9, -1.4], [1.2, -1.1], [1.2, 1.4], [-1.2, 1.4]].forEach(([z, y], i) => i ? s.lineTo(z, y) : s.moveTo(z, y));
+  s.closePath();
+  const h = new THREE.Path();
+  [[-1.1, -1.3], [-1.1, 1.3], [1.1, 1.3], [1.1, -1.05], [0.85, -1.3]].forEach(([z, y], i) => i ? h.lineTo(z, y) : h.moveTo(z, y));
+  h.closePath(); s.holes.push(h);
+  const g = new THREE.ExtrudeGeometry(s, { depth: 0.1, bevelEnabled: false });
+  g.translate(0, 0, -0.05); g.rotateY(-PI / 2);
+  return g;
+})();
+
+/* Pale d'hélice (ventilateur extérieur) */
+const fanBladeGeo = (() => {
+  const s = new THREE.Shape();
+  [[0.25, -0.1], [0.6, -0.3], [1.0, -0.3], [1.15, -0.12], [1.12, 0.15], [0.8, 0.24], [0.4, 0.12]].forEach(([x, y], i) => i ? s.lineTo(x, y) : s.moveTo(x, y));
+  s.closePath();
+  const g = new THREE.ExtrudeGeometry(s, { depth: 0.03, bevelEnabled: false });
+  g.rotateX(0.45);
+  return g;
+})();
+
+/* ═══════════ UNITÉ INTÉRIEURE (en haut à droite) ═══════════ */
+add(new THREE.BoxGeometry(9.6, 2.8, 0.12), { name: 'Plaque de fixation murale', position: iu(0, 0, -1.3), explodeVec: [0, 0, -3.5] });
+for (const sx of [-1, 1]) for (const sy of [-1, 1])
+  add(new THREE.CylinderGeometry(0.12, 0.12, 0.18, 16), { name: 'Vis de fixation murale', position: iu(sx * 4.4, sy * 1.0, -1.18), rotation: [PI / 2, 0, 0], explodeVec: [0, 0, -5] });
+
+add(new THREE.BoxGeometry(9.4, 0.06, 1.1), { name: 'Carter inférieur arrière', position: iu(0, -1.37, -0.6), explodeVec: [0, -1.5, -1.0] });
+[-1, 1].forEach(s => add(flasqueGeo, { name: s < 0 ? 'Flasque gauche' : 'Flasque droit', position: iu(s * 4.75, 0, 0), explodeVec: [s * 3, 0, 0] }));
+
+/* Bacs à condensats */
+add(new THREE.BoxGeometry(8.4, 0.1, 0.36), { name: 'Bac à condensats avant', position: iu(0, 0.02, 0.85), explodeVec: [0, -1.5, 1.2] });
+add(new THREE.BoxGeometry(8.4, 0.1, 0.36), { name: 'Bac à condensats arrière', position: iu(0, 0.02, -0.62), explodeVec: [0, -1.5, -1.2] });
+
+/* Évaporateur : deux batteries en Λ (ailettes + tubes de cuivre) */
+const finGeo = new THREE.BoxGeometry(0.03, 1.4, 0.6);
+const banks = [
+  { n: 'avant', phi: -0.55, y0: 0.7, z0: 0.45, vy: 1.1, vz: 1.7 },
+  { n: 'arrière', phi: 0.55, y0: 0.7, z0: -0.25, vy: 1.8, vz: -1.6 }
+];
+banks.forEach(b => {
+  for (let i = 0; i < 28; i++) {
+    const x = -4 + i * (8 / 27);
+    add(finGeo, { name: `Ailette d'évaporateur ${b.n} ${i + 1}`, position: iu(x, b.y0, b.z0), rotation: [b.phi, 0, 0], explodeVec: [x * 0.25, b.vy, b.vz] });
+  }
+  for (let j = 0; j < 3; j++) {
+    const yo = (j - 1) * 0.45, zo = j % 2 ? 0.13 : -0.13;
+    const y = b.y0 + yo * cos(b.phi) - zo * sin(b.phi), z = b.z0 + yo * sin(b.phi) + zo * cos(b.phi);
+    add(new THREE.CylinderGeometry(0.05, 0.05, 8.2, 12), { name: `Tube de cuivre ${b.n} ${j + 1}`, position: iu(0, y, z), rotation: [0, 0, PI / 2], explodeVec: [0, b.vy, b.vz] });
+    add(new THREE.CylinderGeometry(0.075, 0.075, 0.14, 12), { name: `Coude de retour ${b.n} ${j + 1}`, position: iu(-4.15, y, z), rotation: [0, 0, PI / 2], explodeVec: [0, b.vy, b.vz] });
+  }
+});
+
+/* Filtre à air (cadre + maille) devant la batterie avant */
+const fPos = iu(0, 0.878, 0.739), fVec = [0, 1.4, 2.3];
+add(rectRing(8.6, 1.25, 0.07, 0.03), { name: "Cadre du filtre à air", position: fPos, rotation: [-0.55, 0, 0], explodeVec: fVec });
+for (let i = 0; i < 14; i++)
+  add(new THREE.BoxGeometry(0.02, 1.19, 0.02), { name: `Maille du filtre ${i + 1}`, position: iu(-4.1 + i * (8.2 / 13), 0.878, 0.739), rotation: [-0.55, 0, 0], explodeVec: fVec });
+
+/* Volute arrière + langue de soufflage */
+add(new THREE.CylinderGeometry(0.95, 0.95, 8.4, 16, 1, true, 0.6 * PI, 1.1 * PI), { name: 'Volute arrière (guide d\'air)', position: iu(0, -0.2, 0.1), rotation: [0, 0, PI / 2], explodeVec: [0, -1.5, -1.5] });
+add(new THREE.BoxGeometry(8.4, 0.05, 0.5), { name: 'Langue de soufflage', position: iu(0, -0.55, 0.95), rotation: [-0.3, 0, 0], explodeVec: [0, -1.2, 1.2] });
+
+/* Ventilateur tangentiel : anneaux + 24 pales + arbre + moteur */
+[-4, -2, 0, 2, 4].forEach(x => add(ringX(0.74, 0.6, 0.05), { name: 'Anneau du rotor tangentiel', position: iu(x, -0.2, 0.1), explodeVec: [x * 0.4, 0, 0] }));
+const bladeGeo = new THREE.BoxGeometry(8.0, 0.3, 0.025);
+for (let i = 0; i < 24; i++) {
+  const a0 = i / 24 * PI * 2;
+  add(bladeGeo, {
+    name: `Pale du ventilateur tangentiel ${i + 1}`, position: iu(0, -0.2, 0.1), explodeVec: [0, 0, 0],
+    onUpdate: (g, t) => { const th = a0 + t * 5; g.position.y += 0.62 * sin(th); g.position.z += 0.62 * cos(th); g.rotation.x = -th + 0.5; }
+  });
+}
+add(new THREE.CylinderGeometry(0.08, 0.08, 9.0, 12), { name: 'Arbre du ventilateur', position: iu(0, -0.2, 0.1), rotation: [0, 0, PI / 2], explodeVec: [0, 0, 0] });
+add(new THREE.CylinderGeometry(0.42, 0.42, 0.6, 16), { name: 'Moteur du ventilateur', position: iu(4.35, -0.2, 0.1), rotation: [0, 0, PI / 2], explodeVec: [3, 0, 0] });
+add(new THREE.CylinderGeometry(0.2, 0.2, 0.3, 16), { name: 'Palier gauche', position: iu(-4.35, -0.2, 0.1), rotation: [0, 0, PI / 2], explodeVec: [-3, 0, 0] });
+
+/* Sortie d'air : ailettes verticales, biellette, volet horizontal */
+for (let i = 0; i < 18; i++) {
+  const x = -4 + i * (8 / 17), ph = i * 0.05;
+  add(new THREE.BoxGeometry(0.025, 0.45, 0.35), { name: `Ailette verticale ${i + 1}`, position: iu(x, -1.1, 0.8), explodeVec: [0, -1.8, 1.2], onUpdate: (g, t) => { g.rotation.y = sin(t * 0.9 + ph) * 0.5; } });
+}
+add(new THREE.BoxGeometry(8.4, 0.03, 0.04), { name: "Biellette des ailettes", position: iu(0, -0.85, 0.95), explodeVec: [0, -1.8, 1.5], onUpdate: (g, t) => { g.position.x += sin(t * 0.9) * 0.12; } });
+add(new THREE.BoxGeometry(8.8, 0.04, 0.62), { name: "Volet horizontal", position: iu(0, -1.3, 0.95), explodeVec: [0, -2.2, 2.0], onUpdate: (g, t) => { g.rotation.x = -0.35 + sin(t * 0.6) * 0.3; } });
+
+/* Face avant, afficheur, grille d'aspiration */
+add(rectRing(9.6, 1.9, 0.3, 0.1), { name: 'Face avant (cadre)', position: iu(0, 0.35, 1.25), explodeVec: [0, 0.6, 4.5] });
+add(new THREE.BoxGeometry(0.7, 0.12, 0.04), { name: 'Afficheur LED et récepteur IR', position: iu(3.7, -0.45, 1.3), explodeVec: [0, 0.3, 5.2] });
+for (let i = 0; i < 9; i++) {
+  const z = -0.8 + i * 0.2;
+  add(new THREE.BoxGeometry(9.2, 0.04, 0.1), { name: `Lame de la grille d'aspiration ${i + 1}`, position: iu(0, 1.45, z), explodeVec: [0, 3.0, z * 0.6] });
+}
+add(new THREE.CylinderGeometry(0.04, 0.04, 0.45, 8), { name: 'Sonde de température', position: iu(-2, 0.9, 0.1), explodeVec: [0, 1.5, 1.5] });
+add(new THREE.CylinderGeometry(0.1, 0.1, 1.3, 12), { name: "Tuyau d'évacuation des condensats", position: iu(-5.45, -1.2, -0.7), rotation: [0, 0, PI / 2], explodeVec: [-3, -1.5, 0] });
+
+/* Carte électronique */
+add(new THREE.BoxGeometry(1.8, 1.0, 0.05), { name: 'Carte électronique de commande', position: iu(3.0, -0.8, -0.95), explodeVec: [0, -1.2, -2.4] });
+for (let i = 0; i < 4; i++)
+  add(new THREE.CylinderGeometry(0.09, 0.09, 0.3, 12), { name: `Condensateur ${i + 1}`, position: iu(2.4 + i * 0.4, -0.55, -0.78), rotation: [PI / 2, 0, 0], explodeVec: [0, -1.2, -3.3] });
+for (let i = 0; i < 3; i++)
+  add(new THREE.BoxGeometry(0.3, 0.2, 0.08), { name: `Circuit intégré ${i + 1}`, position: iu(2.5 + i * 0.5, -1.0, -0.9), explodeVec: [0, -1.2, -3.3] });
+add(new THREE.BoxGeometry(0.5, 0.4, 0.3), { name: 'Transformateur', position: iu(3.7, -0.8, -0.78), explodeVec: [0, -1.2, -3.3] });
+
+/* ═══════════ LIAISON FRIGORIFIQUE ═══════════ */
+const pv = [1.5, 0.3, 0];
+add(new THREE.CylinderGeometry(0.11, 0.11, 3.9, 16), { name: 'Tuyau de gaz (aspiration)', position: [0.95, 2.85, -0.9], explodeVec: pv });
+add(new THREE.CylinderGeometry(0.2, 0.2, 3.4, 16, 1, true, 0, 1.5 * PI), { name: 'Gaine isolante fendue', position: [0.95, 2.85, -0.9], explodeVec: pv });
+add(new THREE.CylinderGeometry(0.07, 0.07, 3.5, 12), { name: 'Tuyau de liquide', position: [0.6, 3.05, -0.9], explodeVec: pv });
+add(new THREE.CylinderGeometry(0.11, 0.11, 0.65, 16), { name: 'Raccord de gaz horizontal', position: [0.625, 0.9, -0.9], rotation: [0, 0, PI / 2], explodeVec: pv });
+add(new THREE.CylinderGeometry(0.07, 0.07, 0.3, 12), { name: 'Raccord de liquide horizontal', position: [0.45, 1.3, -0.9], rotation: [0, 0, PI / 2], explodeVec: pv });
+add(new THREE.SphereGeometry(0.15, 8, 6), { name: 'Coude de gaz', position: [0.95, 0.9, -0.9], explodeVec: pv, edgeThreshold: 5 });
+add(new THREE.SphereGeometry(0.11, 8, 6), { name: 'Coude de liquide', position: [0.6, 1.3, -0.9], explodeVec: pv, edgeThreshold: 5 });
+[0.95, 0.6].forEach(x => add(new THREE.CylinderGeometry(0.16, 0.16, 0.14, 6), { name: 'Écrou flare', position: [x, 4.85, -0.9], explodeVec: pv }));
+
+/* ═══════════ UNITÉ EXTÉRIEURE (y ≈ 0) ═══════════ */
+add(new THREE.BoxGeometry(5.2, 0.1, 2.4), { name: 'Socle de l\'unité extérieure', position: ou(0, -1.8, 0), explodeVec: [0, -2.2, 0] });
+for (const sx of [-1, 1]) for (const sz of [-1, 1])
+  add(new THREE.CylinderGeometry(0.18, 0.18, 0.26, 16), { name: 'Pied antivibratoire', position: ou(sx * 2.2, -1.98, sz * 0.9), explodeVec: [0, -3.4, 0] });
+
+/* Condenseur en L : face arrière + face gauche */
+const bfin = new THREE.BoxGeometry(0.03, 3.3, 0.6), lfin = new THREE.BoxGeometry(0.6, 3.3, 0.03);
+for (let i = 0; i < 30; i++) {
+  const x = -2.1 + i * (4.2 / 29);
+  add(bfin, { name: `Ailette de condenseur arrière ${i + 1}`, position: ou(x, 0.1, -0.8), explodeVec: [x * 0.3, 0, -2.0] });
+}
+for (let i = 0; i < 11; i++) {
+  const z = -0.6 + i * (1.45 / 10);
+  add(lfin, { name: `Ailette de condenseur latérale ${i + 1}`, position: ou(-2.15, 0.1, z), explodeVec: [-2.2, 0, z * 0.3] });
+}
+for (let j = 0; j < 8; j++)
+  add(new THREE.CylinderGeometry(0.055, 0.055, 4.3, 12), { name: `Tube de condenseur ${j + 1}`, position: ou(0, -1.35 + j * 0.4, -0.8 + (j % 2 ? 0.1 : -0.1)), rotation: [0, 0, PI / 2], explodeVec: [0, 0, -2.0] });
+for (let j = 0; j < 6; j++)
+  add(new THREE.CylinderGeometry(0.055, 0.055, 1.45, 12), { name: `Tube latéral de condenseur ${j + 1}`, position: ou(-2.15, -1.2 + j * 0.48, 0.125), rotation: [PI / 2, 0, 0], explodeVec: [-2.2, 0, 0] });
+[2.15, 2.3].forEach(x => add(new THREE.CylinderGeometry(0.08, 0.08, 3.2, 12), { name: 'Collecteur du condenseur', position: ou(x, 0.1, -0.8), explodeVec: [0, 0, -2.0] }));
+
+/* Circuit frigorifique : compresseur, accumulateur, vanne 4 voies, détendeur */
+const cv = [2.2, -0.8, 0.8];
+add(new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16), { name: 'Compresseur rotatif', position: ou(1.3, -0.95, -0.15), explodeVec: cv, onUpdate: (g, t) => { g.position.x += sin(t * 38) * 0.006; g.rotation.y = sin(t * 38) * 0.01; } });
+add(new THREE.BoxGeometry(0.35, 0.2, 0.3), { name: 'Boîtier de bornes du compresseur', position: ou(1.3, -0.1, -0.15), explodeVec: cv });
+add(new THREE.CylinderGeometry(0.22, 0.22, 1.1, 16), { name: 'Accumulateur', position: ou(1.95, -1.15, 0.4), explodeVec: [3.2, -0.5, 1.0] });
+add(new THREE.CylinderGeometry(0.16, 0.16, 0.5, 16), { name: 'Condensateur de démarrage', position: ou(1.9, -1.45, 0.85), explodeVec: [3.2, -1.0, 1.8] });
+add(new THREE.CylinderGeometry(0.14, 0.14, 0.9, 16), { name: 'Vanne 4 voies', position: ou(1.3, 0.75, -0.3), rotation: [0, 0, PI / 2], explodeVec: [2.6, 0.8, -0.5] });
+add(new THREE.BoxGeometry(0.25, 0.3, 0.25), { name: 'Bobine de la vanne 4 voies', position: ou(1.3, 1.0, -0.3), explodeVec: [2.6, 1.3, -0.5] });
+add(new THREE.CylinderGeometry(0.05, 0.05, 0.75, 12), { name: 'Tuyau de refoulement', position: ou(1.3, 0.375, -0.2), explodeVec: [2.4, 0.4, 0.2] });
+add(new THREE.CylinderGeometry(0.05, 0.05, 0.7, 12), { name: 'Tuyau vers vanne de service', position: ou(2.1, 0.75, -0.3), rotation: [0, 0, PI / 2], explodeVec: [2.8, 0.8, -0.5] });
+add(new THREE.CylinderGeometry(0.14, 0.14, 0.5, 16), { name: 'Détendeur électronique', position: ou(2.2, 1.55, -0.9), explodeVec: [3.0, 1.5, -0.8] });
+add(new THREE.BoxGeometry(1.0, 0.5, 0.8), { name: "Boîtier électronique extérieur", position: ou(1.6, 1.55, 0.35), explodeVec: [3.0, 2.2, 0.5] });
+add(new THREE.CylinderGeometry(0.16, 0.16, 0.4, 16), { name: 'Vanne de service gaz', position: ou(2.5, 0.9, -0.9), rotation: [0, 0, PI / 2], explodeVec: [3.2, 0.3, 0] });
+add(new THREE.CylinderGeometry(0.11, 0.11, 0.4, 16), { name: 'Vanne de service liquide', position: ou(2.5, 1.3, -0.9), rotation: [0, 0, PI / 2], explodeVec: [3.2, 0.3, 0] });
+add(new THREE.BoxGeometry(0.05, 1.0, 0.8), { name: 'Plaque des vannes de service', position: ou(2.55, 1.1, -0.85), explodeVec: [3.3, 0.3, 0] });
+
+/* Ventilateur hélicoïde (axe Z) */
+const FX = -0.9, FY = 0.1;
+add(new THREE.CylinderGeometry(0.3, 0.3, 0.3, 16), { name: "Moyeu de l'hélice", position: ou(FX, FY, 0.75), rotation: [PI / 2, 0, 0], explodeVec: [0, 0, 2.0] });
+for (let i = 0; i < 7; i++) {
+  const a0 = i / 7 * PI * 2;
+  add(fanBladeGeo, { name: `Pale d'hélice ${i + 1}`, position: ou(FX, FY, 0.75), explodeVec: [0, 0, 2.0], onUpdate: (g, t) => { g.rotation.z = a0 + t * 9; } });
+}
+add(new THREE.CylinderGeometry(0.35, 0.35, 0.6, 16), { name: 'Moteur du ventilateur extérieur', position: ou(FX, FY, 0.3), rotation: [PI / 2, 0, 0], explodeVec: [0, 0, 0.6] });
+[PI / 2, PI / 2 + 2 * PI / 3, PI / 2 + 4 * PI / 3].forEach(a =>
+  add(new THREE.BoxGeometry(1.0, 0.07, 0.07), { name: 'Bras de support moteur', position: ou(FX + 0.8 * cos(a), FY + 0.8 * sin(a), 0.3), rotation: [0, 0, a], explodeVec: [0, 0, 0.9] }));
+add(ringZ(1.32, 1.2, 0.25), { name: "Buse d'air (bell mouth)", position: ou(FX, FY, 1.0), explodeVec: [0, 0, 3.2] });
+[0.45, 0.8, 1.15].forEach(r => add(ringZ(r, r - 0.04, 0.04), { name: 'Anneau de la grille de protection', position: ou(FX, FY, 1.12), explodeVec: [0, 0, 4.2] }));
+for (let i = 0; i < 12; i++) {
+  const a = i / 12 * PI * 2;
+  add(new THREE.BoxGeometry(0.9, 0.035, 0.035), { name: `Rayon de la grille ${i + 1}`, position: ou(FX + 0.75 * cos(a), FY + 0.75 * sin(a), 1.12), rotation: [0, 0, a], explodeVec: [0, 0, 4.2] });
+}
+
+/* Habillage : face avant et capot supérieur (cadres ouverts) */
+add(rectRing(5.2, 3.9, 0.3, 0.08), { name: "Face avant de l'unité extérieure", position: ou(0, 0.1, 1.16), explodeVec: [0, 0, 5.2] });
+add(rectRing(5.2, 2.4, 0.3, 0.08).rotateX(PI / 2), { name: 'Capot supérieur (cadre)', position: ou(0, 1.98, 0), explodeVec: [0, 3.0, 0] });
+for (let i = 0; i < 7; i++)
+  add(new THREE.BoxGeometry(0.06, 0.04, 2.2), { name: `Traverse du capot ${i + 1}`, position: ou(-2.0 + i * 0.667, 1.98, 0), explodeVec: [0, 3.0, 0] });
+
+engine.start();
+</script>
+</body>
+</html>

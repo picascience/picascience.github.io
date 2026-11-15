@@ -28,5 +28,15 @@
     "added": "2026-11-14",
     "file": "models/rtx-2070-super.html",
     "thumb": "thumbs/rtx-2070-super.webp"
+  },
+  {
+    "id": "climatiseur",
+    "number": "No. 04",
+    "title": "Climatiseur",
+    "subtitle": "split mural · cycle frigorifique",
+    "parts": 290,
+    "added": "2026-11-15",
+    "file": "models/climatiseur.html",
+    "thumb": "thumbs/climatiseur.webp"
   }
 ]
