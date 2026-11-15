@@ -38,5 +38,15 @@
     "added": "2026-11-15",
     "file": "models/climatiseur.html",
     "thumb": "thumbs/climatiseur.webp"
+  },
+  {
+    "id": "ballon-thermodynamique",
+    "number": "No. 05",
+    "title": "Ballon d’eau chaude",
+    "subtitle": "thermodynamique · PAC sur cuve de 270 L",
+    "parts": 159,
+    "added": "2026-11-15",
+    "file": "models/ballon-thermodynamique.html",
+    "thumb": "thumbs/ballon-thermodynamique.webp"
   }
 ]
