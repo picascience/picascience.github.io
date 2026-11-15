@@ -1,7 +1,20 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-14T23:10:25.111Z",
+  "generated": "2026-11-15T12:30:10.017Z",
   "apps": [
+    {
+      "name": "Top Skills",
+      "emoji": "🏆",
+      "colors": [
+        "#140c00",
+        "#eab308"
+      ],
+      "category": "Outils",
+      "added": "2026-11-15",
+      "description": "Les meilleurs skills GitHub pour Claude, par catégorie et notés",
+      "icon": "apps/top-skills/icon.svg",
+      "id": "top-skills"
+    },
     {
       "name": "CAD 3D",
       "emoji": "🧊",

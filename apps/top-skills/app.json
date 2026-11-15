@@ -1,0 +1,9 @@
+{
+  "name": "Top Skills",
+  "emoji": "🏆",
+  "colors": ["#140c00", "#eab308"],
+  "category": "Outils",
+  "added": "2026-11-15",
+  "description": "Les meilleurs skills GitHub pour Claude, par catégorie et notés",
+  "icon": "icon.svg"
+}
