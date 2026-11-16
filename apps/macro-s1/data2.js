@@ -1,7 +1,28 @@
 window.DATA2={
 title:"Macro · Dossier 2 · Séance 2",
 intro:`<p><b>Dossier 2 : les opérations sur les produits et l'égalité emplois-ressources.</b> Le quiz est noté et à réponses rédigées : apprends d'abord la carte 1 (réponses types), puis les formules.</p>`,
+carte:`<style>.mm .br{border-left:3px solid;padding:2px 0 2px 12px;margin:0 0 16px 4px}.mm .br h2{font-size:16px;margin:0 0 8px}.mm .n{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:0 0 6px;font-size:14.5px}.mm .n small{display:block;color:var(--mut);font-size:12.5px}.mm .top{background:var(--acc2);border:1.5px solid var(--acc);border-radius:14px;padding:12px;text-align:center;margin:0 0 6px}.mm .top span{font-family:"Cambria Math",Georgia,serif;font-size:14px}.mm .sub{margin:6px 0 0 6px;padding-left:8px;border-left:1px dashed var(--line);font-size:13px;color:var(--mut)}.mm .sub div{margin:3px 0}</style><div class="mm">
+<div class="top"><b>Opérations sur les produits</b><br><span>P + IM + IP − SP = CI + DC + FBCF + VS + OV + EX</span></div>
+<div class="br" style="border-color:#1D9E75"><h2>Ressources : d'où viennent les produits</h2>
+<div class="n"><b>Production (P)</b><div class="sub"><div><b>Marchande</b> : prix ≥ 50 % des coûts, au prix de base</div><div><b>Emploi final propre</b> : loyers imputés, personnel domestique salarié, potager</div><div><b>Non marchande</b> : APU et ISBLSM, somme des coûts</div><div><b>Cas particuliers</b> : banque = intérêts reçus − versés ; assurance = primes − indemnités ; commerce = marge</div></div></div>
+<div class="n"><b>Importations (IM)</b><small>Prix CAF · critère de résidence</small></div></div>
+<div class="br" style="border-color:#7F77DD"><h2>Emplois : à quoi servent les produits</h2>
+<div class="n"><b>Consommation intermédiaire (CI)</b><small>Détruite totalement dans la production</small></div>
+<div class="n"><b>Consommation finale (DC)</b><small>Ménages, APU, ISBLSM · jamais les SNF</small></div>
+<div class="n"><b>FBCF</b><small>Investissement, actifs utilisés plus d'un an · logement des ménages</small></div>
+<div class="n"><b>Variation de stocks (VS)</b><small>Positive ou négative · variable d'ajustement</small></div>
+<div class="n"><b>Objets de valeur (OV)</b><small>Réserve de valeur · acquisitions − cessions</small></div>
+<div class="n"><b>Exportations (EX)</b><small>Prix FAB · critère de résidence</small></div></div>
+<div class="br" style="border-color:#D85A30"><h2>Prix : qui touche quoi</h2>
+<div class="n"><b>Prix de base</b><small>Reçu par le producteur = acquisition − IP + SP</small></div>
+<div class="n"><b>Prix d'acquisition</b><small>Payé par l'acheteur (TTC) = base + IP − SP</small></div>
+<div class="n"><b>Consommation effective des ménages</b><small>DC ménages + DC individuelle des APU + DC des ISBLSM</small></div></div></div>`,
 fiche:[
+{t:"Questions de ta photo (réponses types)",s:"Poly D2 p.2, p.4, p.5",h:`
+<h3>Acquisition nette d'objets de valeur</h3><p>Achats de biens détenus comme <b>réserve de valeur</b> (bijoux, métaux précieux, objets d'art), en <b>acquisitions − cessions</b> de la période. Surtout les ménages. Classée à part de la consommation finale car on garde la valeur dans le temps.</p>
+<h3>Prix d'acquisition</h3><p>Prix <b>payé par l'acheteur</b> (prix de marché, TTC). <b>Prix de base + IP − SP</b> (plus marges commerciales et de transport quand il y en a). C'est à ce prix que s'écrit l'équilibre emplois-ressources.</p>
+<h3>Classer une consommation : CI, consommation finale ou FBCF ?</h3><p>On regarde l'<b>utilisation</b> : but productif ou non, et durée.</p><ul><li><b>CI</b> : détruit totalement dans la production (carburant d'une entreprise, électricité d'une SNF).</li><li><b>Consommation finale</b> : satisfait un besoin direct (ménage, APU, ISBLSM).</li><li><b>FBCF</b> : actif utilisé plus d'un an en production.</li></ul>
+<h3>Une voiture et son carburant</h3><ul><li><b>Ménage</b> : voiture = <b>consommation finale</b> (pas FBCF, seul le logement l'est) ; carburant = consommation finale.</li><li><b>Entreprise (SNF) ou entreprise individuelle</b> : voiture = <b>FBCF</b> ; carburant = <b>CI</b>.</li></ul>`},
 {t:"Réponses types aux 7 questions de l'exemple de quiz",s:"Dossier TD 2 p.1 · Poly D2 · Insee Première n° 1950",h:`
 <h3>1. Les ménages ont-ils une production marchande ?</h3>
 <p><b>Oui, à double titre</b> : (1) les <b>services de logement marchands</b> des propriétaires qui louent leur logement (loyers) ; (2) les biens et services marchands produits par les <b>entreprises individuelles</b>. À ne pas confondre avec leur production pour emploi final propre (loyers imputés, personnel domestique salarié, potager).</p>
@@ -125,6 +146,9 @@ fiche:[
 </ul>`}
 ],
 qcm:[
+{q:"Une SNF achète une voiture de société et son carburant. On enregistre :",c:["FBCF pour la voiture, CI pour le carburant","Consommation finale pour les deux","CI pour la voiture, FBCF pour le carburant","FBCF pour les deux"],a:0,e:"Voiture utilisée plus d'un an en production = FBCF. Carburant détruit totalement = CI. Les SNF n'ont pas de consommation finale.",s:"Poly D2 p.4"},
+{q:"Un ménage achète une voiture (hors entreprise individuelle) et fait le plein. On enregistre :",c:["Consommation finale pour les deux","FBCF pour la voiture, consommation finale pour le carburant","FBCF pour les deux","CI pour le carburant"],a:0,e:"Seul le logement est une FBCF des ménages ; les autres biens durables sont de la consommation finale.",s:"Poly D2 p.4"},
+{q:"Les acquisitions nettes d'objets de valeur se calculent :",c:["Acquisitions moins cessions de la période","Acquisitions plus cessions","Acquisitions moins amortissement","Acquisitions au prix de base"],a:0,e:"On calcule directement le net : bijoux, métaux précieux, art, détenus comme réserve de valeur.",s:"Poly D2 p.5"},
 {q:"Parmi ces opérations sur les produits, laquelle est une ressource ?",c:["Les importations","Les exportations","La variation de stocks","La consommation intermédiaire"],a:0,e:"Ressources = production + importations. Tout le reste (CI, DC, FBCF, VS, OV, EX) est un emploi.",s:"Poly D2 p.1"},
 {q:"L'équilibre emplois-ressources s'écrit :",c:["P + IM + IP − SP = CI + DC + FBCF + VS + OV + EX","P + EX + IP − SP = CI + DC + FBCF + VS + OV + IM","P + IM − IP + SP = CI + DC + FBCF + VS + OV + EX","P + IM = CI + DC + FBCF + EX − VS"],a:0,e:"Exprimé au prix d'acquisition : on ajoute les impôts sur les produits et on retire les subventions sur les produits à la production (au prix de base).",s:"Poly D2 p.5"},
 {q:"Quelle grandeur joue le rôle d'ajustement dans l'équilibre emplois-ressources ?",c:["La variation de stocks","La consommation finale","Les importations","La FBCF"],a:0,e:"En pratique la VS est souvent un résidu qui égalise ressources et emplois.",s:"Poly D2 p.5"},

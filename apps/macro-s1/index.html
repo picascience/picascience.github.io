@@ -13,8 +13,8 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-sy
 header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 8px) 12px 8px;border-bottom:1px solid var(--line)}
 header h1{font-size:15px;margin:0 0 8px;color:var(--mut);font-weight:600;letter-spacing:.02em}
 #dos{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 8px}#dos button{border:1.5px solid var(--line);background:var(--card);color:var(--mut);font:600 14px/1 inherit;padding:10px 4px;border-radius:10px}#dos button.on{border-color:var(--acc);background:var(--acc);color:#fff}
-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--line);border-radius:10px;padding:3px}
-nav button{border:0;background:transparent;color:var(--mut);font:600 13px/1 inherit;padding:9px 2px;border-radius:8px}
+nav{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;background:var(--line);border-radius:10px;padding:3px}
+nav button{border:0;background:transparent;color:var(--mut);font:600 12.5px/1 inherit;padding:9px 1px;border-radius:8px}
 nav button.on{background:var(--card);color:var(--acc);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 main{padding:14px 14px calc(env(safe-area-inset-bottom) + 60px);max-width:680px;margin:0 auto}
 section{display:none}section.on{display:block}
@@ -57,12 +57,13 @@ b,strong{font-weight:650}
 <header>
 <h1 id="ttl">Macroéconomie · Séance 1</h1>
 <div id="dos"><button data-d="1">Dossier 1</button><button data-d="2">Dossier 2</button></div>
-<nav id="nav"><button data-t="fiche">Fiche</button><button data-t="qcm">QCM</button><button data-t="flash">Cartes</button><button data-t="pieges">Pièges</button></nav>
+<nav id="nav"><button data-t="fiche">Fiche</button><button data-t="qcm">QCM</button><button data-t="flash">Cartes</button><button data-t="carte">Carte</button><button data-t="pieges">Pièges</button></nav>
 </header>
 <main>
 <section id="fiche"></section>
 <section id="qcm"></section>
 <section id="flash"></section>
+<section id="carte"></section>
 <section id="pieges"></section>
 </main>
 <script src="./data.js"></script>
@@ -89,6 +90,7 @@ $('nav').addEventListener('click',function(e){var b=e.target.closest('button');i
 $('fiche').innerHTML=(D.intro?'<div class="card">'+D.intro+'</div>':'')+D.fiche.map(function(x,i){return '<div class="card"><h2><span class="num">'+(i+1)+'</span>'+x.t+'</h2>'+x.h+(x.s?'<span class="src">Source : '+esc(x.s)+'</span>':'')+'</div>'}).join('');
 $('pieges').innerHTML=D.pieges.map(function(x){return '<div class="card"><h2><span class="tag">Piège</span>'+x.t+'</h2>'+x.h+(x.s?'<span class="src">Source : '+esc(x.s)+'</span>':'')+'</div>'}).join('')||'<p class="center">Bientôt disponible.</p>';
 
+$('carte').innerHTML=D.carte||'<p class="center">Bientôt disponible.</p>';
 /* QCM */
 var S=get('qcm',null);
 function newRun(ids){S={ids:shuf(ids),i:0,ans:{},ord:{}};set('qcm',S);drawQ()}
