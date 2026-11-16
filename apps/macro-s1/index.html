@@ -12,6 +12,7 @@
 html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 8px) 12px 8px;border-bottom:1px solid var(--line)}
 header h1{font-size:15px;margin:0 0 8px;color:var(--mut);font-weight:600;letter-spacing:.02em}
+#dos{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 8px}#dos button{border:1.5px solid var(--line);background:var(--card);color:var(--mut);font:600 14px/1 inherit;padding:10px 4px;border-radius:10px}#dos button.on{border-color:var(--acc);background:var(--acc);color:#fff}
 nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--line);border-radius:10px;padding:3px}
 nav button{border:0;background:transparent;color:var(--mut);font:600 13px/1 inherit;padding:9px 2px;border-radius:8px}
 nav button.on{background:var(--card);color:var(--acc);box-shadow:0 1px 3px rgba(0,0,0,.12)}
@@ -55,6 +56,7 @@ b,strong{font-weight:650}
 <body>
 <header>
 <h1 id="ttl">Macroéconomie · Séance 1</h1>
+<div id="dos"><button data-d="1">Dossier 1</button><button data-d="2">Dossier 2</button></div>
 <nav id="nav"><button data-t="fiche">Fiche</button><button data-t="qcm">QCM</button><button data-t="flash">Cartes</button><button data-t="pieges">Pièges</button></nav>
 </header>
 <main>
@@ -64,9 +66,13 @@ b,strong{font-weight:650}
 <section id="pieges"></section>
 </main>
 <script src="./data.js"></script>
+<script src="./data2.js"></script>
 <script>
 (function(){
-var D=window.DATA||{fiche:[],qcm:[],flash:[],pieges:[]},K='macro-s1:';
+var DOS='2';try{DOS=localStorage.getItem('macro-s1:dossier')||'2'}catch(e){}
+if(DOS==='2'&&!window.DATA2)DOS='1';
+var D=(DOS==='2'?window.DATA2:window.DATA)||{fiche:[],qcm:[],flash:[],pieges:[]},K=DOS==='2'?'macro-s1:d2:':'macro-s1:';
+[].forEach.call(document.querySelectorAll('#dos button'),function(b){b.classList.toggle('on',b.dataset.d===DOS);b.onclick=function(){if(b.dataset.d===DOS)return;try{localStorage.setItem('macro-s1:dossier',b.dataset.d)}catch(e){}location.reload()}});
 function get(k,d){try{var v=localStorage.getItem(K+k);return v==null?d:JSON.parse(v)}catch(e){return d}}
 function set(k,v){try{localStorage.setItem(K+k,JSON.stringify(v))}catch(e){}}
 function $(id){return document.getElementById(id)}
