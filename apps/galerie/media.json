@@ -1,5 +1,15 @@
 [
   {
+    "id": "deux-routes",
+    "type": "image",
+    "title": "Deux routes",
+    "date": "2026-11-16",
+    "file": "media/deux-routes.jpg",
+    "width": 1080,
+    "height": 1920,
+    "description": "Deux fils de lumière tressés, un doré et un bleu : à chaque croisement, une étoile allumée, un projet construit ensemble. À l'horizon, l'un part vers l'aube, l'autre monte en étoile."
+  },
+  {
     "id": "ibn-taymiyya",
     "type": "video",
     "title": "Cheikh al-Islam Ibn Taymiyya",
@@ -10,6 +20,11 @@
     "height": 1920,
     "duration": 50,
     "description": "Edit motion design en cinq actes, de Harran à la citadelle de Damas. Bruitages synthétisés, sans musique.",
-    "links": [{ "label": "Version interactive", "href": "media/ibn-taymiyya.html" }]
+    "links": [
+      {
+        "label": "Version interactive",
+        "href": "media/ibn-taymiyya.html"
+      }
+    ]
   }
 ]
