@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-16T17:30:35.265Z",
+  "generated": "2026-11-16T20:26:51.602Z",
   "apps": [
     {
       "name": "Galerie",
@@ -14,6 +14,19 @@
       "description": "Toutes mes images et vidéos faites avec Claude",
       "icon": "apps/galerie/icon.svg",
       "id": "galerie"
+    },
+    {
+      "name": "Neuro-Éco",
+      "emoji": "🧠",
+      "colors": [
+        "#03141f",
+        "#22c8e6"
+      ],
+      "category": "Labo",
+      "added": "2026-11-16",
+      "description": "Économie simulée de 2 000 agents à réseaux de neurones : marché, rumeurs, espionnage, neuro-évolution",
+      "icon": "apps/neuro-economie/icon.svg",
+      "id": "neuro-economie"
     },
     {
       "name": "Kinetic Pro",

@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070b12">
+<title>Neuro-Économie — 2 000 agents</title>
+<style>
+:root{
+  --bg:#070b12;--panel:#0d1420;--panel2:#111a29;--line:#1c2738;--txt:#dbe6f5;--mut:#7a8aa3;
+  --cy:#4cc9f0;--red:#ff5d73;--amb:#f6ae2d;--grn:#5bd67a;--vio:#b388ff;--mag:#ff4fd8;--yel:#fde68a;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font:13px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) calc(env(safe-area-inset-bottom) + 34px) env(safe-area-inset-left)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.app{display:grid;grid-template-columns:1fr;gap:8px;padding:8px;max-width:1500px;margin:0 auto}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+h1{font-size:15px;margin:0;font-weight:700;letter-spacing:.02em}
+h1 small{display:block;font-weight:400;color:var(--mut);font-size:11px;letter-spacing:0}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-left:auto}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:3px 7px;font-size:11px;color:var(--mut);white-space:nowrap}
+.chip b{color:var(--txt);font-variant-numeric:tabular-nums;font-weight:600}
+.mapwrap{position:relative;background:#050810;border:1px solid var(--line);border-radius:12px;overflow:hidden;height:min(100vw,54vh)}
+#map{display:block;width:100%;height:100%;touch-action:manipulation}
+.badges{position:absolute;left:8px;top:8px;display:flex;flex-direction:column;gap:4px;pointer-events:none}
+.badge{background:rgba(13,20,32,.85);border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:11px}
+.legend{position:absolute;left:8px;bottom:6px;right:8px;font-size:10.5px;color:var(--mut);pointer-events:none;display:flex;flex-wrap:wrap;gap:3px 10px}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.bar{display:flex;flex-wrap:wrap;gap:6px}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:9px;overflow:hidden;flex:1 1 auto}
+.seg button{flex:1;padding:8px 6px;font-size:12px;color:var(--mut);border-right:1px solid var(--line);white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button.on{background:#16324a;color:#fff;font-weight:600}
+.tabs{display:flex;border-bottom:1px solid var(--line)}
+.tabs button{flex:1;padding:9px 4px;font-size:12.5px;color:var(--mut);border-bottom:2px solid transparent}
+.tabs button.on{color:#fff;border-bottom-color:var(--cy);font-weight:600}
+.side{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
+.pane{display:none;padding:10px}
+.pane.on{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 8px;min-width:0}
+.card h3{margin:0 0 2px;font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.card .lg{font-size:10.5px;display:flex;flex-wrap:wrap;gap:1px 8px;min-height:14px}
+.card .lg span{white-space:nowrap}
+.card .lg b{font-variant-numeric:tabular-nums;font-weight:600}
+.card canvas{display:block;width:100%;height:84px;margin-top:3px}
+.wide{grid-column:1/-1}
+.stack{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:5px 0 3px;background:#0a0f18}
+.stack div{height:100%}
+.log{font-size:11px;color:var(--mut);margin:0;padding:0;list-style:none}
+.log li{padding:2px 0;border-bottom:1px dashed var(--line)}
+.log li:last-child{border:0}
+.log b{color:var(--txt);font-weight:500}
+#nn{display:block;width:100%;height:330px}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
+.kv div{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:5px 7px;min-width:0}
+.kv span{display:block;font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.kv b{font-size:13px;font-variant-numeric:tabular-nums}
+.hint{color:var(--mut);font-size:12px;padding:14px 4px;text-align:center}
+.rum{border-left:3px solid var(--line);padding:4px 8px;margin:6px 0;background:var(--panel2);border-radius:0 8px 8px 0;font-size:12px}
+.rum.fake{border-color:var(--red)}.rum.vraie{border-color:var(--amb)}
+.ctl{margin:0 0 12px}
+.ctl label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.ctl label b{font-variant-numeric:tabular-nums;color:var(--cy)}
+input[type=range]{width:100%;accent-color:var(--cy);height:26px;margin:0}
+.btn{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 11px;margin-bottom:7px;font-size:12.5px}
+.btn:active{background:#16324a}
+.btn small{display:block;color:var(--mut);font-size:11px;margin-top:1px}
+.btn.r{border-left:3px solid var(--red)}.btn.a{border-left:3px solid var(--amb)}.btn.c{border-left:3px solid var(--cy)}
+h2{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:14px 0 7px;font-weight:600}
+h2:first-child{margin-top:0}
+@media(min-width:960px){
+  .app{grid-template-columns:minmax(0,1fr) 440px;align-items:start}
+  header{grid-column:1/-1}
+  .mapwrap{height:calc(100vh - 150px);min-height:420px}
+  .side{grid-row:2/span 2;grid-column:2;max-height:calc(100vh - 80px);overflow:auto}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Neuro-Économie<small>Observatoire de 2 000 agents à neuro-évolution</small></h1>
+    <div class="chips">
+      <span class="chip">Tick <b id="cTick">0</b></span>
+      <span class="chip">Gén. moy. <b id="cGen">1</b></span>
+      <span class="chip">Gini <b id="cGini">0,00</b></span>
+      <span class="chip">Trésor <b id="cTres">0</b></span>
+      <span class="chip"><b id="cTps">0</b> ticks/s · <b id="cFps">0</b> ips</span>
+    </div>
+  </header>
+
+  <div class="mapwrap">
+    <canvas id="map"></canvas>
+    <div class="badges" id="badges"></div>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="bar">
+    <div class="seg" id="segSpeed">
+      <button data-v="0">Pause</button><button data-v="1">1x</button><button data-v="5" class="on">5x</button><button data-v="20">20x</button><button data-v="50">50x</button>
+    </div>
+    <div class="seg" id="segMode">
+      <button data-v="0" class="on">Richesse</button><button data-v="1">Rumeurs</button><button data-v="2">Espionnage</button><button data-v="3">Rôles</button>
+    </div>
+  </div>
+
+  <div class="side">
+    <div class="tabs" id="tabs">
+      <button data-v="pDash" class="on">Tableau de bord</button><button data-v="pInsp">Inspecteur</button><button data-v="pPar">Paramètres</button>
+    </div>
+
+    <div class="pane on" id="pDash">
+      <div class="grid">
+        <div class="card"><h3>Prix</h3><div class="lg"><span style="color:var(--red)">Pommes <b id="lPa"></b></span><span style="color:var(--amb)">Matières <b id="lPm"></b></span><span style="color:var(--cy)">Outils <b id="lPt"></b></span></div><canvas id="chPrix"></canvas></div>
+        <div class="card"><h3>Offre / demande (pommes)</h3><div class="lg"><span style="color:var(--grn)">Offre <b id="lSup"></b></span><span style="color:var(--red)">Demande <b id="lDem"></b></span></div><canvas id="chOD"></canvas></div>
+        <div class="card"><h3>Morts / 100 ticks</h3><div class="lg"><span style="color:var(--red)">Famine <b id="lFam"></b></span><span style="color:var(--vio)">Faillite <b id="lBank"></b></span></div><canvas id="chMort"></canvas></div>
+        <div class="card"><h3>Génération moyenne</h3><div class="lg"><span>Moy. <b id="lGen"></b></span><span style="color:var(--mut)">Max <b id="lGenMax"></b></span></div><canvas id="chGen"></canvas></div>
+        <div class="card"><h3>Inégalités (Gini)</h3><div class="lg"><span style="color:var(--yel)">Gini <b id="lGini"></b></span><span style="color:var(--mut)">Top 10 % : <b id="lTop"></b></span></div><canvas id="chGini"></canvas></div>
+        <div class="card"><h3>Rumeurs & espionnage</h3><div class="lg"><span style="color:var(--red)">Infectés <b id="lInf"></b></span><span style="color:var(--cy)">Crédulité <b id="lCred"></b></span><span style="color:var(--mag)">Espions <b id="lSpy"></b></span></div><canvas id="chRum"></canvas></div>
+        <div class="card wide"><h3>Part des richesses par métier</h3>
+          <div class="stack"><div id="sF" style="background:var(--grn)"></div><div id="sM" style="background:var(--amb)"></div><div id="sA" style="background:var(--vio)"></div></div>
+          <div class="lg"><span style="color:var(--grn)">Fermiers <b id="lF"></b></span><span style="color:var(--amb)">Mineurs <b id="lM"></b></span><span style="color:var(--vio)">Artisans <b id="lA"></b></span><span style="color:var(--mut)">Masse monétaire <b id="lMass"></b></span></div>
+        </div>
+        <div class="card wide"><h3>Journal</h3><ul class="log" id="log"></ul></div>
+      </div>
+    </div>
+
+    <div class="pane" id="pInsp">
+      <div class="hint" id="inspHint">Touchez un agent sur la carte pour ouvrir son cerveau.</div>
+      <div id="inspBody" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+          <b style="font-size:14px" id="iTitle"></b><span style="color:var(--mut);font-size:11.5px" id="iAct"></span>
+        </div>
+        <canvas id="nn"></canvas>
+        <div class="kv">
+          <div><span>Énergie</span><b id="iEn"></b></div><div><span>Cash</span><b id="iCash"></b></div><div><span>Patrimoine</span><b id="iW"></b></div>
+          <div><span>Pommes</span><b id="iAp"></b></div><div><span>Matières</span><b id="iMa"></b></div><div><span>Outils</span><b id="iTo"></b></div>
+          <div><span>Génération</span><b id="iGen"></b></div><div><span>Âge (ticks)</span><b id="iAge"></b></div><div><span>Crédulité</span><b id="iCred"></b></div>
+        </div>
+        <h2>Rumeur active</h2><div id="iRum"></div>
+        <h2>Historique d'espionnage</h2><ul class="log" id="iSpy"></ul>
+      </div>
+    </div>
+
+    <div class="pane" id="pPar">
+      <h2>Paramètres scientifiques</h2>
+      <div class="ctl"><label>Taux de mutation génétique <b id="vMut"></b></label><input type="range" id="rMut" min="0" max="25" step="0.5" value="5"></div>
+      <div class="ctl"><label>Virulence des fake news <b id="vVir"></b></label><input type="range" id="rVir" min="0" max="100" step="1" value="50"></div>
+      <div class="ctl"><label>Coût de l'espionnage <b id="vSpy"></b></label><input type="range" id="rSpy" min="0" max="20" step="0.5" value="3"></div>
+      <h2>Scénarios macroéconomiques</h2>
+      <button class="btn r" id="bFake">Injecter une fake news de pénurie de pommes<small>40 foyers de désinformation dans le réseau social</small></button>
+      <button class="btn a" id="bSech">Sécheresse (baisse des récoltes)<small>Rendement des vergers −60 % pendant 500 ticks</small></button>
+      <button class="btn c" id="bBoom">Boom technologique (productivité outils x2)<small>Les outils doublent d'efficacité pendant 800 ticks</small></button>
+      <h2>Simulation</h2>
+      <button class="btn" id="bReset">Réinitialiser l'écosystème<small>Nouvelle population aléatoire, génération 1</small></button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* =====================================================================
+   1. CONSTANTES & ÉTAT (tableaux typés, zéro allocation par tick)
+   ===================================================================== */
+const N = 2000, K = 6;
+const NI = 14, NH = 12, NO = 7;
+const OFF_B1 = NI * NH, OFF_W2 = OFF_B1 + NH, OFF_B2 = OFF_W2 + NH * NO, GENOME = OFF_B2 + NO;
+const E_MAX = 100, METAB = 0.5, AGING = 0.0002, WORK = 0.1, PANTRY = 8, APPLE_E = 20;
+const FEE = 0.02, TAX = 0.0006, BROKE_MAX = 220, START_CASH = 50, ENDOW = 30;
+const ALPHA = 0.02, EPS = 1e-3, P_MIN = 0.05, P_MAX = 5000;
+const YIELD_A = 0.07, YIELD_M = 0.05, TOOL_WEAR = 0.03, MATS_PER_TOOL = 2, ROT = 0.003, RUST = 0.002;
+const HN = 240, SAMPLE = 5;
+const ROLE_NAMES = ['Fermier', 'Mineur', 'Artisan'];
+const ACT_NAMES = ['achète des pommes', 'achète mat./outils', 'produit', 'vend', 'thésaurise'];
+const IN_LABELS = ['Énergie', 'Pommes', 'Matières', 'Outils', 'Cash', 'Prix pom.', 'Prix mat.', 'Prix out.', 'ΔP pommes', 'Offre/dem.', 'Rumeur int.', 'Rumeur val.', 'Rich. voisins', 'Espionnage'];
+const OUT_LABELS = ['Acheter pommes', 'Acheter mat./outils', 'Produire', 'Vendre', 'Thésauriser', 'Rumeur', 'Espionner'];
+
+const G = new Float32Array(N * GENOME);            // poids synaptiques de tous les cerveaux
+const cred = new Float32Array(N);                  // gène de crédulité face aux rumeurs
+const hx = new Float32Array(N), hy = new Float32Array(N), ph = new Float32Array(N);
+const px = new Float32Array(N), py = new Float32Array(N);
+const nb = new Int32Array(N * K);                  // graphe social de proximité
+const energy = new Float32Array(N), apples = new Float32Array(N), mats = new Float32Array(N), tools = new Float32Array(N);
+const cash = new Float64Array(N), wealth = new Float64Array(N);
+const age = new Int32Array(N), gen = new Int32Array(N), broke = new Int32Array(N);
+const role = new Uint8Array(N), lastAct = new Uint8Array(N), actMask = new Uint8Array(N);
+const rumI = new Float32Array(N), rumV = new Float32Array(N);
+const rumT = new Uint8Array(N), rumFake = new Uint8Array(N);
+const rumCd = new Int32Array(N), spyCd = new Int32Array(N), liar = new Int32Array(N), immune = new Int32Array(N);
+const spyInfo = new Float32Array(N);
+const spyFlash = new Uint8Array(N), tgtFlash = new Uint8Array(N);
+const SH = 3;                                       // profondeur de l'historique d'espionnage
+const spyHT = new Int32Array(N * SH), spyHTick = new Int32Array(N * SH), spyHLie = new Uint8Array(N * SH);
+const spyHA = new Float32Array(N * SH), spyHC = new Float32Array(N * SH), spyHN = new Int32Array(N);
+const topIdx = new Int32Array(N / 10), order = new Int32Array(N);
+const buyL = [new Int32Array(N), new Int32Array(N), new Int32Array(N)];
+const sellL = [new Int32Array(N), new Int32Array(N), new Int32Array(N)];
+const sellQ = [new Int32Array(N), new Int32Array(N), new Int32Array(N)];
+const nBuy = new Int32Array(3), nSell = new Int32Array(3);
+const prodL = new Int32Array(N);
+const stocks = [apples, mats, tools];
+const price = new Float64Array(3), pEma = new Float64Array(3), dP = new Float64Array(3);
+const lastD = new Float64Array(3), lastS = new Float64Array(3), imb = new Float64Array(3), vol = new Float64Array(3);
+const inp = new Float32Array(NI), hid = new Float32Array(NH), out = new Float32Array(NO);
+const sortBuf = new Float64Array(N);
+
+const H = {};
+['pa', 'pm', 'pt', 'sup', 'dem', 'fam', 'bank', 'gen', 'gini', 'inf', 'cred', 'spy'].forEach(k => H[k] = new Float32Array(HN));
+let hPos = 0, hCnt = 0;
+
+const P = { mut: 0.05, vir: 0.5, spyCost: 3 };
+const S = {
+  tick: 0, treasury: 0, avgW: 1, drought: 0, boom: 0,
+  famE: 0, bankE: 0, spyE: 0, supE: 0, demE: 0, truthA: 0,
+  gini: 0, top10: 0, genAvg: 1, genMax: 1, infected: 0, credAvg: 0.5,
+  nF: 0, nM: 0, nA: 0, mass: 0, deaths: 0, fabricated: 0
+};
+
+/* Effets visuels : tampons circulaires */
+const FX_N = 256, WV_N = 64;
+const fxA = new Int32Array(FX_N), fxB = new Int32Array(FX_N), fxT = new Float32Array(FX_N), fxK = new Uint8Array(FX_N);
+const wvI = new Int32Array(WV_N), wvT = new Float32Array(WV_N), wvK = new Uint8Array(WV_N);
+let fxP = 0, wvP = 0;
+function addFx(a, b, k) { fxA[fxP] = a; fxB[fxP] = b; fxT[fxP] = 1; fxK[fxP] = k; fxP = (fxP + 1) % FX_N; }
+function addWave(i, k) { wvI[wvP] = i; wvT[wvP] = 1; wvK[wvP] = k; wvP = (wvP + 1) % WV_N; }
+
+const logs = []; let logDirty = true;
+function logEvt(msg) { logs.unshift('<b>t' + S.tick + '</b> · ' + msg); if (logs.length > 7) logs.pop(); logDirty = true; }
+
+const rnd = Math.random;
+function gauss() { return (rnd() + rnd() + rnd() + rnd() - 2) * 1.732; }
+function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+
+/* =====================================================================
+   2. INITIALISATION : monde, graphe social, cerveaux
+   ===================================================================== */
+function buildWorld() {
+  const NV = 16, vx = [], vy = [], vr = [];
+  for (let v = 0; v < NV; v++) { vx.push(0.1 + rnd() * 0.8); vy.push(0.1 + rnd() * 0.8); vr.push(v % 7 < 3 ? 0 : v % 7 < 6 ? 1 : 2); }
+  for (let i = 0; i < N; i++) {
+    if (rnd() < 0.82) {
+      const v = (rnd() * NV) | 0;
+      hx[i] = clamp(vx[v] + gauss() * 0.065, 0.02, 0.98); hy[i] = clamp(vy[v] + gauss() * 0.065, 0.02, 0.98);
+      role[i] = rnd() < 0.55 ? vr[v] : pickRole();
+    } else { hx[i] = 0.02 + rnd() * 0.96; hy[i] = 0.02 + rnd() * 0.96; role[i] = pickRole(); }
+    ph[i] = rnd() * 6.283;
+  }
+  // K plus proches voisins via une grille spatiale
+  const GS = 24, cells = []; for (let c = 0; c < GS * GS; c++) cells.push([]);
+  for (let i = 0; i < N; i++) cells[Math.min(GS - 1, (hy[i] * GS) | 0) * GS + Math.min(GS - 1, (hx[i] * GS) | 0)].push(i);
+  const bi = new Int32Array(K), bd = new Float32Array(K);
+  for (let i = 0; i < N; i++) {
+    const cx = Math.min(GS - 1, (hx[i] * GS) | 0), cy = Math.min(GS - 1, (hy[i] * GS) | 0);
+    let found = 0;
+    for (let k = 0; k < K; k++) { bi[k] = -1; bd[k] = 1e9; }
+    for (let r = 1; r < GS; r++) {
+      found = 0; for (let k = 0; k < K; k++) { bi[k] = -1; bd[k] = 1e9; }
+      for (let yy = Math.max(0, cy - r); yy <= Math.min(GS - 1, cy + r); yy++)
+        for (let xx = Math.max(0, cx - r); xx <= Math.min(GS - 1, cx + r); xx++) {
+          const cell = cells[yy * GS + xx];
+          for (let q = 0; q < cell.length; q++) {
+            const j = cell[q]; if (j === i) continue;
+            const dx = hx[j] - hx[i], dy = hy[j] - hy[i], d = dx * dx + dy * dy;
+            found++;
+            if (d < bd[K - 1]) { let k = K - 1; while (k > 0 && bd[k - 1] > d) { bd[k] = bd[k - 1]; bi[k] = bi[k - 1]; k--; } bd[k] = d; bi[k] = j; }
+          }
+        }
+      if (found >= K * 3 && bd[K - 1] < (r / GS) * (r / GS)) break;
+    }
+    for (let k = 0; k < K; k++) nb[i * K + k] = bi[k] >= 0 ? bi[k] : (i + k + 1) % N;
+  }
+}
+function pickRole() { const r = rnd(); return r < 0.45 ? 0 : r < 0.85 ? 1 : 2; }
+
+function resetAgentSocial(i) {
+  rumI[i] = 0; rumV[i] = 0; rumT[i] = 0; rumFake[i] = 0; rumCd[i] = 20 + (rnd() * 60 | 0); spyCd[i] = 20 + (rnd() * 80 | 0);
+  liar[i] = 0; immune[i] = 0; spyInfo[i] = 0; spyHN[i] = 0; spyFlash[i] = 0; tgtFlash[i] = 0; broke[i] = 0; lastAct[i] = 4;
+}
+function initSim() {
+  buildWorld();
+  for (let i = 0; i < N; i++) {
+    const o = i * GENOME;
+    for (let w = 0; w < GENOME; w++) G[o + w] = gauss() * ((w >= OFF_B1 && w < OFF_W2) || w >= OFF_B2 ? 0.3 : 0.8);
+    G[o + OFF_B2 + 2] += 0.6; G[o + OFF_B2 + 5] -= 1.5; G[o + OFF_B2 + 6] -= 1.5;   // a priori initial : travailler d'abord, intriguer rarement
+    cred[i] = 0.3 + rnd() * 0.5;
+    energy[i] = 70 + rnd() * 30; apples[i] = 8 + (rnd() * 5 | 0); mats[i] = role[i] === 2 ? 6 : 0; tools[i] = role[i] !== 2 && rnd() < 0.6 ? 1 : 0;
+    cash[i] = START_CASH; age[i] = (rnd() * 40) | 0; gen[i] = 1;
+    resetAgentSocial(i); order[i] = i;
+  }
+  price[0] = 2; price[1] = 1.5; price[2] = 8;
+  for (let g = 0; g < 3; g++) { pEma[g] = price[g]; dP[g] = 0; imb[g] = 0; lastD[g] = lastS[g] = vol[g] = 0; }
+  Object.assign(S, { tick: 0, treasury: 0, drought: 0, boom: 0, famE: 0, bankE: 0, spyE: 0, supE: 0, demE: 0, truthA: 0, deaths: 0, fabricated: 0, genAvg: 1, genMax: 1 });
+  hPos = 0; hCnt = 0; fxT.fill(0); wvT.fill(0); logs.length = 0;
+  for (let i = 0; i < topIdx.length; i++) topIdx[i] = i;
+  logEvt('Naissance de 2 000 agents aux cerveaux aléatoires');
+  computeStats();
+}
+
+/* =====================================================================
+   3. CERVEAU : perceptron multicouche 14 → 12 (tanh) → 7
+   ===================================================================== */
+function fillInputs(i, x) {
+  const ri = rumI[i], im = immune[i] > 0;
+  x[0] = energy[i] / E_MAX;
+  x[1] = Math.min(apples[i] / 8, 1.5);
+  x[2] = Math.min(mats[i] / 8, 1.5);
+  x[3] = Math.min(tools[i], 1.5);
+  x[4] = Math.min(cash[i] / (START_CASH * 2), 1.5);
+  x[5] = Math.min(price[0] / START_CASH * 8, 2);
+  x[6] = Math.min(price[1] / START_CASH * 8, 2);
+  x[7] = Math.min(price[2] / START_CASH * 2, 2);
+  x[8] = clamp(dP[0] * 12, -1, 1);
+  // le ratio offre/demande « visible » est déformé par la rumeur (sauf agent immunisé par espionnage)
+  x[9] = clamp(imb[0] + (im || rumT[i] ? 0 : rumV[i] * ri * cred[i] * 0.8), -1, 1);
+  x[10] = ri;
+  x[11] = rumV[i] * ri * (rumT[i] ? 0.5 : 1);
+  let s = 0; const o = i * K; for (let k = 0; k < K; k++) s += wealth[nb[o + k]];
+  x[12] = clamp(s / (K * S.avgW) - 1, -1, 2);
+  x[13] = spyInfo[i];
+}
+function forward(i, x, h, y) {
+  const o = i * GENOME;
+  for (let a = 0; a < NH; a++) {
+    let s = G[o + OFF_B1 + a]; const w = o + a * NI;
+    for (let k = 0; k < NI; k++) s += G[w + k] * x[k];
+    h[a] = Math.tanh(s);
+  }
+  for (let q = 0; q < NO; q++) {
+    let s = G[o + OFF_B2 + q]; const w = o + OFF_W2 + q * NH;
+    for (let a = 0; a < NH; a++) s += G[w + a] * h[a];
+    y[q] = s;                                       // pré-activation (logit)
+  }
+}
+function sellQty(i, g) {
+  if (g === 0) return Math.min(2, Math.floor(apples[i] - 2));
+  if (g === 1) return role[i] === 2 ? 0 : Math.min(3, Math.floor(mats[i]));
+  return role[i] === 2 ? Math.min(2, Math.floor(tools[i])) : Math.min(1, Math.floor(tools[i] - 1));
+}
+/* Biais de crédulité (gène évolutif) : une rumeur crue pousse à acheter / retenir ses ventes */
+function applyRumorBias(i, y) {
+  if (immune[i] === 0 && rumI[i] > 0) {
+    const b = cred[i] * rumV[i] * rumI[i] * 4;
+    if (rumT[i] === 0) { y[0] += b; y[3] -= b; } else y[1] += b;
+  }
+}
+
+/* =====================================================================
+   4. MOTEUR ÉCONOMIQUE : un tick
+   ===================================================================== */
+let nProd = 0;
+function step() {
+  S.tick++;
+  const pa = price[0], pm = price[1], pt = price[2];
+  let tw = 0;
+  for (let i = 0; i < N; i++) { const w = cash[i] + apples[i] * pa + mats[i] * pm + tools[i] * pt; wealth[i] = w; tw += w; }
+  S.avgW = tw / N || 1;
+  nBuy[0] = nBuy[1] = nBuy[2] = 0; nSell[0] = nSell[1] = nSell[2] = 0; nProd = 0;
+  const toolMult = S.boom > 0 ? 8 : 4, harvest = S.drought > 0 ? 0.4 : 1;
+  let spies = 0;
+
+  for (let i = 0; i < N; i++) {
+    age[i]++;
+    energy[i] -= METAB + age[i] * AGING;              // le métabolisme s'alourdit avec l'âge
+    apples[i] *= 1 - ROT; mats[i] *= 1 - RUST; if (role[i] === 2) tools[i] *= 1 - RUST;
+    const fee = FEE + cash[i] * TAX;                  // frais d'entretien + taxe de détention du cash
+    if (cash[i] >= FEE) { cash[i] -= fee; S.treasury += fee; broke[i] = 0; } else broke[i]++;
+    if (energy[i] <= E_MAX - APPLE_E && apples[i] >= 1) { apples[i] -= 1; energy[i] += APPLE_E; }
+    if (rumCd[i] > 0) rumCd[i]--; if (spyCd[i] > 0) spyCd[i]--; if (liar[i] > 0) liar[i]--; if (immune[i] > 0) immune[i]--;
+    if (spyFlash[i] > 0) spyFlash[i]--; if (tgtFlash[i] > 0) tgtFlash[i]--;
+    spyInfo[i] *= 0.995;
+
+    fillInputs(i, inp); forward(i, inp, hid, out);
+    applyRumorBias(i, out);
+    const o1 = out[0], o2 = out[1], o3 = out[2], o4 = out[3], o5 = out[4], zR = out[5], zS = out[6];
+    const r = role[i]; let mask = 0, dom = 4, dv = -1e9;
+    /* Arbitrage : chaque sortie est une propension ; « thésauriser » (o5) inhibe tout achat moins désiré
+       que la conservation du cash ; un ordre n'est déposé que s'il est réellement finançable / livrable. */
+    if (o3 > 0) {                                     // 3. Produire
+      const hasTool = r !== 2 && tools[i] > 0.01, m = hasTool ? toolMult : 1;
+      if (r === 0) apples[i] += YIELD_A * m * harvest;
+      else if (r === 1) mats[i] += YIELD_M * m;
+      else if (mats[i] >= MATS_PER_TOOL) { mats[i] -= MATS_PER_TOOL; tools[i] += 1; }
+      else mats[i] += YIELD_M;
+      if (hasTool) { tools[i] -= TOOL_WEAR; if (tools[i] < 0.01) tools[i] = 0; }
+      energy[i] -= WORK; prodL[nProd++] = i; mask |= 4; dom = 2; dv = o3;
+    }
+    const sell = o4 > 0;
+    let buysApples = false;
+    if (o1 > 0 && o1 > o5 && !(sell && o4 > o1) && apples[i] < PANTRY && cash[i] >= pa) {   // 1. Acheter des pommes
+      buyL[0][nBuy[0]++] = i; buysApples = true; mask |= 1; if (o1 > dv) { dv = o1; dom = 0; }
+    }
+    if (o2 > 0 && o2 > o5) {                          // 2. Acheter matières (artisan) ou outil (autres)
+      const budget = cash[i] - (buysApples ? pa : 0);
+      if (r === 2 ? (mats[i] < 12 && budget >= pm) : (tools[i] < 0.5 && budget >= pt)) {
+        buyL[r === 2 ? 1 : 2][nBuy[r === 2 ? 1 : 2]++] = i; mask |= 2; if (o2 > dv) { dv = o2; dom = 1; }
+      }
+    }
+    if (sell) {                                       // 4. Vendre ses surplus
+      for (let g = buysApples ? 1 : 0; g < 3; g++) {
+        const q = sellQty(i, g);
+        if (q > 0) { sellL[g][nSell[g]] = i; sellQ[g][nSell[g]++] = q; mask |= 8; }
+      }
+      if ((mask & 8) && o4 > dv) { dv = o4; dom = 3; }
+    }
+    if (o5 > 0 && !(mask & 3)) { mask |= 16; if (o5 > dv) dom = 4; }   // 5. Thésauriser
+    actMask[i] = mask; lastAct[i] = dom;
+
+    // --- Sortie 6 : fabriquer une fake news (intéressée) ---
+    if (zR > 1.4 && rumCd[i] === 0 && cash[i] >= 3) {
+      cash[i] -= 3; S.treasury += 3; rumCd[i] = 200;
+      let t = 0, v;
+      if (r === 2) { t = 1; v = 1; }
+      else if (tools[i] < 0.5 && rnd() < 0.3) { t = 1; v = -1; }
+      else v = apples[i] >= 3 ? 1 : -1;               // stock à écouler → « pénurie » ; sinon « effondrement »
+      rumI[i] = 0.6 + 0.4 * P.vir; rumV[i] = v; rumT[i] = t; rumFake[i] = 1; liar[i] = 150; immune[i] = 200;
+      S.fabricated++; if (rnd() < 0.12) addWave(i, 0);
+    }
+    // --- Contagion de voisin en voisin, avec déformation du signal ---
+    const ri = rumI[i];
+    if (ri > 0) {
+      if (ri > 0.12 && rnd() < (rumFake[i] ? 0.04 + 0.4 * P.vir : 0.15)) {
+        const j = nb[i * K + ((rnd() * K) | 0)];
+        if (immune[j] === 0 && rumI[j] < ri * 0.85) {
+          rumI[j] = ri * 0.93; rumV[j] = clamp(rumV[i] + gauss() * 0.2, -1, 1); rumT[j] = rumT[i]; rumFake[j] = rumFake[i];
+        }
+      }
+      rumI[i] = ri * 0.97; if (rumI[i] < 0.05) { rumI[i] = 0; rumFake[i] = 0; if (immune[i] < 400) immune[i] = 400; }   // lassitude : période réfractaire
+    }
+    // --- Sortie 7 : espionnage économique & neuronal ---
+    if (zS > 1.4 && spyCd[i] === 0 && cash[i] >= P.spyCost + 1) {
+      const t = rnd() < 0.5 ? nb[i * K + ((rnd() * K) | 0)] : topIdx[(rnd() * topIdx.length) | 0];
+      if (t !== i) {
+        cash[i] -= P.spyCost; S.treasury += P.spyCost; spyCd[i] = 110; spies++;
+        const lie = liar[t] > 0 ? 1 : 0;
+        spyInfo[i] = clamp(S.truthA * 1.5, -1, 1);       // vraie tension du marché, sans bruit de rumeur
+        if (lie || rumFake[i]) { rumI[i] = 0; rumFake[i] = 0; }
+        immune[i] = lie ? 320 : 160;
+        if (wealth[t] > wealth[i]) {                    // vol d'une fraction des poids synaptiques
+          const oi = i * GENOME, ot = t * GENOME;
+          for (let w = 0; w < GENOME; w++) if (rnd() < 0.12) G[oi + w] = G[ot + w];
+          if (rnd() < 0.3) cred[i] = cred[t];
+        }
+        const n = spyHN[i]++, s = i * SH + (n % SH);
+        spyHT[s] = t; spyHTick[s] = S.tick; spyHLie[s] = lie; spyHA[s] = apples[t]; spyHC[s] = cash[t];
+        spyFlash[i] = 90; tgtFlash[t] = 90; if (rnd() < 0.5) addFx(i, t, 3);
+      }
+    }
+  }
+
+  clearMarket(0); clearMarket(1); clearMarket(2);
+
+  // Le Trésor recycle l'excédent de frais en primes de production (masse monétaire constante)
+  const exc = S.treasury - N * 4;
+  if (exc > 0 && nProd > 0) { const b = exc * 0.02 / nProd; for (let k = 0; k < nProd; k++) cash[prodL[k]] += b; S.treasury -= b * nProd; }
+
+  // Rumeurs spontanées en cas de forte volatilité
+  for (let g = 0; g < 3; g += 2) {
+    if (Math.abs(dP[g]) > 0.2 && rnd() < 0.01) {
+      const v = dP[g] > 0 ? 1 : -1;
+      for (let k = 0; k < 3; k++) { const j = (rnd() * N) | 0; if (immune[j]) continue; rumI[j] = 0.8; rumV[j] = v; rumT[j] = g ? 1 : 0; rumFake[j] = 0; addWave(j, 1); }
+      logEvt('Rumeur spontanée : « ' + rumorText(g ? 1 : 0, v) + ' »');
+    }
+  }
+
+  // Sélection naturelle : famine ou faillite prolongée → remplacement immédiat
+  let fam = 0, bank = 0;
+  for (let i = 0; i < N; i++) {
+    if (energy[i] <= 0) { fam++; replaceAgent(i); }
+    else if (broke[i] >= BROKE_MAX) { bank++; replaceAgent(i); }
+  }
+  S.deaths += fam + bank;
+  S.famE += (fam * 100 - S.famE) * 0.02; S.bankE += (bank * 100 - S.bankE) * 0.02; S.spyE += (spies * 100 - S.spyE) * 0.02;
+  S.supE += (lastS[0] - S.supE) * 0.08; S.demE += (lastD[0] - S.demE) * 0.08;
+  S.truthA += (imb[0] - S.truthA) * 0.03;
+  if (S.drought > 0 && --S.drought === 0) logEvt('Fin de la sécheresse');
+  if (S.boom > 0 && --S.boom === 0) logEvt('Fin du boom technologique');
+  if (S.tick % 25 === 0) refreshTop();
+  if (S.tick % SAMPLE === 0) { computeStats(); pushHistory(); }
+}
+
+/* Carnet de transactions : un ordre n'est exécuté que si le bien ET le cash existent réellement */
+function clearMarket(g) {
+  const B = buyL[g], SL = sellL[g], Q = sellQ[g], st = stocks[g], nb_ = nBuy[g], ns = nSell[g], p = price[g];
+  let supply = 0; for (let k = 0; k < ns; k++) supply += Q[k];
+  const demand = nb_;
+  let v = 0;
+  if (nb_ > 0 && ns > 0) {
+    for (let k = nb_ - 1; k > 0; k--) { const j = (rnd() * (k + 1)) | 0, t = B[k]; B[k] = B[j]; B[j] = t; }
+    let sp = (rnd() * ns) | 0, scanned = 0;
+    for (let k = 0; k < nb_; k++) {
+      const b = B[k]; if (cash[b] < p) continue;
+      while (scanned < ns && (Q[sp] <= 0 || st[SL[sp]] < 1)) { sp = (sp + 1) % ns; scanned++; }
+      if (scanned >= ns) break;
+      const s = SL[sp];
+      cash[b] -= p; cash[s] += p; st[b] += 1; st[s] -= 1; Q[sp]--; v++;
+      if (v % 23 === 1 && rnd() < 0.35) addFx(s, b, g);
+    }
+  }
+  vol[g] = v; lastD[g] = demand; lastS[g] = supply;
+  const tot = demand + supply;
+  if (tot > 0) {
+    const r = (demand - supply) / (tot + EPS);
+    price[g] = clamp(p * (1 + ALPHA * r), P_MIN, P_MAX);       // P(t+1) = P(t)·(1 + α·(D−O)/(D+O+ε))
+    imb[g] += (r - imb[g]) * 0.2;
+  }
+  pEma[g] += (price[g] - pEma[g]) * 0.02;
+  dP[g] = (price[g] - pEma[g]) / pEma[g];
+}
+
+/* Neuro-évolution : tournoi, crossover uniforme, mutation gaussienne */
+function tournament(i, excl) {
+  let best = -1, bs = -1e9;
+  const r = role[i];                                  // le métier est attaché au lieu : on sélectionne parmi les pairs
+  for (let t = 0; t < 7; t++) {
+    const c = t < 2 ? nb[i * K + ((rnd() * K) | 0)] : (rnd() * N) | 0;
+    if (c === i || c === excl || energy[c] <= 0 || (role[c] !== r && best >= 0)) continue;
+    if (role[c] !== r && t < 6) continue;
+    const sc = wealth[c] / S.avgW + Math.min(3, age[c] / 400);
+    if (sc > bs) { bs = sc; best = c; }
+  }
+  if (best < 0) { best = (i + 1 + ((rnd() * (N - 1)) | 0)) % N; }
+  return best;
+}
+function replaceAgent(i) {
+  S.treasury += cash[i]; cash[i] = 0;
+  const a = tournament(i, -1), b = tournament(i, a);
+  const o = i * GENOME, oa = a * GENOME, ob = b * GENOME, mr = P.mut;
+  for (let w = 0; w < GENOME; w++) {
+    let v = rnd() < 0.5 ? G[oa + w] : G[ob + w];
+    if (rnd() < mr) v += gauss() * 0.35;
+    G[o + w] = v;
+  }
+  cred[i] = clamp((rnd() < 0.5 ? cred[a] : cred[b]) + (rnd() < mr * 2 ? gauss() * 0.1 : 0), 0, 1);
+  gen[i] = Math.max(gen[a], gen[b]) + 1; age[i] = 0;
+  energy[i] = 75; apples[i] = 3; mats[i] = 0; tools[i] = 0;
+  const e = Math.min(S.treasury, ENDOW); cash[i] = e; S.treasury -= e;
+  resetAgentSocial(i);
+  wealth[i] = cash[i] + apples[i] * price[0];
+}
+function refreshTop() {
+  order.sort((a, b) => wealth[b] - wealth[a]);
+  for (let k = 0; k < topIdx.length; k++) topIdx[k] = order[k];
+}
+function computeStats() {
+  let tw = 0, gs = 0, gm = 0, inf = 0, cs = 0, nF = 0, nM = 0, wF = 0, wM = 0, mass = S.treasury;
+  for (let i = 0; i < N; i++) {
+    const w = cash[i] + apples[i] * price[0] + mats[i] * price[1] + tools[i] * price[2];
+    sortBuf[i] = w; tw += w; gs += gen[i]; if (gen[i] > gm) gm = gen[i];
+    if (rumI[i] > 0.1) inf++; cs += cred[i]; mass += cash[i];
+    if (role[i] === 0) { nF++; wF += w; } else if (role[i] === 1) { nM++; wM += w; }
+  }
+  sortBuf.sort();
+  let acc = 0, top = 0;
+  for (let i = 0; i < N; i++) { acc += (i + 1) * sortBuf[i]; if (i >= N * 0.9) top += sortBuf[i]; }
+  S.gini = tw > 0 ? clamp(2 * acc / (N * tw) - (N + 1) / N, 0, 1) : 0;
+  S.top10 = tw > 0 ? top / tw : 0;
+  S.genAvg = gs / N; S.genMax = gm; S.infected = inf / N; S.credAvg = cs / N;
+  S.nF = nF; S.nM = nM; S.nA = N - nF - nM; S.mass = mass;
+  S.wF = tw > 0 ? wF / tw : 0; S.wM = tw > 0 ? wM / tw : 0; S.wA = Math.max(0, 1 - S.wF - S.wM);
+}
+function pushHistory() {
+  H.pa[hPos] = price[0]; H.pm[hPos] = price[1]; H.pt[hPos] = price[2];
+  H.sup[hPos] = S.supE; H.dem[hPos] = S.demE; H.fam[hPos] = S.famE; H.bank[hPos] = S.bankE;
+  H.gen[hPos] = S.genAvg; H.gini[hPos] = S.gini; H.inf[hPos] = S.infected * 100; H.cred[hPos] = S.credAvg * 100; H.spy[hPos] = S.spyE;
+  hPos = (hPos + 1) % HN; if (hCnt < HN) hCnt++;
+}
+function rumorText(t, v) {
+  if (t === 0) return v > 0 ? 'Pénurie massive de pommes imminente !' : 'Récolte record : le prix des pommes va s\'effondrer !';
+  return v > 0 ? 'Rupture de stock d\'outils imminente !' : 'Effondrement du prix des outils !';
+}
+
+/* Scénarios macroéconomiques */
+function scenFake() {
+  immune.fill(0);                                     // rumeur inédite : personne n'est encore vacciné
+  for (let k = 0; k < 40; k++) { const j = (rnd() * N) | 0; rumI[j] = 1; rumV[j] = 1; rumT[j] = 0; rumFake[j] = 1; immune[j] = 0; addWave(j, 0); }
+  logEvt('<span style="color:var(--red)">Fake news injectée</span> : « Pénurie massive de pommes imminente ! »');
+}
+function scenDrought() { S.drought = 500; logEvt('<span style="color:var(--amb)">Sécheresse</span> : récoltes −60 % pendant 500 ticks'); }
+function scenBoom() { S.boom = 800; logEvt('<span style="color:var(--cy)">Boom technologique</span> : productivité des outils x2'); }
+
+initSim();
+
+/* =====================================================================
+   5. INTERFACE & RENDU (découplés du moteur)
+   ===================================================================== */
+if (typeof document !== 'undefined') (function () {
+  const $ = id => document.getElementById(id);
+  const fmt = (v, d) => v.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const map = $('map'), ctx = map.getContext('2d');
+  let dpr = Math.min(2, window.devicePixelRatio || 1), W = 0, Hh = 0;
+  let speed = 5, mode = 0, sel = -1, acc = 0, lastT = performance.now(), frame = 0;
+  let tpsCount = 0, fpsCount = 0, tpsT = lastT;
+  const colIdx = new Uint8Array(N), rad = new Float32Array(N);
+  const PAL_W = ['#2b3a67', '#31508c', '#2f6f9f', '#2a8fa3', '#35ab98', '#5fc47f', '#9bd65c', '#d6dd4a', '#f6c443', '#ffe9a8'];
+  const PAL_R = ['#27313f', '#7a2f3d', '#c2445a', '#ff5d73', '#2c4a7a', '#3f77c4', '#62a8ff', '#f6ae2d'];
+  const PAL_S = ['#27313f', '#ff4fd8', '#fde68a', '#2f8f8a'];
+  const PAL_ROLE = ['#5bd67a', '#f6ae2d', '#b388ff'];
+  const FX_COL = ['255,93,115', '246,174,45', '76,201,240', '255,79,216'];
+  const LEG = [
+    '<span><i style="background:#2b3a67"></i>pauvre</span><span><i style="background:#35ab98"></i>moyen</span><span><i style="background:#ffe9a8"></i>riche</span><span>taille = capital</span>',
+    '<span><i style="background:#ff5d73"></i>fake « hausse »</span><span><i style="background:#62a8ff"></i>fake « baisse »</span><span><i style="background:#f6ae2d"></i>rumeur fondée</span>',
+    '<span><i style="background:#ff4fd8"></i>espion</span><span><i style="background:#fde68a"></i>cible infiltrée</span><span><i style="background:#2f8f8a"></i>immunisé</span>',
+    '<span><i style="background:#5bd67a"></i>fermier</span><span><i style="background:#f6ae2d"></i>mineur</span><span><i style="background:#b388ff"></i>artisan</span>'
+  ];
+
+  function resize() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    const r = map.getBoundingClientRect(); W = Math.max(50, r.width); Hh = Math.max(50, r.height);
+    map.width = Math.round(W * dpr); map.height = Math.round(Hh * dpr);
+  }
+  window.addEventListener('resize', resize); resize();
+
+  function bindSeg(id, fn) {
+    const el = $(id);
+    el.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      el.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); fn(b.dataset.v);
+    });
+  }
+  bindSeg('segSpeed', v => { speed = +v; });
+  bindSeg('segMode', v => { mode = +v; $('legend').innerHTML = LEG[mode]; });
+  function showTab(id) {
+    document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.v === id));
+    document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === id));
+  }
+  $('tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) showTab(b.dataset.v); });
+  $('legend').innerHTML = LEG[0];
+
+  function bindRange(id, lab, set, show) { const el = $(id), up = () => { set(+el.value); $(lab).textContent = show(+el.value); }; el.addEventListener('input', up); up(); }
+  bindRange('rMut', 'vMut', v => P.mut = v / 100, v => fmt(v, 1) + ' %');
+  bindRange('rVir', 'vVir', v => P.vir = v / 100, v => v + ' %');
+  bindRange('rSpy', 'vSpy', v => P.spyCost = v, v => fmt(v, 1) + ' ¤');
+  $('bFake').onclick = () => { scenFake(); setMode(1); };
+  $('bSech').onclick = scenDrought; $('bBoom').onclick = scenBoom;
+  $('bReset').onclick = () => { initSim(); sel = -1; $('inspBody').style.display = 'none'; $('inspHint').style.display = ''; };
+  function setMode(m) { mode = m; document.querySelectorAll('#segMode button').forEach(x => x.classList.toggle('on', +x.dataset.v === m)); $('legend').innerHTML = LEG[m]; }
+
+  map.addEventListener('click', e => {
+    const r = map.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+    let best = -1, bd = 22 * 22;
+    for (let i = 0; i < N; i++) { const dx = px[i] - mx, dy = py[i] - my, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = i; } }
+    if (best >= 0) { sel = best; $('inspBody').style.display = ''; $('inspHint').style.display = 'none'; showTab('pInsp'); sizeCanvas($('nn')); }
+  });
+
+  /* ---------- Carte de l'écosystème ---------- */
+  function drawMap(time) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#050810'; ctx.fillRect(0, 0, W, Hh);
+    const pad = 14, sw = W - pad * 2, sh = Hh - pad * 2, sc = Math.max(0.75, Math.min(1.6, Math.min(W, Hh) / 520));
+    const t = time * 0.0006, amp = speed === 0 ? 0 : 0.0035;
+    const aw = S.avgW || 1;
+    for (let i = 0; i < N; i++) {
+      px[i] = pad + (hx[i] + Math.cos(ph[i] + t) * amp) * sw;
+      py[i] = pad + (hy[i] + Math.sin(ph[i] * 1.7 + t * 1.3) * amp) * sh;
+      const rr = wealth[i] / aw;
+      rad[i] = (0.9 + Math.sqrt(Math.min(rr, 12)) * 1.25) * sc;
+      let c;
+      if (mode === 0) c = clamp(((Math.log2(rr + 0.02) + 3) * 1.6) | 0, 0, 9);
+      else if (mode === 1) { const ri = rumI[i]; c = ri < 0.08 ? 0 : !rumFake[i] ? 7 : (rumV[i] > 0 ? 1 : 4) + (ri > 0.6 ? 2 : ri > 0.3 ? 1 : 0); }
+      else if (mode === 2) c = spyFlash[i] ? 1 : tgtFlash[i] ? 2 : immune[i] ? 3 : 0;
+      else c = role[i];
+      colIdx[i] = c;
+    }
+    // flux commerciaux et lignes d'espionnage
+    ctx.lineWidth = 1;
+    for (let k = 0; k < FX_N; k++) {
+      const tt = fxT[k]; if (tt <= 0) continue;
+      const a = fxA[k], b = fxB[k], kind = fxK[k];
+      if (kind === 3) { ctx.setLineDash([4, 4]); ctx.strokeStyle = 'rgba(' + FX_COL[3] + ',' + (tt * 0.9) + ')'; ctx.lineWidth = 1.3; }
+      else { ctx.setLineDash([]); ctx.strokeStyle = 'rgba(' + FX_COL[kind] + ',' + (tt * 0.35) + ')'; ctx.lineWidth = 1; }
+      ctx.beginPath(); ctx.moveTo(px[a], py[a]); ctx.lineTo(px[b], py[b]); ctx.stroke();
+      fxT[k] = tt - (kind === 3 ? 0.012 : 0.035);
+    }
+    ctx.setLineDash([]);
+    // ondes de propagation des rumeurs
+    for (let k = 0; k < WV_N; k++) {
+      const tt = wvT[k]; if (tt <= 0) continue;
+      const i = wvI[k];
+      ctx.strokeStyle = (wvK[k] === 0 ? 'rgba(255,93,115,' : 'rgba(246,174,45,') + (tt * 0.7) + ')';
+      ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(px[i], py[i], (1 - tt) * 46 * sc + 3, 0, 6.283); ctx.stroke();
+      wvT[k] = tt - 0.014;
+    }
+    // agents, regroupés par couleur pour limiter les changements d'état du canvas
+    const pal = mode === 0 ? PAL_W : mode === 1 ? PAL_R : mode === 2 ? PAL_S : PAL_ROLE;
+    ctx.globalAlpha = 0.92;
+    for (let c = 0; c < pal.length; c++) {
+      ctx.fillStyle = pal[c]; ctx.beginPath();
+      for (let i = 0; i < N; i++) if (colIdx[i] === c) { const x = px[i], y = py[i], r = rad[i]; ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.283); }
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    if (sel >= 0) {
+      ctx.strokeStyle = 'rgba(255,255,255,.28)'; ctx.lineWidth = 1; ctx.beginPath();
+      for (let k = 0; k < K; k++) { const j = nb[sel * K + k]; ctx.moveTo(px[sel], py[sel]); ctx.lineTo(px[j], py[j]); }
+      ctx.stroke();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(px[sel], py[sel], rad[sel] + 5, 0, 6.283); ctx.stroke();
+    }
+  }
+
+  /* ---------- Graphiques ---------- */
+  function sizeCanvas(cv) {
+    const r = cv.getBoundingClientRect(), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
+    if (w > 0 && (cv.width !== w || cv.height !== h)) { cv.width = w; cv.height = h; }
+    return r;
+  }
+  function drawChart(id, series, cols, log, fixedMax) {
+    const cv = $(id), r = sizeCanvas(cv); if (r.width < 10) return;
+    const c = cv.getContext('2d'), w = r.width, h = r.height;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+    let mn = 1e30, mx = -1e30;
+    const start = hCnt < HN ? 0 : hPos;
+    for (let s = 0; s < series.length; s++) for (let k = 0; k < hCnt; k++) { let v = series[s][(start + k) % HN]; if (log) v = Math.log(Math.max(v, 1e-3)); if (v < mn) mn = v; if (v > mx) mx = v; }
+    if (!log) { mn = 0; if (fixedMax) mx = fixedMax; }
+    if (mx - mn < 1e-6) mx = mn + 1;
+    const span = (mx - mn) * 1.08;
+    c.strokeStyle = '#1c2738'; c.lineWidth = 1; c.beginPath();
+    for (let g = 0; g <= 2; g++) { const y = Math.round(2 + (h - 4) * g / 2) + 0.5; c.moveTo(0, y); c.lineTo(w, y); }
+    c.stroke();
+    if (hCnt < 2) return;
+    c.lineWidth = 1.6; c.lineJoin = 'round';
+    for (let s = 0; s < series.length; s++) {
+      c.strokeStyle = cols[s]; c.beginPath();
+      for (let k = 0; k < hCnt; k++) {
+        let v = series[s][(start + k) % HN]; if (log) v = Math.log(Math.max(v, 1e-3));
+        const x = k / (HN - 1) * w, y = h - 2 - (v - mn) / span * (h - 4);
+        k ? c.lineTo(x, y) : c.moveTo(x, y);
+      }
+      c.stroke();
+    }
+  }
+  function drawDash() {
+    if (!$('pDash').classList.contains('on')) return;
+    drawChart('chPrix', [H.pa, H.pm, H.pt], ['#ff5d73', '#f6ae2d', '#4cc9f0'], true);
+    drawChart('chOD', [H.sup, H.dem], ['#5bd67a', '#ff5d73'], false);
+    drawChart('chMort', [H.fam, H.bank], ['#ff5d73', '#b388ff'], false);
+    drawChart('chGen', [H.gen], ['#dbe6f5'], false);
+    drawChart('chGini', [H.gini], ['#fde68a'], false, 1);
+    drawChart('chRum', [H.inf, H.cred, H.spy], ['#ff5d73', '#4cc9f0', '#ff4fd8'], false, 100);
+    $('lPa').textContent = fmt(price[0], 2); $('lPm').textContent = fmt(price[1], 2); $('lPt').textContent = fmt(price[2], 2);
+    $('lSup').textContent = fmt(S.supE, 0); $('lDem').textContent = fmt(S.demE, 0);
+    $('lFam').textContent = fmt(S.famE, 1); $('lBank').textContent = fmt(S.bankE, 1);
+    $('lGen').textContent = fmt(S.genAvg, 1); $('lGenMax').textContent = S.genMax;
+    $('lGini').textContent = fmt(S.gini, 3); $('lTop').textContent = fmt(S.top10 * 100, 0) + ' %';
+    $('lInf').textContent = fmt(S.infected * 100, 0) + ' %'; $('lCred').textContent = fmt(S.credAvg * 100, 0) + ' %'; $('lSpy').textContent = fmt(S.spyE, 0) + '/100t';
+    $('sF').style.width = S.wF * 100 + '%'; $('sM').style.width = S.wM * 100 + '%'; $('sA').style.width = S.wA * 100 + '%';
+    $('lF').textContent = S.nF + ' · ' + fmt(S.wF * 100, 0) + ' %'; $('lM').textContent = S.nM + ' · ' + fmt(S.wM * 100, 0) + ' %'; $('lA').textContent = S.nA + ' · ' + fmt(S.wA * 100, 0) + ' %'; $('lMass').textContent = fmt(S.mass, 0) + ' ¤';
+    if (logDirty) { $('log').innerHTML = logs.map(l => '<li>' + l + '</li>').join(''); logDirty = false; }
+  }
+  function drawHeader() {
+    $('cTick').textContent = fmt(S.tick, 0); $('cGen').textContent = fmt(S.genAvg, 1);
+    $('cGini').textContent = fmt(S.gini, 2); $('cTres').textContent = fmt(S.treasury, 0) + ' ¤';
+    let b = '';
+    if (S.drought > 0) b += '<span class="badge" style="color:var(--amb)">Sécheresse · ' + S.drought + ' t</span>';
+    if (S.boom > 0) b += '<span class="badge" style="color:var(--cy)">Boom techno · ' + S.boom + ' t</span>';
+    if (S.infected > 0.08) b += '<span class="badge" style="color:var(--red)">Rumeur virale · ' + fmt(S.infected * 100, 0) + ' %</span>';
+    if ($('badges').innerHTML !== b) $('badges').innerHTML = b;
+  }
+
+  /* ---------- Inspecteur neuronal ---------- */
+  const iIn = new Float32Array(NI), iHid = new Float32Array(NH), iOut = new Float32Array(NO);
+  function drawInspector(textToo) {
+    if (sel < 0 || !$('pInsp').classList.contains('on')) return;
+    const i = sel; fillInputs(i, iIn); forward(i, iIn, iHid, iOut);
+    const cv = $('nn'), r = sizeCanvas(cv); if (r.width < 10) return;
+    const c = cv.getContext('2d'), w = r.width, h = r.height;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+    const x0 = 80, x2 = w - 112, x1 = (x0 + x2) / 2, o = i * GENOME;
+    const yi = k => 12 + k * (h - 24) / (NI - 1), yh = k => 22 + k * (h - 44) / (NH - 1), yo = k => 40 + k * (h - 80) / (NO - 1);
+    c.lineWidth = 1;
+    for (let a = 0; a < NH; a++) for (let k = 0; k < NI; k++) {
+      const wt = G[o + a * NI + k], al = Math.min(1, Math.abs(wt) / 1.6) * (0.1 + 0.9 * Math.min(1, Math.abs(iIn[k]))) * 0.75;
+      if (al < 0.04) continue;
+      c.strokeStyle = (wt > 0 ? 'rgba(91,214,122,' : 'rgba(255,93,115,') + al + ')';
+      c.beginPath(); c.moveTo(x0, yi(k)); c.lineTo(x1, yh(a)); c.stroke();
+    }
+    for (let q = 0; q < NO; q++) for (let a = 0; a < NH; a++) {
+      const wt = G[o + OFF_W2 + q * NH + a], al = Math.min(1, Math.abs(wt) / 1.6) * (0.1 + 0.9 * Math.abs(iHid[a])) * 0.75;
+      if (al < 0.04) continue;
+      c.strokeStyle = (wt > 0 ? 'rgba(91,214,122,' : 'rgba(255,93,115,') + al + ')';
+      c.beginPath(); c.moveTo(x1, yh(a)); c.lineTo(x2, yo(q)); c.stroke();
+    }
+    c.font = '10px -apple-system,Helvetica,Arial,sans-serif'; c.textBaseline = 'middle';
+    function node(x, y, v, rr, ring) {
+      const a = Math.min(1, Math.abs(v));
+      c.fillStyle = '#0a0f18'; c.beginPath(); c.arc(x, y, rr, 0, 6.283); c.fill();
+      c.fillStyle = (v >= 0 ? 'rgba(120,235,160,' : 'rgba(255,110,130,') + (0.12 + a * 0.88) + ')';
+      c.beginPath(); c.arc(x, y, rr, 0, 6.283); c.fill();
+      c.strokeStyle = ring ? '#fff' : '#2a3850'; c.lineWidth = ring ? 2 : 1; c.stroke();
+    }
+    c.textAlign = 'right';
+    for (let k = 0; k < NI; k++) { node(x0, yi(k), iIn[k], 5); c.fillStyle = '#9fb0c8'; c.fillText(IN_LABELS[k], x0 - 9, yi(k)); }
+    for (let a = 0; a < NH; a++) node(x1, yh(a), iHid[a], 5.5);
+    c.textAlign = 'left';
+    for (let q = 0; q < NO; q++) {
+      const sg = 1 / (1 + Math.exp(-iOut[q])), on = q < 5 ? (actMask[i] >> q & 1) === 1 : (q === 5 ? rumCd[i] > 185 : spyCd[i] > 100);
+      node(x2, yo(q), sg, 7, on);
+      c.fillStyle = on ? '#fff' : '#9fb0c8'; c.fillText(OUT_LABELS[q], x2 + 12, yo(q) - 5);
+      c.fillStyle = '#5f6f88'; c.fillText(fmt(sg * 100, 0) + ' %', x2 + 12, yo(q) + 7);
+    }
+    if (!textToo) return;
+    $('iTitle').textContent = 'Agent n° ' + i + ' — ' + ROLE_NAMES[role[i]];
+    { let a = []; for (let q = 0; q < 5; q++) if (actMask[i] >> q & 1) a.push(ACT_NAMES[q]); $('iAct').textContent = a.length ? a.join(' + ') : 'inactif'; }
+    $('iEn').textContent = fmt(Math.max(0, energy[i]), 0) + ' / 100'; $('iCash').textContent = fmt(cash[i], 2) + ' ¤'; $('iW').textContent = fmt(wealth[i], 1) + ' ¤';
+    $('iAp').textContent = fmt(apples[i], 1); $('iMa').textContent = fmt(mats[i], 1); $('iTo').textContent = fmt(tools[i], 2);
+    $('iGen').textContent = gen[i]; $('iAge').textContent = fmt(age[i], 0); $('iCred').textContent = fmt(cred[i] * 100, 0) + ' %';
+    let rh;
+    if (rumI[i] > 0.05) rh = '<div class="rum ' + (rumFake[i] ? 'fake' : 'vraie') + '">« ' + rumorText(rumT[i], rumV[i]) + ' »<br><span style="color:var(--mut)">' + (rumFake[i] ? 'Fake news' : 'Rumeur fondée') + ' · ' + (rumV[i] > 0 ? 'haussière' : 'baissière') + ' · intensité ' + fmt(rumI[i] * 100, 0) + ' %' + (liar[i] > 0 ? ' · <b style="color:var(--red)">il en est l\'auteur</b>' : '') + '</span></div>';
+    else rh = '<div class="rum">Aucune rumeur en tête' + (immune[i] > 0 ? ' · immunisé encore ' + immune[i] + ' ticks' : '') + '</div>';
+    if ($('iRum').innerHTML !== rh) $('iRum').innerHTML = rh;
+    let sh = '';
+    const n = Math.min(spyHN[i], SH);
+    for (let k = 0; k < n; k++) {
+      const s = i * SH + ((spyHN[i] - 1 - k) % SH);
+      sh += '<li><b>t' + spyHTick[s] + '</b> · cible n° ' + spyHT[s] + ' : ' + fmt(spyHA[s], 1) + ' pommes, ' + fmt(spyHC[s], 0) + ' ¤ réels' + (spyHLie[s] ? ' · <span style="color:var(--red)">mensonge détecté</span>' : '') + '</li>';
+    }
+    if (!n) sh = '<li>Aucune opération (' + spyHN[i] + ' au total)</li>';
+    if ($('iSpy').innerHTML !== sh) $('iSpy').innerHTML = sh;
+  }
+
+  /* ---------- Boucle principale : simulation à pas fixe, rendu via requestAnimationFrame ---------- */
+  const BASE_TPS = 6;
+  function loop(now) {
+    const dt = Math.min(0.1, (now - lastT) / 1000); lastT = now;
+    if (speed > 0) {
+      acc += dt * BASE_TPS * speed;
+      const t0 = performance.now(); let n = 0;
+      while (acc >= 1 && n < 60) { step(); acc -= 1; n++; tpsCount++; if (performance.now() - t0 > 11) { acc = 0; break; } }
+    }
+    drawMap(now);
+    frame++; fpsCount++;
+    if (frame % 3 === 0) drawInspector(frame % 12 === 0);
+    if (frame % 10 === 0) { drawDash(); drawHeader(); }
+    if (now - tpsT >= 1000) { $('cTps').textContent = Math.round(tpsCount * 1000 / (now - tpsT)); $('cFps').textContent = Math.round(fpsCount * 1000 / (now - tpsT)); tpsCount = 0; fpsCount = 0; tpsT = now; }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

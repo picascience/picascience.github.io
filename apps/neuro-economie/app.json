@@ -1,0 +1,9 @@
+{
+  "name": "Neuro-Éco",
+  "emoji": "🧠",
+  "colors": ["#03141f", "#22c8e6"],
+  "category": "Labo",
+  "added": "2026-11-16",
+  "description": "Économie simulée de 2 000 agents à réseaux de neurones : marché, rumeurs, espionnage, neuro-évolution",
+  "icon": "icon.svg"
+}
