@@ -1,7 +1,20 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-15T14:50:56.915Z",
+  "generated": "2026-11-16T11:24:25.695Z",
   "apps": [
+    {
+      "name": "Galerie",
+      "emoji": "🎞️",
+      "colors": [
+        "#0b1220",
+        "#94a3b8"
+      ],
+      "category": "Outils",
+      "added": "2026-11-16",
+      "description": "Toutes mes images et vidéos faites avec Claude",
+      "icon": "apps/galerie/icon.svg",
+      "id": "galerie"
+    },
     {
       "name": "Kinetic Pro",
       "emoji": "✅",

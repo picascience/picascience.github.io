@@ -1,0 +1,9 @@
+{
+  "name": "Galerie",
+  "emoji": "🎞️",
+  "colors": ["#0b1220", "#94a3b8"],
+  "category": "Outils",
+  "added": "2026-11-16",
+  "description": "Toutes mes images et vidéos faites avec Claude",
+  "icon": "icon.svg"
+}
