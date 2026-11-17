@@ -53,6 +53,8 @@ main{max-width:720px;margin:0 auto;padding:16px calc(env(safe-area-inset-right) 
 .btn.ghost{background:none}
 .btn svg{width:17px;height:17px}
 .btn:active{transform:scale(.97)}
+.paste .row{flex-wrap:nowrap;gap:6px}
+.paste .row .btn{padding:10px 11px;font-size:13.5px;white-space:nowrap}
 .found{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .found span{font-size:12.5px;padding:4px 9px;border-radius:999px;background:var(--s3);border:1px solid var(--line);animation:pop .35s ease both}
 .found span.y{border-color:rgba(52,211,153,.45);color:#b8f5dc}
@@ -217,6 +219,7 @@ select{width:100%;background:var(--s2);border:1px solid var(--line);border-radiu
       <button class="btn pri" id="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Analyser</button>
       <button class="btn" id="paste-btn">Coller</button>
       <button class="btn ghost" id="ex">Exemple</button>
+      <button class="btn ghost" id="clear" aria-label="Effacer le texte collé" title="Effacer" style="margin-left:auto;color:var(--bad);padding:10px 12px;border-color:rgba(248,113,113,.4)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg></button>
     </div>
     <div class="found" id="found"></div>
   </section>
@@ -687,6 +690,10 @@ $("go").addEventListener("click", ()=>{
   if(out.ddr) patch.ddr = out.ddr; if(out.price) patch.price = out.price;
   setS(patch);
   setTimeout(()=>scrollToEl($("verdict")), 120);
+});
+$("clear").addEventListener("click", ()=>{
+  $("txt").value = ""; $("found").innerHTML = ""; S.text = ""; store("draft", S);
+  $("txt").focus(); toast("Texte effacé");
 });
 $("paste-btn").addEventListener("click", async ()=>{
   try{ const t = await navigator.clipboard.readText(); if(t){ $("txt").value = t; $("go").click(); } else toast("Presse-papiers vide"); }
