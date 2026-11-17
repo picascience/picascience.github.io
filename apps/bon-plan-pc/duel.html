@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Duel de Silicium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#ECEFF3; --surface:#FFFFFF; --surface-2:#F5F7FA; --ink:#121821; --muted:#5A6575; --line:#D4DAE2;
+  --a:#2350C6; --a-soft:#DCE5FB; --b:#C9581A; --b-soft:#F8E3D6;
+  --good:#1D7F47; --warn:#A86A12; --crit:#B83232;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+:root[data-theme="dark"]{
+  --bg:#0B0F17; --surface:#131A24; --surface-2:#1A2230; --ink:#E6EBF1; --muted:#8B97A6; --line:#263040;
+  --a:#7099FF; --a-soft:#1D2A4A; --b:#F2884A; --b-soft:#3A2416;
+  --good:#4CC27F; --warn:#E3A93E; --crit:#F06A6A; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding:16px max(14px,env(safe-area-inset-right,0px)) 60px max(14px,env(safe-area-inset-left,0px))}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.brand h1{font-family:var(--f-display);font-weight:700;font-size:32px;line-height:1;margin:0;letter-spacing:.01em;text-transform:uppercase}
+.brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.tabs{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px}
+.tabs button{border:0;background:none;padding:8px 16px;border-radius:7px;cursor:pointer;font-weight:600;font-size:14px;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.duel{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.duel-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch}
+.side{padding:18px 20px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.side.b{text-align:right;align-items:flex-end}
+.side.a{border-top:4px solid var(--a)}
+.side.b{border-top:4px solid var(--b)}
+.mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 4px;border-top:4px solid var(--line)}
+.vs{font-family:var(--f-display);font-weight:700;font-size:20px;color:var(--muted)}
+.swap{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);cursor:pointer;display:grid;place-items:center}
+.pick{display:flex;flex-direction:column;gap:2px;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:8px 12px;cursor:pointer;text-align:left;max-width:100%;min-width:0}
+.side.b .pick{text-align:right;align-items:flex-end}
+.pick .vendor{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pick .nm{font-family:var(--f-display);font-weight:700;font-size:24px;line-height:1.05;display:flex;align-items:center;gap:6px}
+.side.b .pick .nm{flex-direction:row-reverse}
+.pick .nm svg{flex:none;opacity:.6}
+.big{font-family:var(--f-display);font-weight:700;font-size:clamp(46px,11vw,84px);line-height:.9;font-variant-numeric:tabular-nums}
+.side.a .big{color:var(--a)} .side.b .big{color:var(--b)}
+.big small{display:block;font-family:var(--f-mono);font-weight:400;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.meter{display:flex;height:10px;background:var(--line)}
+.meter span{transition:flex-grow .5s ease}
+.meter .ma{background:var(--a)} .meter .mb{background:var(--b)}
+.verdict{padding:16px 20px 18px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line)}
+.verdict h2{margin:0;font-family:var(--f-display);font-weight:700;font-size:28px;line-height:1.1;text-wrap:balance}
+.verdict h2 .pa{color:var(--a)} .verdict h2 .pb{color:var(--b)}
+.verdict .ctx{margin:0;color:var(--muted);font-size:14px}
+.notes{margin:4px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.notes li{display:flex;gap:8px;font-size:14px;max-width:75ch}
+.notes li::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--muted);margin-top:8px}
+.notes li.w::before{background:var(--warn)}
+.presets{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.presets .lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer}
+.chip.mine{border-color:var(--ink);font-weight:600}
+.controls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ctl > .lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:6px 12px;cursor:pointer;font-weight:600;font-size:13px;color:var(--muted);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.tog{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:500;background:none;border:0;padding:0}
+.tog .sw{width:34px;height:20px;border-radius:10px;background:var(--line);position:relative;transition:background .2s}
+.tog .sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);transition:transform .2s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.tog[aria-pressed="true"] .sw{background:var(--ink)}
+.tog[aria-pressed="true"] .sw::after{transform:translateX(14px)}
+select{font:inherit;font-size:14px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;max-width:100%}
+section.block{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.block h3{margin:0 0 4px;font-family:var(--f-display);font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em}
+.block .sub{margin:0 0 14px;color:var(--muted);font-size:13px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;margin-bottom:10px}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.games{display:flex;flex-direction:column}
+.g-row{display:grid;grid-template-columns:minmax(150px,210px) 1fr 70px;gap:4px 16px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.g-row:first-child{border-top:0}
+.g-name{min-width:0}
+.g-name b{display:block;font-weight:600;font-size:14px;line-height:1.25}
+.g-name span{font-size:12px;color:var(--muted)}
+.g-bars{display:flex;flex-direction:column;gap:5px;min-width:0}
+.bar{display:flex;align-items:center;gap:8px;min-width:0}
+.bar .track{flex:1;height:14px;background:var(--surface-2);border-radius:3px;overflow:hidden;min-width:40px}
+.bar .fill{height:100%;border-radius:3px;transition:width .45s ease}
+.bar.a .fill{background:var(--a)} .bar.b .fill{background:var(--b)}
+.bar .v{font-family:var(--f-mono);font-size:13px;font-weight:500;width:46px;text-align:right;font-variant-numeric:tabular-nums;flex:none}
+.v.lo{color:var(--crit)} .v.mid{color:var(--warn)}
+.tags{display:flex;gap:4px;flex:none;width:96px}
+.tag{font-family:var(--f-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;padding:2px 5px;border-radius:4px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;font-style:normal}
+.tag.vr{border-color:var(--warn);color:var(--warn)}
+.tag.no{border-color:var(--crit);color:var(--crit)}
+.g-diff{font-family:var(--f-display);font-weight:700;font-size:20px;text-align:right;font-variant-numeric:tabular-nums}
+.g-diff.da{color:var(--a)} .g-diff.db{color:var(--b)} .g-diff.eq{color:var(--muted);font-size:15px}
+.tagkey{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:12px;color:var(--muted)}
+.tagkey span{display:flex;align-items:center;gap:5px}
+.idx{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px 28px}
+.idx-item h4{margin:0 0 2px;font-size:14px;font-weight:600}
+.idx-item p{margin:0 0 8px;font-size:12px;color:var(--muted)}
+.spec-scroll{overflow-x:auto}
+table.spec{width:100%;border-collapse:collapse;font-size:14px;min-width:360px}
+.spec th,.spec td{padding:9px 8px;border-top:1px solid var(--line);vertical-align:top}
+.spec tr:first-child th,.spec tr:first-child td{border-top:0}
+.spec th{font-weight:500;color:var(--muted);text-align:center;font-size:12px;font-family:var(--f-mono);letter-spacing:.04em;text-transform:uppercase;width:34%}
+.spec td{width:33%;font-variant-numeric:tabular-nums}
+.spec td.r{text-align:right}
+.spec td.win{font-weight:600}
+.spec td.win.ca{color:var(--a)} .spec td.win.cb{color:var(--b)}
+.spec thead th{font-family:var(--f-display);font-size:18px;font-weight:700;text-transform:none;letter-spacing:0;color:var(--ink)}
+.spec thead th.ha{color:var(--a);text-align:left} .spec thead th.hb{color:var(--b);text-align:right}
+footer{color:var(--muted);font-size:12px;max-width:80ch;line-height:1.6}
+.ov{position:fixed;inset:0;background:rgba(5,8,14,.6);z-index:50;display:flex;justify-content:center;align-items:flex-start;
+  padding:calc(6vh + env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) 16px max(14px,env(safe-area-inset-left,0px))}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;width:100%;max-width:520px;max-height:78vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.panel-head{padding:12px;border-bottom:1px solid var(--line);display:flex;gap:8px}
+.panel-head input{flex:1;min-width:0;font:inherit;font-size:16px;padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink)}
+.panel-head button{border:1px solid var(--line);background:var(--surface-2);border-radius:9px;padding:0 12px;cursor:pointer}
+.flt{display:flex;gap:6px;padding:8px 12px 0;flex-wrap:wrap}
+.flt button{border:1px solid var(--line);background:none;border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--muted)}
+.flt button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.list{overflow-y:auto;padding:6px 6px 10px}
+.grp{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:10px 8px 4px}
+.opt{display:grid;grid-template-columns:1fr 90px;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:none;padding:8px;border-radius:8px;cursor:pointer}
+.opt:hover,.opt.act{background:var(--surface-2)}
+.opt.cur{box-shadow:inset 3px 0 0 var(--ink)}
+.opt b{font-weight:600;font-size:14px;display:block}
+.opt span{font-size:12px;color:var(--muted)}
+.opt .mini{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.opt .mini i{display:block;height:100%;background:var(--muted)}
+.empty{padding:20px;color:var(--muted);text-align:center;font-size:14px}
+@media (max-width:640px){
+  .side{padding:14px 12px 12px}
+  .pick .nm{font-size:19px}
+  .verdict{padding:14px 14px 16px}
+  .verdict h2{font-size:23px}
+  section.block{padding:16px 14px}
+  .g-row{grid-template-columns:1fr auto;gap:6px 10px}
+  .g-name{grid-column:1/-1}
+  .tags{width:auto;min-width:0}
+  .tags:empty{display:none}
+  .bar .v{width:40px}
+  .g-diff{font-size:17px;align-self:center}
+  .controls{padding:12px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>Duel de Silicium</h1>
+      <p>Compare cartes graphiques et processeurs, avec FPS estimés jeu par jeu.</p>
+    </div>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-mode="gpu">Cartes graphiques</button>
+      <button role="tab" aria-selected="false" data-mode="cpu">Processeurs</button>
+    </div>
+  </header>
+
+  <section class="duel" aria-live="polite">
+    <div class="duel-top">
+      <div class="side a">
+        <button class="pick" id="pick-a" data-slot="a"></button>
+        <div class="big" id="avg-a"></div>
+      </div>
+      <div class="mid">
+        <span class="vs">VS</span>
+        <button class="swap" id="swap" title="Inverser" aria-label="Inverser les deux composants">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg>
+        </button>
+      </div>
+      <div class="side b">
+        <button class="pick" id="pick-b" data-slot="b"></button>
+        <div class="big" id="avg-b"></div>
+      </div>
+    </div>
+    <div class="meter"><span class="ma" id="m-a"></span><span class="mb" id="m-b"></span></div>
+    <div class="verdict" id="verdict"></div>
+  </section>
+
+  <div class="presets" id="presets"></div>
+
+  <div class="controls">
+    <div class="ctl">
+      <span class="lbl">Résolution</span>
+      <div class="seg" id="res">
+        <button data-res="1080" aria-pressed="true">1080p</button>
+        <button data-res="1440" aria-pressed="false">1440p</button>
+        <button data-res="2160" aria-pressed="false">4K</button>
+      </div>
+    </div>
+    <button class="tog" id="tog-rt" aria-pressed="false"><span class="sw"></span>Ray tracing</button>
+    <button class="tog" id="tog-up" aria-pressed="false"><span class="sw"></span>Upscaling (Qualité)</button>
+    <div class="ctl">
+      <label class="lbl" for="test-sel" id="test-lbl">Processeur de test</label>
+      <select id="test-sel"></select>
+    </div>
+  </div>
+
+  <section class="block">
+    <h3>FPS estimés par jeu</h3>
+    <p class="sub" id="games-sub"></p>
+    <div class="legend" id="legend"></div>
+    <div class="games" id="games"></div>
+    <div class="tagkey">
+      <span><em class="tag">CPU</em> limité par le processeur</span>
+      <span><em class="tag">GPU</em> limité par la carte graphique</span>
+      <span><em class="tag">Plafond</em> limite du jeu lui-même</span>
+      <span><em class="tag vr">VRAM</em> mémoire vidéo saturée</span>
+      <span><em class="tag no">Sans RT</em> pas de ray tracing matériel</span>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3>Puissance brute</h3>
+    <p class="sub" id="idx-sub"></p>
+    <div class="idx" id="idx"></div>
+  </section>
+
+  <section class="block">
+    <h3>Fiche technique</h3>
+    <p class="sub">En gras : l'avantage sur chaque ligne. Dernière ligne : la cote d'occasion utilisée par Bon Plan PC.</p>
+    <div class="spec-scroll"><table class="spec" id="spec"></table></div>
+  </section>
+
+  <footer>
+    Les FPS sont des estimations calculées à partir d'indices de performance moyens issus de tests publics (2016 à 2026), aux réglages indiqués, sans génération d'images. Le résultat réel dépend de la RAM, des pilotes, de la version du jeu et de la scène testée : compte une marge de ±10 à 15 %. Les prix de lancement sont en dollars US ; la cote d'occasion est indicative, en euros.
+  </footer>
+</div>
+
+<div class="ov" id="ov" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="q">
+    <div class="panel-head">
+      <input id="q" type="search" placeholder="Rechercher (ex. 2070 super, 6700, 5600X)" autocomplete="off" aria-label="Rechercher un composant">
+      <button id="close" aria-label="Fermer">✕</button>
+    </div>
+    <div class="flt" id="flt"></div>
+    <div class="list" id="list" role="listbox"></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+const PRESETS = {
+ gpu:[["RTX 2070 Super","RX 6700"],["RTX 4060","RX 7600"],["RTX 5070","RX 9070"],["RTX 5070 Ti","RX 9070 XT"],["RTX 5060 Ti 16 Go","RX 9060 XT 16 Go"],["RTX 3060","Arc B580"]],
+ cpu:[["Ryzen 5 3600","Ryzen 7 5700X3D"],["Ryzen 5 5600","Core i5-12400F"],["Ryzen 5 7600","Core i5-13600K"],["Ryzen 7 7800X3D","Core i9-14900K"],["Ryzen 7 9800X3D","Core Ultra 9 285K"]]
+};
+const state = {mode:"gpu", gA:G("RTX 2070 Super"), gB:G("RX 6700"), cA:C("Ryzen 5 3600"), cB:C("Ryzen 7 5700X3D"),
+  testCpu:C("Ryzen 7 9800X3D"), testGpu:G("RTX 4090"), res:"1080", rt:false, up:false};
+
+// Ouverture directe depuis Bon Plan PC : duel.html?mode=gpu&a=RTX%203070&b=RTX%202070%20Super&cpu=Ryzen%205%205600
+(function(){
+  const q = new URLSearchParams(location.search);
+  const mode = q.get("mode")==="cpu" ? "cpu" : "gpu";
+  state.mode = mode;
+  const look = mode==="gpu" ? G : C;
+  if(look(q.get("a")||"")) state[mode==="gpu"?"gA":"cA"] = look(q.get("a"));
+  if(look(q.get("b")||"")) state[mode==="gpu"?"gB":"cB"] = look(q.get("b"));
+  if(C(q.get("cpu")||"")) state.testCpu = C(q.get("cpu"));
+  if(G(q.get("gpu")||"")) state.testGpu = G(q.get("gpu"));
+  if(RES[q.get("res")]) state.res = q.get("res");
+})();
+
+function calc(gpu,cpu,game){
+  const rtOn = state.rt && !!game.rt, arch = ARCH[gpu.arch];
+  if(rtOn && !arch.rt) return {fps:null,lim:"nort"};
+  const R = RES[state.res];
+  let g = game.g*gpu.p/100*R.f;
+  if(rtOn) g *= game.rt*arch.rt;
+  if(state.up) g *= 1.38;
+  const need = game.v[R.i] + (rtOn?1.5:0) - (state.up?.7:0);
+  let vram=false;
+  if(gpu.vram < need){ g *= Math.max(.45, Math.pow(gpu.vram/need,1.6)); vram=true; }
+  const c = game.c*cpu.g/100*(rtOn?.9:1), e = game.e||Infinity;
+  const fps = Math.min(g,c,e);
+  const lim = (e<=g && e<=c) ? "engine" : (c<g ? "cpu" : "gpu");
+  return {fps,lim,vram};
+}
+const fmt = n => n==null ? "—" : Math.round(n).toLocaleString("fr-FR");
+const pct = (a,b) => Math.round((Math.max(a,b)/Math.min(a,b)-1)*100);
+const price = p => p==null ? "Non communiqué" : p.toLocaleString("fr-FR")+" $";
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const chev = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>';
+function cote(x){
+  const gpuMode = !!x.arch;
+  let o={}; try{ o = JSON.parse(localStorage.getItem("bon-plan-pc:cote")||"{}"); }catch(e){}
+  const v = o[x.n] ?? (gpuMode?USED_GPU:USED_CPU)[x.n];
+  return v==null ? "—" : "≈ "+v.toLocaleString("fr-FR")+" €";
+}
+
+function render(){
+  const gpuMode = state.mode==="gpu";
+  const A = gpuMode?state.gA:state.cA, B = gpuMode?state.gB:state.cB;
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected", b.dataset.mode===state.mode));
+  for(const [id,x] of [["pick-a",A],["pick-b",B]]){
+    const sub = gpuMode ? `${VENDOR[x.b]} · ${x.vram} Go · ${x.y}` : `${VENDOR[x.b]} · ${x.c}C/${x.t}T · ${x.y}`;
+    document.getElementById(id).innerHTML = `<span class="vendor">${sub}</span><span class="nm">${esc(x.n)}${chev}</span>`;
+  }
+  const rows = GAMES.map(gm => gpuMode
+    ? [calc(A,state.testCpu,gm), calc(B,state.testCpu,gm)]
+    : [calc(state.testGpu,A,gm), calc(state.testGpu,B,gm)]);
+  const both = rows.filter(r=>r[0].fps!=null && r[1].fps!=null);
+  const avgA = both.length?geo(both.map(r=>r[0].fps)):null, avgB = both.length?geo(both.map(r=>r[1].fps)):null;
+  const onlyA = rows.filter(r=>r[0].fps!=null).map(r=>r[0].fps), onlyB = rows.filter(r=>r[1].fps!=null).map(r=>r[1].fps);
+  const dA = avgA ?? (onlyA.length?geo(onlyA):0), dB = avgB ?? (onlyB.length?geo(onlyB):0);
+  document.getElementById("avg-a").innerHTML = `${fmt(dA)}<small>FPS moyens</small>`;
+  document.getElementById("avg-b").innerHTML = `${fmt(dB)}<small>FPS moyens</small>`;
+  const tot = (dA+dB)||1;
+  document.getElementById("m-a").style.flexGrow = dA/tot; document.getElementById("m-b").style.flexGrow = dB/tot;
+
+  const R = RES[state.res], n = GAMES.length;
+  const opts = [R.l, state.rt?"ray tracing activé":null, state.up?"upscaling Qualité":null].filter(Boolean).join(", ");
+  const test = gpuMode ? state.testCpu : state.testGpu;
+  let h2, notes=[];
+  if(avgA && avgB){
+    const d = pct(avgA,avgB);
+    if(d<3) h2 = `Match nul : moins de 3 % d'écart`;
+    else { const w = avgA>avgB; h2 = `<span class="${w?"pa":"pb"}">${esc((w?A:B).n)}</span> gagne avec +${d} % de FPS`; }
+  } else h2 = "Comparaison impossible dans ces réglages";
+
+  if(gpuMode){
+    const rawA = state.rt ? A.p*ARCH[A.arch].rt : A.p, rawB = state.rt ? B.p*ARCH[B.arch].rt : B.p;
+    const cpuLim = rows.filter(r=>r[0].lim!=="gpu" && r[1].lim!=="gpu" && r[0].fps!=null).length;
+    if(rawA && rawB && cpuLim>=4) notes.push({w:1,t:`Le ${test.n} plafonne les deux cartes dans ${cpuLim} jeux sur ${n} : en puissance brute, l'écart est de ${pct(rawA,rawB)} %.`});
+    for(const x of [A,B]) if(state.rt && !ARCH[x.arch].rt) notes.push({w:1,t:`La ${x.n} n'a pas de cœurs de ray tracing : les jeux en RT sont marqués « Sans RT » et exclus de la moyenne.`});
+    for(const [i,x] of [[0,A],[1,B]]){ const k = rows.filter(r=>r[i].vram).length; if(k) notes.push({w:1,t:`La ${x.n} manque de mémoire vidéo (${x.vram} Go) dans ${k} jeu${k>1?"x":""} en ${R.l}.`}); }
+    if(!state.rt){ const ra=A.p*ARCH[A.arch].rt, rb=B.p*ARCH[B.arch].rt;
+      if(ra && rb && pct(ra,rb)>=5) notes.push({t:`En ray tracing, l'avantage va à la ${(ra>rb?A:B).n} (+${pct(ra,rb)} %). Active l'option pour voir l'effet.`});
+      else if(!ra !== !rb) notes.push({t:`Seule la ${(ra?A:B).n} gère le ray tracing matériel.`}); }
+    const effA=A.p/A.w, effB=B.p/B.w;
+    if(pct(effA,effB)>=8) notes.push({t:`La ${(effA>effB?A:B).n} est plus efficace : ${(effA>effB?A:B).w} W contre ${(effA>effB?B:A).w} W, soit ${pct(effA,effB)} % de perf en plus par watt.`});
+    if(A.arch!==B.arch && ARCH[A.arch].up!==ARCH[B.arch].up) notes.push({t:`Upscaling : ${ARCH[A.arch].up} pour la ${A.n}, ${ARCH[B.arch].up} pour la ${B.n}.`});
+  } else {
+    const gpuLim = rows.filter(r=>r[0].lim==="gpu" && r[1].lim==="gpu").length;
+    if(gpuLim>=4) notes.push({w:1,t:`En ${R.l}, la ${test.n} limite dans ${gpuLim} jeux sur ${n} : les deux processeurs font jeu égal là-dessus. Passe en 1080p ou choisis une carte plus puissante pour voir l'écart entre CPU.`});
+    if(pct(A.mt,B.mt)>=5) notes.push({t:`Montage vidéo, rendu 3D, compilation : le ${(A.mt>B.mt?A:B).n} est ${pct(A.mt,B.mt)} % plus rapide en multi-cœur.`});
+    notes.push({t: A.sock===B.sock ? `Même socket ${A.sock} : les deux vont sur la même carte mère (vérifie la version du BIOS).` : `Sockets différents (${A.sock} contre ${B.sock}) : passer de l'un à l'autre demande aussi une nouvelle carte mère${(A.sock==="AM5"||B.sock==="AM5"||A.sock==="LGA1851"||B.sock==="LGA1851")?" et de la DDR5":""}.`});
+    if(/X3D/.test(A.n)!==/X3D/.test(B.n)) notes.push({t:`Les puces X3D ont un grand cache 3D V-Cache : c'est ce qui les rend si fortes en jeu par rapport à leur fréquence.`});
+  }
+  document.getElementById("verdict").innerHTML = `<h2>${h2}</h2>
+    <p class="ctx">Moyenne sur ${both.length} jeux en ${opts}, ${gpuMode?"avec le processeur":"avec la carte"} ${esc(test.n)}.</p>
+    ${notes.length?`<ul class="notes">${notes.map(x=>`<li class="${x.w?"w":""}">${esc(x.t)}</li>`).join("")}</ul>`:""}`;
+
+  const pr = PRESETS[state.mode].map(([a,b])=>`<button class="chip" data-a="${esc(a)}" data-b="${esc(b)}">${esc(a)} vs ${esc(b)}</button>`).join("");
+  document.getElementById("presets").innerHTML = `<span class="lbl">Duels populaires</span>${pr}<button class="chip mine" id="mine">Avec ma config (${MY.cpu} + ${MY.gpu})</button>`;
+
+  const sel = document.getElementById("test-sel");
+  document.getElementById("test-lbl").textContent = gpuMode ? "Processeur de test" : "Carte de test";
+  const list = gpuMode ? CPUS : GPUS, cur = gpuMode ? state.testCpu : state.testGpu;
+  sel.innerHTML = ["A","I","N"].filter(b=>list.some(x=>x.b===b)).map(b=>`<optgroup label="${VENDOR[b]}">${list.filter(x=>x.b===b).map(x=>`<option${x===cur?" selected":""}>${esc(x.n)}</option>`).join("")}</optgroup>`).join("");
+
+  document.querySelectorAll("#res button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.res===state.res));
+  document.getElementById("tog-rt").setAttribute("aria-pressed", state.rt);
+  document.getElementById("tog-up").setAttribute("aria-pressed", state.up);
+
+  document.getElementById("games-sub").textContent = `Réglages graphiques indiqués sous chaque jeu, ${opts}. ${gpuMode?"Processeur":"Carte"} : ${test.n}.`;
+  document.getElementById("legend").innerHTML = `<span><i style="background:var(--a)"></i>${esc(A.n)}</span><span><i style="background:var(--b)"></i>${esc(B.n)}</span>`;
+  document.getElementById("games").innerHTML = GAMES.map((gm,i)=>{
+    const [ra,rb] = rows[i], mx = Math.max(ra.fps||0, rb.fps||0)||1;
+    const bar = (r,cls)=>{
+      const tags=[];
+      if(r.lim==="nort") tags.push('<em class="tag no">Sans RT</em>');
+      else { if(r.lim==="engine") tags.push('<em class="tag">Plafond</em>');
+        else if(gpuMode ? r.lim==="cpu" : r.lim==="gpu") tags.push(`<em class="tag">${gpuMode?"CPU":"GPU"}</em>`);
+        if(r.vram) tags.push('<em class="tag vr">VRAM</em>'); }
+      const tone = r.fps==null?"":(r.fps<30?"lo":(r.fps<60?"mid":""));
+      return `<div class="bar ${cls}"><span class="v ${tone}">${fmt(r.fps)}</span><div class="track"><div class="fill" style="width:${r.fps?Math.max(2,r.fps/mx*100):0}%"></div></div><span class="tags">${tags.join("")}</span></div>`;
+    };
+    let diff = '<span class="g-diff eq">—</span>';
+    if(ra.fps!=null && rb.fps!=null){ const d = pct(ra.fps,rb.fps); diff = d<2 ? '<span class="g-diff eq">égal</span>' : `<span class="g-diff ${ra.fps>rb.fps?"da":"db"}">+${d} %</span>`; }
+    else if(ra.fps!=null || rb.fps!=null) diff = `<span class="g-diff ${ra.fps!=null?"da":"db"}">RT</span>`;
+    return `<div class="g-row"><div class="g-name"><b>${esc(gm.n)}</b><span>${esc(gm.s)}${gm.e?` · plafond ${gm.e} FPS`:""}</span></div><div class="g-bars">${bar(ra,"a")}${bar(rb,"b")}</div>${diff}</div>`;
+  }).join("");
+
+  const idx = gpuMode ? [
+    ["Rastérisation","Indice, RTX 4090 = 100", A.p, B.p, v=>fmt(v)],
+    ["Ray tracing","Indice, RTX 4090 = 100 (0 = pas de RT matériel)", A.p*ARCH[A.arch].rt, B.p*ARCH[B.arch].rt, v=>v?fmt(v):"—"],
+    ["Efficacité","Points de perf pour 100 W", A.p/A.w*100, B.p/B.w*100, v=>v.toFixed(1).replace(".",",")],
+    ["Mémoire vidéo","Go de VRAM", A.vram, B.vram, v=>v+" Go"]
+  ] : [
+    ["Jeu","Indice, Ryzen 7 9800X3D = 100", A.g, B.g, v=>fmt(v)],
+    ["Mono-cœur","Points Cinebench R23 (1 thread)", A.st, B.st, v=>fmt(v)],
+    ["Multi-cœur","Points Cinebench R23 (tous les threads)", A.mt, B.mt, v=>fmt(v)],
+    ["Cœurs / threads","Nombre de threads", A.t, B.t, (v,x)=>`${x.c}C / ${x.t}T`]
+  ];
+  document.getElementById("idx-sub").textContent = gpuMode ? "Performances moyennes mesurées indépendamment du processeur et du jeu." : "Scores moyens indépendants de la carte graphique.";
+  document.getElementById("idx").innerHTML = idx.map(([t,s,a,b,f])=>{
+    const mx = Math.max(a,b)||1;
+    const row=(v,x,cls)=>`<div class="bar ${cls}"><span class="v" style="width:72px">${f(v,x)}</span><div class="track"><div class="fill" style="width:${v?Math.max(2,v/mx*100):0}%"></div></div></div>`;
+    return `<div class="idx-item"><h4>${t}</h4><p>${s}</p><div class="g-bars">${row(a,A,"a")}${row(b,B,"b")}</div></div>`;
+  }).join("");
+
+  const L = gpuMode ? [
+    ["Marque", x=>VENDOR[x.b]], ["Architecture", x=>ARCH[x.arch].lbl], ["Sortie", x=>x.y, x=>x.y, 1],
+    ["VRAM", x=>x.vram+" Go", x=>x.vram, 1], ["Consommation", x=>x.w+" W", x=>-x.w, 1],
+    ["Prix de lancement", x=>price(x.price), x=>x.price==null?null:-x.price, 1],
+    ["Indice raster", x=>fmt(x.p), x=>x.p, 1], ["Indice RT", x=>{const v=x.p*ARCH[x.arch].rt; return v?fmt(v):"Non"}, x=>x.p*ARCH[x.arch].rt, 1],
+    ["Upscaling", x=>ARCH[x.arch].up], ["Cote occasion", x=>cote(x)]
+  ] : [
+    ["Marque", x=>VENDOR[x.b]], ["Socket", x=>x.sock], ["Sortie", x=>x.y, x=>x.y, 1],
+    ["Cœurs / threads", x=>`${x.c} / ${x.t}`, x=>x.t, 1], ["Fréquence boost", x=>x.ghz.toFixed(1).replace(".",",")+" GHz", x=>x.ghz, 1],
+    ["TDP", x=>x.w+" W", x=>-x.w, 1], ["Prix de lancement", x=>price(x.price), x=>-x.price, 1],
+    ["Indice jeu", x=>fmt(x.g), x=>x.g, 1], ["Mono-cœur", x=>fmt(x.st), x=>x.st, 1], ["Multi-cœur", x=>fmt(x.mt), x=>x.mt, 1],
+    ["Cote occasion", x=>cote(x)]
+  ];
+  document.getElementById("spec").innerHTML = `<thead><tr><th class="ha">${esc(A.n)}</th><th></th><th class="hb">${esc(B.n)}</th></tr></thead><tbody>${L.map(([lab,f,score,cmp])=>{
+    let wa="",wb="";
+    if(cmp){ const sc = typeof score==="function"?score:(x=>f(x)); const a=sc(A), b=sc(B);
+      if(a!=null && b!=null && a!==b){ if(a>b) wa=" win ca"; else wb=" win cb"; } }
+    return `<tr><td class="${wa}">${esc(f(A))}</td><th scope="row">${lab}</th><td class="r${wb}">${esc(f(B))}</td></tr>`;
+  }).join("")}</tbody>`;
+}
+
+const norm = s => s.toLowerCase().replace(/geforce|radeon|core|ryzen/g,"").replace(/[\s\-_]/g,"");
+let picker = {slot:null, list:[], act:0, vendor:"all"};
+function openPicker(slot){
+  picker.slot = slot; picker.vendor="all"; picker.act=0;
+  document.getElementById("ov").hidden=false;
+  const q = document.getElementById("q"); q.value=""; drawList(); q.focus();
+}
+function closePicker(){ document.getElementById("ov").hidden=true; const s=picker.slot; picker.slot=null; if(s) document.getElementById("pick-"+s).focus(); }
+function drawList(){
+  const gpuMode = state.mode==="gpu", src = gpuMode?GPUS:CPUS;
+  const cur = gpuMode ? (picker.slot==="a"?state.gA:state.gB) : (picker.slot==="a"?state.cA:state.cB);
+  const vendors = [...new Set(src.map(x=>x.b))];
+  document.getElementById("flt").innerHTML = ["all",...vendors].map(v=>`<button data-v="${v}" aria-pressed="${picker.vendor===v}">${v==="all"?"Toutes":VENDOR[v]}</button>`).join("");
+  const q = norm(document.getElementById("q").value);
+  const items = src.filter(x=> (picker.vendor==="all"||x.b===picker.vendor) &&
+    (!q || (norm(x.n)+"|"+norm(x.n).replace("super","s")+"|"+norm(VENDOR[x.b])).includes(q)));
+  picker.list = items; if(picker.act>=items.length) picker.act=0;
+  const mx = Math.max(...src.map(x=>gpuMode?x.p:x.g));
+  let html="", last=null;
+  items.forEach((x,i)=>{
+    if(x.b!==last){ html+=`<div class="grp">${VENDOR[x.b]}</div>`; last=x.b; }
+    const sub = gpuMode ? `${x.y} · ${x.vram} Go · ${x.w} W` : `${x.y} · ${x.c}C/${x.t}T · ${x.sock}`;
+    const v = gpuMode?x.p:x.g;
+    html+=`<button class="opt${i===picker.act?" act":""}${x===cur?" cur":""}" role="option" aria-selected="${x===cur}" data-i="${i}"><div><b>${esc(x.n)}</b><span>${sub}</span></div><div class="mini" title="Indice ${fmt(v)}"><i style="width:${v/mx*100}%"></i></div></button>`;
+  });
+  document.getElementById("list").innerHTML = html || `<div class="empty">Aucun résultat. Essaie juste le numéro du modèle, par exemple « 3060 » ou « 5600 ».</div>`;
+}
+function choose(x){
+  const k = (state.mode==="gpu"?"g":"c") + (picker.slot==="a"?"A":"B");
+  state[k]=x; closePicker(); render();
+}
+
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{ state.mode=b.dataset.mode; render(); }));
+document.getElementById("pick-a").addEventListener("click",()=>openPicker("a"));
+document.getElementById("pick-b").addEventListener("click",()=>openPicker("b"));
+document.getElementById("swap").addEventListener("click",()=>{
+  if(state.mode==="gpu") [state.gA,state.gB]=[state.gB,state.gA]; else [state.cA,state.cB]=[state.cB,state.cA]; render();
+});
+document.getElementById("res").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b){ state.res=b.dataset.res; render(); }});
+document.getElementById("tog-rt").addEventListener("click",()=>{ state.rt=!state.rt; render(); });
+document.getElementById("tog-up").addEventListener("click",()=>{ state.up=!state.up; render(); });
+document.getElementById("test-sel").addEventListener("change",e=>{
+  if(state.mode==="gpu") state.testCpu=C(e.target.value); else state.testGpu=G(e.target.value); render();
+});
+document.getElementById("presets").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  if(b.id==="mine"){
+    if(state.mode==="gpu"){ state.gA=G(MY.gpu); if(state.gB===state.gA) state.gB=G("RX 6700"); state.testCpu=C(MY.cpu); }
+    else { state.cA=C(MY.cpu); if(state.cB===state.cA) state.cB=C("Ryzen 7 5700X3D"); state.testGpu=G(MY.gpu); }
+  } else if(state.mode==="gpu"){ state.gA=G(b.dataset.a); state.gB=G(b.dataset.b); }
+  else { state.cA=C(b.dataset.a); state.cB=C(b.dataset.b); }
+  render();
+});
+document.getElementById("q").addEventListener("input",()=>{ picker.act=0; drawList(); });
+document.getElementById("q").addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"){ e.preventDefault(); picker.act=Math.min(picker.list.length-1,picker.act+1); drawList(); scrollAct(); }
+  else if(e.key==="ArrowUp"){ e.preventDefault(); picker.act=Math.max(0,picker.act-1); drawList(); scrollAct(); }
+  else if(e.key==="Enter"){ e.preventDefault(); if(picker.list[picker.act]) choose(picker.list[picker.act]); }
+});
+function scrollAct(){ const el=document.querySelector(".opt.act"); if(el) el.scrollIntoView({block:"nearest"}); }
+document.getElementById("list").addEventListener("click",e=>{ const b=e.target.closest(".opt"); if(b) choose(picker.list[+b.dataset.i]); });
+document.getElementById("flt").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b){ picker.vendor=b.dataset.v; picker.act=0; drawList(); document.getElementById("q").focus(); }});
+document.getElementById("close").addEventListener("click",closePicker);
+document.getElementById("ov").addEventListener("click",e=>{ if(e.target.id==="ov") closePicker(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !document.getElementById("ov").hidden) closePicker(); });
+
+render();
+</script>
+</body>
+</html>

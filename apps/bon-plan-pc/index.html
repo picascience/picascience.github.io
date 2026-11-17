@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06080d">
+<title>Bon Plan PC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#06080d; --s1:#0d121b; --s2:#141b27; --s3:#1b2433; --line:#232e40; --ink:#eef2f8; --muted:#8a97aa; --dim:#5c6a7e;
+  --acc:#6d7cff; --acc2:#22d3ee; --gold:#fde68a;
+  --ok:#34d399; --ok2:#a3e635; --mid:#facc15; --warn:#fb923c; --bad:#f87171;
+  --f-d:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-b:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --f-m:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-b);font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
+body{min-height:100dvh}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- En-tête ---------- */
+.top{position:sticky;top:0;z-index:20;background:rgba(6,8,13,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 10px) calc(env(safe-area-inset-right) + 14px) 10px calc(env(safe-area-inset-left) + 14px)}
+.top-in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.logo{display:flex;align-items:center;gap:9px;flex:none}
+.logo svg{width:30px;height:30px;border-radius:8px}
+.logo b{font-family:var(--f-d);font-weight:800;font-size:21px;letter-spacing:.02em;text-transform:uppercase;line-height:1}
+.tabs{margin-left:auto;display:flex;background:var(--s1);border:1px solid var(--line);border-radius:11px;padding:3px;gap:2px}
+.tabs button{border:0;background:none;padding:7px 11px;border-radius:8px;font-weight:600;font-size:13px;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:linear-gradient(135deg,var(--acc),#4f46e5);color:#fff;box-shadow:0 4px 14px rgba(109,124,255,.35)}
+
+main{max-width:720px;margin:0 auto;padding:16px calc(env(safe-area-inset-right) + 14px) calc(env(safe-area-inset-bottom) + 56px) calc(env(safe-area-inset-left) + 14px);display:flex;flex-direction:column;gap:14px}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:18px;padding:16px}
+.card h2{margin:0 0 2px;font-family:var(--f-d);font-weight:700;font-size:21px;text-transform:uppercase;letter-spacing:.03em}
+.card .sub{margin:0 0 12px;color:var(--muted);font-size:13px}
+.kicker{font-family:var(--f-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+
+/* ---------- Coller l'annonce ---------- */
+.paste textarea{width:100%;min-height:110px;resize:vertical;background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:15px;line-height:1.45}
+.paste textarea::placeholder{color:var(--dim)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--s2);border-radius:11px;padding:10px 14px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:7px}
+.btn.pri{border:0;background:linear-gradient(135deg,var(--acc),#4f46e5 60%,#0891b2);color:#fff;box-shadow:0 6px 20px rgba(79,70,229,.35)}
+.btn.ghost{background:none}
+.btn svg{width:17px;height:17px}
+.btn:active{transform:scale(.97)}
+.found{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.found span{font-size:12.5px;padding:4px 9px;border-radius:999px;background:var(--s3);border:1px solid var(--line);animation:pop .35s ease both}
+.found span.y{border-color:rgba(52,211,153,.45);color:#b8f5dc}
+.found span.n{border-color:rgba(251,146,60,.45);color:#fed7aa}
+@keyframes pop{from{opacity:0;transform:translateY(4px) scale(.96)}to{opacity:1;transform:none}}
+
+/* ---------- Verdict ---------- */
+.verdict{position:relative;overflow:hidden;padding:18px 16px 16px;border-radius:22px;border:1px solid var(--line);
+  background:radial-gradient(120% 90% at 0% 0%,color-mix(in srgb,var(--vc) 22%,transparent),transparent 60%),var(--s1)}
+.verdict .lbl{font-family:var(--f-d);font-weight:800;font-size:40px;line-height:.95;text-transform:uppercase;letter-spacing:.01em;color:var(--vc);text-wrap:balance}
+.verdict .why{margin:8px 0 0;color:#c9d3e1;font-size:14px;max-width:60ch}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.trio div{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:13px;padding:10px}
+.trio b{display:block;font-family:var(--f-d);font-weight:700;font-size:28px;line-height:1;font-variant-numeric:tabular-nums}
+.trio small{display:block;margin-top:4px;font-size:11.5px;color:var(--muted)}
+.gauge{margin-top:16px}
+.gtrack{position:relative;height:12px;border-radius:999px;background:linear-gradient(90deg,#f97316 0%,#a3e635 14%,#34d399 30%,#a3e635 44%,#facc15 55%,#fb923c 70%,#f87171 100%)}
+.gmark{position:absolute;top:50%;width:22px;height:22px;margin-left:-11px;border-radius:50%;background:#fff;border:4px solid var(--bg);box-shadow:0 0 0 2px #fff,0 4px 12px rgba(0,0,0,.5);transform:translateY(-50%);transition:left .7s cubic-bezier(.2,.9,.25,1.2)}
+.gleg{display:flex;justify-content:space-between;margin-top:7px;font-size:11px;color:var(--dim);font-family:var(--f-m);letter-spacing:.04em}
+.offer{margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:linear-gradient(135deg,rgba(109,124,255,.14),rgba(34,211,238,.08));border:1px solid rgba(109,124,255,.35);border-radius:15px;padding:12px}
+.offer .o1{flex:1;min-width:170px}
+.offer .o1 small{display:block;font-size:12px;color:var(--muted)}
+.offer .o1 b{font-family:var(--f-d);font-size:30px;font-weight:800;line-height:1.05}
+.flip{margin-top:10px;font-size:13.5px;color:#c9d3e1}
+.flip b{color:var(--ok)}
+.flip b.neg{color:var(--bad)}
+
+/* ---------- Formulaire ---------- */
+.price{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:8px 14px}
+.price input{flex:1;min-width:0;background:none;border:0;font-family:var(--f-d);font-weight:800;font-size:38px;outline:none;font-variant-numeric:tabular-nums}
+.price span{font-family:var(--f-d);font-weight:700;font-size:30px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f{display:flex;flex-direction:column;gap:5px;min-width:0}
+.f.full{grid-column:1/-1}
+.f > label,.f > .kicker{font-family:var(--f-m);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+select{width:100%;background:var(--s2);border:1px solid var(--line);border-radius:11px;padding:10px 11px;font-size:15px;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a97aa' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+.seg{display:flex;background:var(--s2);border:1px solid var(--line);border-radius:11px;padding:3px;gap:2px}
+.seg button{flex:1;border:0;background:none;border-radius:8px;padding:7px 4px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--s3);color:var(--ink);box-shadow:inset 0 0 0 1px #33415a}
+.seg button:disabled{opacity:.35}
+.togs{display:flex;flex-wrap:wrap;gap:8px}
+.tog{border:1px solid var(--line);background:var(--s2);border-radius:999px;padding:7px 12px;font-size:13.5px;font-weight:500;color:var(--muted);display:flex;align-items:center;gap:7px}
+.tog i{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.tog[aria-pressed="true"]{color:var(--ink);border-color:rgba(109,124,255,.6);background:rgba(109,124,255,.12)}
+.tog[aria-pressed="true"] i{background:var(--acc2);box-shadow:0 0 8px var(--acc2)}
+
+/* ---------- Cote ---------- */
+.lines{display:flex;flex-direction:column}
+.ln{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.ln:first-child{border-top:0}
+.ln b{display:block;font-size:14px;font-weight:600}
+.ln span{font-size:12.5px;color:var(--muted)}
+.ln .bar{height:4px;border-radius:2px;background:var(--s3);margin-top:6px;overflow:hidden}
+.ln .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:2px;transition:width .5s}
+.eur{display:flex;align-items:center;gap:4px;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:4px 8px}
+.eur input{width:64px;background:none;border:0;text-align:right;font-family:var(--f-m);font-size:15px;outline:none}
+.eur.mod{border-color:rgba(253,230,138,.6)}
+.eur.mod input{color:var(--gold)}
+.tot{display:flex;justify-content:space-between;align-items:baseline;padding-top:12px;margin-top:4px;border-top:1px dashed #33415a}
+.tot b{font-family:var(--f-d);font-size:26px;font-weight:800}
+.note{font-size:12.5px;color:var(--dim);margin:10px 0 0}
+
+/* ---------- Perfs ---------- */
+.perf-top{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.perf-top div{background:var(--s2);border:1px solid var(--line);border-radius:13px;padding:10px}
+.perf-top b{display:block;white-space:nowrap;font-family:var(--f-d);font-size:30px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.perf-top small{display:block;margin-top:4px;font-size:11.5px;color:var(--muted)}
+.up{color:var(--ok)} .dn{color:var(--bad)}
+.gl{margin-top:12px;display:flex;flex-direction:column}
+.gr{display:grid;grid-template-columns:1fr 58px 58px;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.gr.h{border-top:0;font-family:var(--f-m);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding-bottom:2px}
+.gr .v{text-align:right;font-family:var(--f-m);font-variant-numeric:tabular-nums}
+.gr .v.lo{color:var(--bad)} .gr .v.md{color:var(--mid)} .gr .v.hi{color:var(--ok)}
+
+/* ---------- Alertes ---------- */
+.alerts{display:flex;flex-direction:column;gap:8px}
+.al{display:flex;gap:10px;padding:10px 12px;border-radius:12px;background:var(--s2);border:1px solid var(--line);font-size:14px}
+.al svg{flex:none;width:18px;height:18px;margin-top:1px}
+.al.bad{border-color:rgba(248,113,113,.45);background:rgba(248,113,113,.07)} .al.bad svg{color:var(--bad)}
+.al.warn{border-color:rgba(251,146,60,.4);background:rgba(251,146,60,.06)} .al.warn svg{color:var(--warn)}
+.al.ok{border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.05)} .al.ok svg{color:var(--ok)}
+.al.info svg{color:var(--acc2)}
+
+/* ---------- Mes annonces ---------- */
+.deals{display:flex;flex-direction:column;gap:8px}
+.deal{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--s2);border:1px solid var(--line);border-radius:13px;padding:10px 12px;text-align:left;width:100%}
+.deal .dot{width:10px;height:10px;border-radius:50%}
+.deal b{display:block;font-size:14px}
+.deal span{font-size:12px;color:var(--muted)}
+.deal .pr{text-align:right;font-family:var(--f-d);font-weight:700;font-size:20px;line-height:1.1}
+.deal .pr small{display:block;font-family:var(--f-b);font-weight:500;font-size:11.5px}
+.deal.best{border-color:rgba(52,211,153,.5)}
+.x{border:0;background:none;color:var(--dim);padding:4px;margin-left:4px}
+.empty{color:var(--dim);font-size:13.5px;margin:0}
+
+/* ---------- Pièges ---------- */
+.ck{display:flex;flex-direction:column}
+.ck label{display:flex;gap:11px;padding:10px 0;border-top:1px solid var(--line);font-size:14.5px;cursor:pointer}
+.ck label:first-child{border-top:0}
+.ck input{appearance:none;-webkit-appearance:none;flex:none;width:22px;height:22px;border-radius:7px;border:2px solid #3a4860;margin:0;display:grid;place-items:center}
+.ck input:checked{background:var(--ok);border-color:var(--ok)}
+.ck input:checked::after{content:"";width:6px;height:11px;border:solid #052e16;border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.ck input:checked + span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--dim)}
+.prog{height:6px;border-radius:3px;background:var(--s3);overflow:hidden;margin:4px 0 2px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--ok),var(--ok2));transition:width .4s}
+.scam li{margin:6px 0}
+
+/* ---------- Duel ---------- */
+#v-duel{position:fixed;left:0;right:0;bottom:0;top:var(--top-h,64px);z-index:5}
+#v-duel iframe{width:100%;height:100%;border:0;display:block;background:var(--bg)}
+
+/* ---------- Divers ---------- */
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 64px);transform:translateX(-50%) translateY(16px);background:#fff;color:#0b1020;font-weight:700;font-size:14px;padding:10px 16px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;z-index:60;white-space:nowrap}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.foot{font-size:12px;color:var(--dim);line-height:1.55;margin:4px 2px 0}
+@media (max-width:420px){
+  .logo b{display:none}
+  .verdict .lbl{font-size:34px}
+  .trio b,.perf-top b{font-size:24px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="top-in">
+    <div class="logo">
+      <svg viewBox="0 0 512 512" aria-hidden="true"><use href="#ico"/></svg>
+      <b>Bon Plan PC</b>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-v="an" aria-selected="true">Analyser</button>
+      <button role="tab" data-v="duel" aria-selected="false">Duel</button>
+      <button role="tab" data-v="ck" aria-selected="false">Pièges</button>
+    </nav>
+  </div>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0c0a3e"/><stop offset=".55" stop-color="#4f46e5"/><stop offset="1" stop-color="#22d3ee"/></linearGradient>
+  </defs>
+  <symbol id="ico" viewBox="0 0 512 512">
+    <rect width="512" height="512" fill="url(#lbg)"/>
+    <path d="M118 236 L236 118 H372 a22 22 0 0 1 22 22 V276 L276 394 a28 28 0 0 1 -40 0 L118 276 a28 28 0 0 1 0 -40 Z" fill="#fff"/>
+    <circle cx="330" cy="182" r="24" fill="#4f46e5"/>
+    <path d="M196 262 l38 38 l72 -78" fill="none" stroke="#4f46e5" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="i-bad" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="m7.5 12.5 3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 11v6m0-10h.01" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+</svg>
+
+<!-- ======================= ANALYSER ======================= -->
+<main id="v-an">
+  <section class="card paste">
+    <h2>Colle l'annonce</h2>
+    <p class="sub">Copie le titre et la description depuis Leboncoin (ou Marketplace, Vinted…) : je repère les pièces et le prix tout seul.</p>
+    <textarea id="txt" placeholder="Ex. « PC gamer RTX 3070, Ryzen 5 5600X, 16 Go DDR4, SSD 1 To, alim 650 W… 600 € »"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="btn pri" id="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Analyser</button>
+      <button class="btn" id="paste-btn">Coller</button>
+      <button class="btn ghost" id="ex">Exemple</button>
+    </div>
+    <div class="found" id="found"></div>
+  </section>
+
+  <section class="verdict" id="verdict" style="--vc:var(--ok)">
+    <div class="kicker">Verdict</div>
+    <div class="lbl" id="v-lbl">—</div>
+    <p class="why" id="v-why"></p>
+    <div class="trio">
+      <div><b id="v-fair">—</b><small>Prix juste estimé</small></div>
+      <div><b id="v-price">—</b><small>Prix demandé</small></div>
+      <div><b id="v-gap">—</b><small id="v-gap-l">Écart</small></div>
+    </div>
+    <div class="gauge">
+      <div class="gtrack"><span class="gmark" id="v-mark" style="left:50%"></span></div>
+      <div class="gleg"><span>Louche</span><span>Affaire</span><span>Correct</span><span>Cher</span></div>
+    </div>
+    <div class="offer">
+      <div class="o1"><small id="o-l">Ton offre conseillée</small><b id="o-v" class="num">—</b></div>
+      <button class="btn pri" id="nego"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>Message de négo</button>
+    </div>
+    <p class="flip" id="flip"></p>
+  </section>
+
+  <section class="card">
+    <h2>Prix demandé</h2>
+    <div class="price"><input id="price" type="number" inputmode="numeric" min="0" step="10" aria-label="Prix demandé en euros"><span>€</span></div>
+  </section>
+
+  <section class="card">
+    <h2>La config</h2>
+    <p class="sub">Corrige ce que l'analyse n'a pas trouvé ou a mal compris.</p>
+    <div class="grid">
+      <div class="f full"><label for="gpu">Carte graphique</label><select id="gpu"></select></div>
+      <div class="f full"><label for="cpu">Processeur</label><select id="cpu"></select></div>
+      <div class="f"><span class="kicker">RAM</span><div class="seg" id="ram"><button data-v="8">8</button><button data-v="16">16</button><button data-v="32">32</button><button data-v="64">64</button></div></div>
+      <div class="f"><span class="kicker">Type</span><div class="seg" id="ddr"><button data-v="DDR4">DDR4</button><button data-v="DDR5">DDR5</button></div></div>
+      <div class="f"><label for="ssd">SSD</label><select id="ssd"><option value="0">Aucun</option><option value="256">256 Go</option><option value="512">512 Go</option><option value="1000">1 To</option><option value="2000">2 To</option><option value="4000">4 To</option></select></div>
+      <div class="f"><label for="hdd">Disque dur</label><select id="hdd"><option value="0">Aucun</option><option value="1000">1 To</option><option value="2000">2 To</option><option value="4000">4 To</option></select></div>
+      <div class="f"><label for="psu">Alimentation</label><select id="psu"><option value="0">Inconnue / no-name</option><option value="450">450 W</option><option value="550">550 W</option><option value="650">650 W</option><option value="750">750 W</option><option value="850">850 W</option><option value="1000">1000 W et +</option></select></div>
+      <div class="f"><span class="kicker">Boîtier</span><div class="seg" id="box"><button data-v="basique">Basique</button><button data-v="correct">Correct</button><button data-v="premium">Premium</button></div></div>
+      <div class="f full"><span class="kicker">Inclus en plus</span>
+        <div class="togs"><button class="tog" data-k="ecran"><i></i>Écran</button><button class="tog" data-k="periph"><i></i>Clavier + souris</button><button class="tog" data-k="aio"><i></i>Watercooling AIO</button><button class="tog" data-k="mining"><i></i>Ex-minage</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Détail de la cote</h2>
+    <p class="sub">Cote d'occasion de chaque pièce. Touche un montant pour mettre ta propre cote : elle est retenue pour les prochaines annonces.</p>
+    <div class="lines" id="lines"></div>
+    <div class="tot"><span>Valeur des pièces</span><b id="parts" class="num">—</b></div>
+    <p class="note">Un PC complet d'occasion se revend en général un peu sous la somme de ses pièces (pas de garantie, pas de choix) : le prix juste en tient compte (−8 %).</p>
+  </section>
+
+  <section class="card">
+    <h2>En jeu</h2>
+    <p class="sub" id="perf-sub"></p>
+    <div class="perf-top">
+      <div><b id="p-1080">—</b><small>FPS moyens 1080p</small></div>
+      <div><b id="p-1440">—</b><small>FPS moyens 1440p</small></div>
+      <div><b id="p-me">—</b><small id="p-me-l">vs ton PC</small></div>
+    </div>
+    <div class="gl" id="gl"></div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="to-duel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3 8l4 4"/><path d="M3 8h14"/><path d="m17 20 4-4-4-4"/><path d="M21 16H7"/></svg>Comparer à ma carte dans le Duel</button></div>
+  </section>
+
+  <section class="card">
+    <h2>Points de vigilance</h2>
+    <div class="alerts" id="alerts"></div>
+  </section>
+
+  <section class="card">
+    <h2>Mes annonces</h2>
+    <p class="sub">Garde les annonces que tu hésites à prendre pour les comparer.</p>
+    <div class="row" style="margin-bottom:10px"><button class="btn pri" id="save">Enregistrer cette annonce</button></div>
+    <div class="deals" id="deals"></div>
+  </section>
+
+  <p class="foot">La cote est indicative (occasion, France, fin 2026) : compare toujours avec 2 ou 3 annonces similaires près de chez toi et ajuste les montants si besoin. Les FPS viennent du même modèle que le Duel de Silicium, avec ±10 à 15 % de marge.</p>
+</main>
+
+<!-- ======================= DUEL ======================= -->
+<section id="v-duel" hidden><iframe id="duel-f" title="Duel de Silicium"></iframe></section>
+
+<!-- ======================= PIÈGES ======================= -->
+<main id="v-ck" hidden>
+  <section class="card">
+    <h2>Checklist d'achat</h2>
+    <p class="sub">À cocher pour chaque PC. Remets-la à zéro avant la prochaine visite.</p>
+    <div class="prog"><i id="ck-prog"></i></div>
+    <div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="kicker" id="ck-count"></span><button class="btn ghost" id="ck-reset" style="padding:6px 10px;font-size:13px">Remettre à zéro</button></div>
+  </section>
+  <div id="ck-blocks"></div>
+  <section class="card scam">
+    <h2>Signes d'arnaque</h2>
+    <ul>
+      <li>Le vendeur veut continuer sur WhatsApp ou par mail, ou envoie un lien de paiement ou de « livraison sécurisée » : c'est le piège le plus courant.</li>
+      <li>Prix très en dessous de la cote, photos trop parfaites ou trouvées ailleurs (fais une recherche d'image inversée), compte créé récemment sans avis.</li>
+      <li>Il refuse que tu allumes le PC, ou il est « déjà allumé » quand tu arrives : il peut cacher un problème au démarrage.</li>
+      <li>Les pièces dans Windows ne correspondent pas à l'annonce (ex. une RTX 3060 annoncée « 3070 »).</li>
+      <li>Il demande un acompte pour « réserver » : ne paie jamais rien avant d'avoir vu et testé le PC.</li>
+    </ul>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+/* ======================= Utilitaires ======================= */
+const $ = id => document.getElementById(id);
+const eur = n => Math.round(n).toLocaleString("fr-FR")+" €";
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const K = k => "bon-plan-pc:"+k;
+const load = (k,d) => { try{ const v = JSON.parse(localStorage.getItem(K(k))); return v ?? d; }catch(e){ return d; } };
+const store = (k,v) => { try{ localStorage.setItem(K(k), JSON.stringify(v)); }catch(e){} };
+function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("on"); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove("on"),1800); }
+
+/* ======================= État ======================= */
+const DEF = {gpu:"RTX 3070", cpu:"Ryzen 5 5600", ram:16, ddr:"DDR4", ssd:1000, hdd:0, psu:650, box:"correct",
+  ecran:false, periph:false, aio:false, mining:false, price:500, ov:{}, text:""};
+let S = Object.assign({}, DEF, load("draft", {}));
+if(!G(S.gpu)) S.gpu = DEF.gpu; if(!C(S.cpu)) S.cpu = DEF.cpu;
+let COTE = load("cote", {});            // cote perso des GPU / CPU (partagée avec le Duel)
+
+/* ======================= Lecture de l'annonce ======================= */
+const fold = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[’']/g,"'");
+const SUF = {ti:"\\s*ti", super:"\\s*(?:super|s)", xt:"\\s*xt", xtx:"\\s*xtx", gre:"\\s*gre"};
+const NOSUF = "(?!\\s*(?:ti\\b|super|s\\b|xtx|xt\\b|gre))";
+
+const GPU_RX = (()=>{
+  const groups = {};
+  for(const g of GPUS){
+    const base = g.n.replace(/ \d+ Go$/,"");
+    (groups[base] = groups[base] || []).push(g);
+  }
+  return Object.entries(groups).map(([base,list])=>{
+    const w = base.toLowerCase().split(" ");
+    let pre = w.shift(), model = w.shift();
+    if(pre==="rx" && model==="vega"){ model = "vega\\s*"+w.shift(); }
+    const sufs = w;
+    let p;
+    if(pre==="rtx"||pre==="gtx") p = `(?:${pre}\\s*)?${model}`;
+    else if(pre==="rx") p = `rx\\s*${model}`;
+    else p = `(?:arc\\s*)?${model}`;
+    p += sufs.length ? sufs.map(s=>SUF[s]).join("") : NOSUF;
+    return {base, list, rx:new RegExp(`(?<![a-z0-9])${p}(?![a-z0-9])`,"g")};
+  });
+})();
+
+const CPU_RX = CPUS.map(c=>{
+  let p, m;
+  if(c.b==="A"){
+    m = c.n.match(/(\d{4})(X3D|X)?$/);
+    const num = m[1], suf = (m[2]||"").toLowerCase();
+    const tail = suf==="x3d" ? "\\s*x3d" : suf==="x" ? "\\s*x(?!\\s*3d)" : "(?!\\s*x)";
+    p = `(?<!rx\\s?)(?<!ddr\\d\\s?)(?<![\\d.,])(?:ryzen\\s*[3579]\\s*|r[3579]\\s*)?${num}${tail}(?![a-z0-9])(?!\\s*(?:mhz|mt|€|eur|euros?\\b|w\\b|go\\b|gb\\b))`;
+  } else if(/Ultra/.test(c.n)){
+    m = c.n.match(/(\d{3})K/);
+    p = `(?<![\\d])(?:ultra\\s*[579]\\s*)?${m[1]}\\s*kf?(?![a-z0-9])`;
+  } else {
+    m = c.n.match(/i([3579])-(\d{4,5})([A-Z]*)$/);
+    const tier = m[1], num = m[2];
+    if(num.length===5) p = `(?<![\\d])(?:i${tier}[\\s-]*)?${num}\\s*(?:kf|ks|k|f)?(?![a-z0-9])(?!\\s*(?:€|eur|mhz))`;
+    else p = `(?<![\\d])(?:i${tier}[\\s-]*${num}\\s*(?:kf|k|f)?|${num}\\s*kf?)(?![a-z0-9])`;
+  }
+  return {c, rx:new RegExp(p,"g")};
+});
+
+function firstMatch(t, items){
+  let best=null;
+  for(const it of items){
+    it.rx.lastIndex = 0;
+    const m = it.rx.exec(t);
+    if(m && (!best || m.index < best.i || (m.index===best.i && m[0].length > best.len))) best = {it, i:m.index, len:m[0].length};
+  }
+  return best;
+}
+
+function parseAd(raw){
+  const t = fold(raw), out = {}, notes = [];
+  // Carte graphique
+  const gm = firstMatch(t, GPU_RX);
+  if(gm){
+    let g = gm.it.list[0];
+    if(gm.it.list.length>1){
+      const near = t.slice(gm.i+gm.len, gm.i+gm.len+22).match(/(\d{1,2})\s*(?:go|gb)/);
+      const hit = near && gm.it.list.find(x=>x.vram===+near[1]);
+      g = hit || gm.it.list.slice().sort((a,b)=>a.vram-b.vram)[0];
+    }
+    out.gpu = g.n;
+  }
+  // Processeur
+  const cm = firstMatch(t, CPU_RX);
+  if(cm) out.cpu = cm.it.c.n;
+  // RAM : d'abord « 32 Go de RAM / RAM : 32 Go / DDR4 32 Go », puis le contexte proche
+  let m, ram=null;
+  const direct = [/(?:(\d)\s*x\s*)?(\d{1,3})\s*(?:go|gb|g)\b\s*(?:de\s*)?(?:ram|ddr\d|memoire)/, /(?:ram|memoire(?:\s*vive)?)\s*:?\s*(?:ddr\d\s*)?(?:(\d)\s*x\s*)?(\d{1,3})\s*(?:go|gb|g)\b/, /ddr\d\s*(?:(\d)\s*x\s*)?(\d{1,3})\s*(?:go|gb)\b/];
+  for(const rx of direct){ const d = t.match(rx); if(d){ const n=(d[1]?+d[1]:1)*(+d[2]); if([8,16,24,32,48,64,96,128].includes(n)){ ram=n; break; } } }
+  const ramRx = /(?:(\d)\s*x\s*)?(\d{1,3})\s*(?:go|gb|g)\b/g;
+  const gEnd = gm ? gm.i+gm.len : -99;
+  const cands = [];
+  while((m = ramRx.exec(t))){
+    const n = (m[1]?+m[1]:1)*(+m[2]);
+    if(![8,16,32,48,64,96,128].includes(n)) continue;
+    if(m.index - gEnd >= 0 && m.index - gEnd < 26 && !/[,;+\/|\n]|\bet\b/.test(t.slice(gEnd, m.index))) continue;          // VRAM de la carte
+    const ctx = t.slice(Math.max(0,m.index-18), m.index+m[0].length+14);
+    const near = t.slice(Math.max(0,m.index-9), m.index+m[0].length);
+    if(/vram|gddr|ssd|nvme|hdd|disque|stockage|m\.2/.test(near)) continue;
+    cands.push({n, ram:/ram|ddr|memoire|memory/.test(ctx)});
+  }
+  if(!ram){ const c = cands.find(c=>c.ram) || cands[0]; if(c) ram = c.n; }
+  if(ram) out.ram = ram>=64?64:ram>=32?32:ram>=16?16:8;
+  if(/ddr5/.test(t)) out.ddr="DDR5"; else if(/ddr4/.test(t)) out.ddr="DDR4";
+  // Stockage
+  const sto = [];
+  const toRx = /(\d(?:[.,]\d)?)\s*(?:to|tb)\b/g;
+  while((m = toRx.exec(t))) sto.push({go:parseFloat(m[1].replace(",","."))*1000, i:m.index});
+  const goRx = /(\d{3,4})\s*(?:go|gb)\b/g;
+  while((m = goRx.exec(t))){ const v=+m[1]; if(v>=120 && v<=4000) sto.push({go:v, i:m.index}); }
+  for(const s of sto){
+    const before = t.slice(Math.max(0,s.i-22), s.i), after = t.slice(s.i, s.i+22);
+    const li = (str,rx)=>{ let k=-1, mm; const r=new RegExp(rx.source,"g"); while((mm=r.exec(str))) k=mm.index; return k; };
+    const h = li(before,/hdd|disque dur|\bdd\b/), sd = li(before,/ssd|nvme|m\.?2/);
+    let type = h>sd ? "hdd" : sd>h ? "ssd" : (/hdd|disque dur/.test(after) ? "hdd" : /ssd|nvme|m\.?2/.test(after) ? "ssd" : null);
+    if(!type) continue;
+    const key = s.go<=300?256:s.go<=700?512:s.go<=1500?1000:s.go<=3000?2000:4000;
+    if(type==="ssd"){ if(!out.ssd) out.ssd = key; else out.ssd = Math.min(4000, Math.max(out.ssd,key)); }
+    else if(!out.hdd) out.hdd = Math.min(key<1000?1000:key, 4000);
+  }
+  if(out.ssd==null && /ssd|nvme/.test(t)) out.ssd = 512;
+  if(out.ssd==null && out.hdd) out.ssd = 0;
+  // Alimentation
+  const pw = [...t.matchAll(/(\d{3,4})\s*(?:w|watts?)\b/g)].map(x=>+x[1]).filter(x=>x>=350 && x<=1600);
+  if(pw.length){ const w = Math.max(...pw); out.psu = [1000,850,750,650,550,450].find(k=>w>=k) || 450; }
+  else if(/alim|alimentation/.test(t)) notes.push("alim sans puissance");
+  // Prix : on écarte les prix « neuf / acheté / valeur », on préfère « prix / vendu », sinon le dernier cité
+  const pr = [];
+  for(const x of t.matchAll(/(\d{2,5})(?:[.,]\d{2})?\s*(€|e\b|eur\b|euros?\b)?/g)){
+    const v = +x[1], before = t.slice(Math.max(0,x.index-22), x.index), after = t.slice(x.index+x[0].length, x.index+x[0].length+16);
+    const kw = /prix|vendu|vends?\s*(?:a|pour)|demande|a\s*$/.test(before);
+    if(!x[2] && !/prix\D{0,6}$/.test(before)) continue;
+    if(v<50 || v>10000) continue;
+    if(/^\s*(?:a\s*)?neuf|^\s*a l'achat/.test(after) || /achete|paye|valeur|facture|au lieu|neuf/.test(before.slice(-11))) continue;
+    pr.push({v, kw});
+  }
+  const pick = pr.find(p=>p.kw) || pr[pr.length-1];
+  if(pick) out.price = pick.v;
+  // Extras
+  const noScreen = /(sans|pas d'?|non)\s*(?:d'\s*)?(ecran|moniteur)|(ecran|moniteur)\s*(non|pas)\s*(inclus|fourni|compris)/.test(t);
+  out.ecran = /ecran|moniteur/.test(t) && !noScreen;
+  out.periph = /clavier/.test(t) && /souris/.test(t) && !/(sans|pas de)\s*(clavier|souris|peripheriques)/.test(t);
+  out.aio = /\baio\b|watercooling|water cooling|refroidissement liquide|kraken|arctic liquid/.test(t);
+  out.mining = /minage|mining|\bmine\b|mineur/.test(t);
+  if(/lian li|o11|hyte|fractal|be quiet|corsair\s*5000|nzxt\s*h[79]/.test(t)) out.box="premium";
+  return {out, notes};
+}
+
+/* ======================= Cote ======================= */
+function socketDDR(sock){ return (sock==="AM5"||sock==="LGA1851") ? "DDR5" : (sock==="LGA1700" ? null : "DDR4"); }
+function parts(){
+  const gpu = G(S.gpu), cpu = C(S.cpu);
+  const ramV = (RAM_PRICE[S.ddr]||RAM_PRICE.DDR4)[S.ram] ?? 35;
+  const L = [
+    {k:"gpu", t:"Carte graphique", s:`${gpu.n} · ${gpu.vram} Go`, d:USED_GPU[gpu.n]??0, perso:COTE[gpu.n]},
+    {k:"cpu", t:"Processeur", s:cpu.n, d:USED_CPU[cpu.n]??0, perso:COTE[cpu.n]},
+    {k:"mobo", t:"Carte mère", s:`Socket ${cpu.sock}, milieu de gamme`, d:USED_MOBO[cpu.sock]},
+    {k:"ram", t:"Mémoire", s:`${S.ram} Go ${S.ddr}`, d:ramV},
+    {k:"ssd", t:"SSD", s:S.ssd? (S.ssd>=1000? S.ssd/1000+" To" : S.ssd+" Go") : "Aucun", d:SSD_PRICE[S.ssd]},
+    {k:"hdd", t:"Disque dur", s:S.hdd? S.hdd/1000+" To" : "Aucun", d:HDD_PRICE[S.hdd]},
+    {k:"psu", t:"Alimentation", s:S.psu? S.psu+" W" : "Inconnue", d:PSU_PRICE[S.psu]},
+    {k:"box", t:"Boîtier + ventirad", s:{basique:"Basique",correct:"Correct",premium:"Premium"}[S.box], d:CASE_PRICE[S.box]}
+  ];
+  if(S.aio) L.push({k:"aio", t:"Watercooling AIO", s:"Refroidissement liquide", d:40});
+  if(S.ecran) L.push({k:"ecran", t:"Écran", s:"Inclus dans l'annonce", d:80});
+  if(S.periph) L.push({k:"periph", t:"Clavier + souris", s:"Inclus", d:15});
+  for(const l of L){
+    const o = (l.k==="gpu"||l.k==="cpu") ? l.perso : S.ov[l.k];
+    l.mod = o!=null; l.v = o!=null ? o : l.d;
+  }
+  return L.filter(l=>l.v>0 || l.k==="gpu" || l.k==="cpu" || l.mod);
+}
+
+const LEVELS = [
+  {max:.6,  t:"Trop beau pour être vrai", c:"#f97316", w:"Le prix est très en dessous de la cote. Ça peut être une vraie affaire (vendeur pressé, déménagement), mais c'est aussi le profil typique d'une arnaque : vérifie tout avant de te déplacer."},
+  {max:.85, t:"Affaire en or", c:"#a3e635", w:"Clairement sous la cote. Si le PC passe les tests, fonce : ce genre d'annonce part en quelques heures."},
+  {max:.95, t:"Bonne affaire", c:"#34d399", w:"Un peu sous la cote. Bon achat, et tu peux quand même tenter une petite négo."},
+  {max:1.05,t:"Prix correct", c:"#facc15", w:"Dans la cote. Ni arnaque ni cadeau : négocie un peu ou attends une meilleure annonce."},
+  {max:1.2, t:"Un peu cher", c:"#fb923c", w:"Au-dessus de la cote. Ne l'achète pas à ce prix : fais une offre plus basse, chiffres à l'appui."},
+  {max:9,   t:"Trop cher", c:"#f87171", w:"Bien au-dessus de la valeur des pièces. Passe ton chemin, ou propose le prix juste si le vendeur est ouvert."}
+];
+
+function compute(){
+  const L = parts(), sum = L.reduce((a,l)=>a+l.v,0);
+  const fair = Math.round(sum*0.92/10)*10;
+  const price = +S.price||0;
+  const ratio = fair ? price/fair : 1;
+  const lvl = LEVELS.find(x=>ratio<x.max);
+  let offer;
+  if(ratio<.85) offer = Math.max(0, Math.round(price*0.95/10)*10);
+  else offer = Math.min(price, Math.floor(fair*0.9/10)*10);
+  return {L,sum,fair,price,ratio,lvl,offer};
+}
+
+function perf(){
+  const gpu = G(S.gpu), cpu = C(S.cpu), myG = G(MY.gpu), myC = C(MY.cpu);
+  const r1 = GAMES.map(g=>estimateFps(gpu,cpu,g,"1080")), r2 = GAMES.map(g=>estimateFps(gpu,cpu,g,"1440"));
+  const me = GAMES.map(g=>estimateFps(myG,myC,g,"1440"));
+  const a1 = geo(r1.map(x=>x.fps)), a2 = geo(r2.map(x=>x.fps)), am = geo(me.map(x=>x.fps));
+  return {gpu,cpu,r1,r2,a1,a2,am,gain:(a2/am-1)*100, cpuLim:r2.filter(x=>x.lim==="cpu").length, vram:r2.filter(x=>x.vram).length};
+}
+
+/* ======================= Rendu ======================= */
+function fillSelects(){
+  const byV = (list, cur) => ["N","A","I"].filter(b=>list.some(x=>x.b===b))
+    .map(b=>`<optgroup label="${VENDOR[b]}">${list.filter(x=>x.b===b).map(x=>`<option${x.n===cur?" selected":""}>${esc(x.n)}</option>`).join("")}</optgroup>`).join("");
+  $("gpu").innerHTML = byV(GPUS, S.gpu);
+  $("cpu").innerHTML = byV(CPUS.slice().sort((a,b)=>a.b===b.b?0:a.b==="A"?-1:1), S.cpu);
+}
+
+function animateNum(el, to, fmt){
+  const from = +el.dataset.v || 0; el.dataset.v = to;
+  if(matchMedia("(prefers-reduced-motion:reduce)").matches || Math.abs(to-from)<1){ el.textContent = fmt(to); return; }
+  const t0 = performance.now(), d = 550;
+  cancelAnimationFrame(el._raf);
+  const step = now => { const k = Math.min(1,(now-t0)/d), e = 1-Math.pow(1-k,3); el.textContent = fmt(from+(to-from)*e); if(k<1) el._raf = requestAnimationFrame(step); };
+  el._raf = requestAnimationFrame(step);
+}
+
+function render(){
+  const cpu = C(S.cpu), forced = socketDDR(cpu.sock);
+  if(forced) S.ddr = forced;
+  if(S.ddr==="DDR5" && S.ram===8) S.ram = 16;
+  // formulaire
+  $("price").value = S.price || "";
+  $("gpu").value = S.gpu; $("cpu").value = S.cpu;
+  $("ssd").value = S.ssd; $("hdd").value = S.hdd; $("psu").value = S.psu;
+  document.querySelectorAll("#ram button").forEach(b=>{ b.setAttribute("aria-pressed", +b.dataset.v===S.ram); b.disabled = S.ddr==="DDR5" && b.dataset.v==="8"; });
+  document.querySelectorAll("#ddr button").forEach(b=>{ b.setAttribute("aria-pressed", b.dataset.v===S.ddr); b.disabled = !!forced && b.dataset.v!==forced; });
+  document.querySelectorAll("#box button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.v===S.box));
+  document.querySelectorAll(".tog").forEach(b=>b.setAttribute("aria-pressed", !!S[b.dataset.k]));
+
+  // cote
+  const R = compute(), mx = Math.max(...R.L.map(l=>l.v),1);
+  $("lines").innerHTML = R.L.map(l=>`<div class="ln"><div><b>${l.t}</b><span>${esc(l.s)}</span><div class="bar"><i style="width:${l.v/mx*100}%"></i></div></div>
+    <label class="eur${l.mod?" mod":""}"><input type="number" inputmode="numeric" min="0" step="5" data-k="${l.k}" value="${l.v}" aria-label="Cote ${l.t} en euros">€</label></div>`).join("");
+  $("parts").textContent = eur(R.sum);
+
+  // verdict
+  const v = $("verdict");
+  v.style.setProperty("--vc", R.lvl.c);
+  $("v-lbl").textContent = R.price ? R.lvl.t : "Entre le prix";
+  $("v-why").textContent = R.price ? R.lvl.w : "Ajoute le prix demandé pour obtenir le verdict.";
+  animateNum($("v-fair"), R.fair, eur);
+  animateNum($("v-price"), R.price, eur);
+  const gap = R.fair - R.price;
+  $("v-gap-l").textContent = gap>=0 ? "Sous la cote" : "Au-dessus";
+  $("v-gap").style.color = gap>=0 ? "var(--ok)" : "var(--bad)";
+  animateNum($("v-gap"), Math.abs(gap), x=>(gap>=0?"−":"+")+eur(x));
+  const pos = Math.max(0, Math.min(1, (R.ratio-0.5)/1.0));
+  $("v-mark").style.left = (R.price?pos*100:50)+"%";
+  $("o-l").textContent = R.ratio<.85 ? "Prends-le vite, propose au plus" : R.ratio<1.05 ? "Ton offre conseillée" : "Ne paie pas plus que";
+  animateNum($("o-v"), R.offer, eur);
+  const flipGain = R.fair - (R.ratio<.85 ? R.offer : R.offer);
+  $("flip").innerHTML = R.price ? `Si tu l'obtiens à <b>${eur(R.offer)}</b> et que tu le revends au prix juste, marge potentielle : <b class="${flipGain<0?"neg":""}">${flipGain>=0?"+":""}${eur(flipGain)}</b>. En pièces détachées, la valeur monte à ${eur(R.sum)}.` : "";
+
+  // perfs
+  const P = perf();
+  $("perf-sub").textContent = `${P.gpu.n} + ${P.cpu.n}, réglages élevés, sans upscaling ni génération d'images.`;
+  animateNum($("p-1080"), P.a1, x=>Math.round(x));
+  animateNum($("p-1440"), P.a2, x=>Math.round(x));
+  const g = Math.round(P.gain);
+  $("p-me").className = g>=0?"up":"dn";
+  animateNum($("p-me"), g, x=>(x>=0?"+":"")+Math.round(x)+" %");
+  $("p-me-l").textContent = `vs ton PC (${MY.gpu.replace("RTX ","")}) en 1440p`;
+  const tone = f => f<45?"lo":f<75?"md":"hi";
+  $("gl").innerHTML = `<div class="gr h"><span>Jeu</span><span class="v">1080p</span><span class="v">1440p</span></div>` +
+    GAMES.map((gm,i)=>`<div class="gr"><span>${esc(gm.n)}</span><span class="v ${tone(P.r1[i].fps)}">${Math.round(P.r1[i].fps)}</span><span class="v ${tone(P.r2[i].fps)}">${Math.round(P.r2[i].fps)}</span></div>`).join("");
+
+  // alertes
+  const A = [], gpu = P.gpu;
+  if(R.price && R.ratio<.6) A.push(["bad","Prix anormalement bas : exige de voir le PC allumé en vrai, ne paie rien à l'avance et refuse tout lien de paiement envoyé par message."]);
+  if(S.mining) A.push(["bad","L'annonce parle de minage : la carte a peut-être tourné 24 h/24. Pas forcément mort, mais ventilos et pâte thermique sont souvent usés : négocie 15 à 20 % de moins sur la carte."]);
+  const need = Math.ceil((gpu.w + cpu.w + 100)*1.4/50)*50;
+  if(!S.psu) A.push(["warn",`Alimentation inconnue : demande une photo de l'étiquette. Une alim no-name peut griller les autres pièces. Pour cette config, vise ${need} W d'une marque connue.`]);
+  else if(S.psu < need) A.push(["bad",`Alim un peu juste : ${S.psu} W pour une ${gpu.n} (${gpu.w} W) + ${cpu.n}. Il faudrait ${need} W, compte ~60 € pour la changer.`]);
+  else A.push(["ok",`Alimentation suffisante (${S.psu} W pour ${need} W conseillés).`]);
+  if(gpu.vram<=6) A.push(["warn",`${gpu.vram} Go de mémoire vidéo : trop juste pour les jeux récents en élevé (textures à baisser).`]);
+  else if(P.vram>=3) A.push(["warn",`La mémoire vidéo (${gpu.vram} Go) sature dans ${P.vram} jeux en 1440p : 1080p conseillé pour les gros jeux.`]);
+  if(S.ram===8) A.push(["warn","8 Go de RAM, c'est trop peu aujourd'hui : prévois environ 45 € pour passer à 16 Go."]);
+  if(P.cpuLim>=6) A.push(["warn",`Le ${cpu.n} bride la ${gpu.n} dans ${P.cpuLim} jeux sur ${GAMES.length} : la carte ne donne pas tout son potentiel.`]);
+  if(!ARCH[gpu.arch].rt) A.push(["info",`La ${gpu.n} n'a ni ray tracing ni DLSS : seulement FSR, intégré à certains jeux.`]);
+  if(!S.ssd && S.hdd) A.push(["warn","Pas de SSD : Windows et les jeux seront lents. Un SSD 1 To coûte environ 55 €."]);
+  const sn = SOCKET_NOTE[cpu.sock]; if(sn) A.push([sn.ok>0?"ok":sn.ok<0?"warn":"info", sn.t]);
+  if(P.gain>=25) A.push(["ok",`${g} % plus rapide que ton PC actuel en 1440p : un vrai saut.`]);
+  else if(P.gain<10) A.push(["warn",`Seulement ${g>=0?"+":""}${g} % par rapport à ton PC actuel : pour jouer, l'upgrade n'en vaut pas la peine. Pour revendre, regarde juste la marge.`]);
+  $("alerts").innerHTML = A.map(([k,t])=>`<div class="al ${k}"><svg><use href="#i-${k==="bad"||k==="warn"?"bad":k==="ok"?"ok":"info"}"/></svg><span>${esc(t)}</span></div>`).join("");
+
+  renderDeals();
+  store("draft", S);
+}
+
+/* ======================= Message de négo ======================= */
+function negoText(){
+  const R = compute(), gpu = G(S.gpu), cpu = C(S.cpu);
+  const pc = R.L.find(l=>l.k==="gpu"), pp = R.L.find(l=>l.k==="cpu");
+  if(R.ratio<.85) return `Bonjour, votre PC (${gpu.n} / ${cpu.n}) m'intéresse beaucoup. Je peux venir le voir rapidement, aujourd'hui ou demain, pour un paiement en main propre. Est-il toujours disponible ? Si possible, pourriez-vous me faire ${eur(R.offer)} ? Merci et bonne journée.`;
+  return `Bonjour, votre PC m'intéresse. J'ai regardé les prix de l'occasion en ce moment : une ${gpu.n} se trouve autour de ${eur(pc.v)} et un ${cpu.n} autour de ${eur(pp.v)}, ce qui met l'ensemble aux alentours de ${eur(R.fair)}. Je peux vous proposer ${eur(R.offer)}, avec un paiement en main propre et je me déplace rapidement. Est-ce que ça vous irait ? Bonne journée.`;
+}
+
+/* ======================= Mes annonces ======================= */
+function renderDeals(){
+  const D = load("deals", []);
+  if(!D.length){ $("deals").innerHTML = `<p class="empty">Aucune annonce enregistrée pour l'instant.</p>`; return; }
+  const sorted = D.slice().sort((a,b)=>a.ratio-b.ratio);
+  const bestId = sorted.find(d=>d.ratio>=.6)?.id;
+  $("deals").innerHTML = sorted.map(d=>{
+    const lv = LEVELS.find(x=>d.ratio<x.max);
+    return `<div class="deal${d.id===bestId?" best":""}" data-id="${d.id}" role="button" tabindex="0">
+      <span class="dot" style="background:${lv.c}"></span>
+      <div><b>${esc(d.gpu)} · ${esc(d.cpu.replace(/^(Ryzen \d|Core )/,"").trim())}</b><span>${lv.t} · ${Math.round(d.fps)} FPS en 1440p${d.id===bestId?" · meilleur rapport":""}</span></div>
+      <div class="pr">${eur(d.price)}<small style="color:${lv.c}">juste ${eur(d.fair)}</small></div>
+      </div>`;
+  }).join("") + `<button class="btn ghost" id="clear-deals" style="align-self:flex-start;font-size:13px">Tout effacer</button>`;
+}
+
+/* ======================= Événements ======================= */
+function setS(patch){ Object.assign(S, patch); render(); }
+$("gpu").addEventListener("change", e=>setS({gpu:e.target.value}));
+$("cpu").addEventListener("change", e=>setS({cpu:e.target.value}));
+["ssd","hdd","psu"].forEach(k=>$(k).addEventListener("change", e=>{ delete S.ov[k]; setS({[k]:+e.target.value}); }));
+$("ram").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b&&!b.disabled){ delete S.ov.ram; setS({ram:+b.dataset.v}); } });
+$("ddr").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b&&!b.disabled){ delete S.ov.ram; setS({ddr:b.dataset.v}); } });
+$("box").addEventListener("click", e=>{ const b=e.target.closest("button"); if(b){ delete S.ov.box; setS({box:b.dataset.v}); } });
+document.querySelectorAll(".tog").forEach(b=>b.addEventListener("click", ()=>setS({[b.dataset.k]:!S[b.dataset.k]})));
+$("price").addEventListener("input", e=>{ S.price = +e.target.value||0; clearTimeout(render.t); render.t=setTimeout(render,250); });
+$("lines").addEventListener("change", e=>{
+  const i = e.target.closest("input"); if(!i) return;
+  const k = i.dataset.k, v = Math.max(0, +i.value||0);
+  if(k==="gpu"||k==="cpu"){
+    const name = S[k], def = (k==="gpu"?USED_GPU:USED_CPU)[name];
+    if(v===def) delete COTE[name]; else COTE[name]=v;
+    store("cote", COTE); toast(`Ta cote pour la ${name} est retenue`);
+  } else S.ov[k] = v;
+  render();
+});
+
+$("go").addEventListener("click", ()=>{
+  const raw = $("txt").value.trim();
+  if(!raw){ toast("Colle d'abord le texte de l'annonce"); $("txt").focus(); return; }
+  const {out, notes} = parseAd(raw);
+  const chips = [];
+  const yes = (t)=>chips.push(`<span class="y">${esc(t)}</span>`), no = (t)=>chips.push(`<span class="n">${esc(t)}</span>`);
+  out.gpu ? yes(out.gpu) : no("Carte graphique non trouvée");
+  out.cpu ? yes(out.cpu) : no("Processeur non trouvé");
+  out.ram ? yes(`${out.ram} Go${out.ddr?" "+out.ddr:""}`) : no("RAM non précisée (16 Go supposés)");
+  if(out.ssd) yes(`SSD ${out.ssd>=1000?out.ssd/1000+" To":out.ssd+" Go"}`); else if(out.ssd!==0) no("SSD non précisé");
+  if(out.hdd) yes(`HDD ${out.hdd/1000} To`);
+  out.psu ? yes(`Alim ${out.psu} W`) : no("Alim : puissance inconnue");
+  out.price ? yes(`${out.price} €`) : no("Prix à entrer");
+  if(out.ecran) yes("Écran inclus"); if(out.periph) yes("Clavier + souris"); if(out.aio) yes("Watercooling");
+  if(out.mining) no("Ex-minage");
+  $("found").innerHTML = chips.join("");
+  const patch = {text:raw, ov:{}, ecran:!!out.ecran, periph:!!out.periph, aio:!!out.aio, mining:!!out.mining,
+    ram: out.ram || 16, ssd: out.ssd ?? 512, hdd: out.hdd || 0, psu: out.psu || 0, box: out.box || "correct"};
+  if(out.gpu) patch.gpu = out.gpu; if(out.cpu) patch.cpu = out.cpu;
+  if(out.ddr) patch.ddr = out.ddr; if(out.price) patch.price = out.price;
+  setS(patch);
+  setTimeout(()=>$("verdict").scrollIntoView({behavior:"smooth", block:"start"}), 120);
+});
+$("paste-btn").addEventListener("click", async ()=>{
+  try{ const t = await navigator.clipboard.readText(); if(t){ $("txt").value = t; $("go").click(); } else toast("Presse-papiers vide"); }
+  catch(e){ toast("Appuie longuement dans la zone pour coller"); $("txt").focus(); }
+});
+$("ex").addEventListener("click", ()=>{
+  $("txt").value = "PC Gamer RTX 3070 / Ryzen 5 5600X\nVends mon PC gamer monté il y a 2 ans, jamais overclocké.\nCarte graphique : MSI RTX 3070 Gaming X Trio 8Go\nProcesseur : AMD Ryzen 5 5600X + ventirad\nRAM : 16 Go DDR4 3600 MHz (2x8)\nStockage : SSD NVMe 1 To + HDD 2 To\nAlimentation Corsair 650W 80+ Gold\nBoîtier NZXT H510, Windows 11 activé.\nÉcran non inclus. Prix : 600 € à débattre, remise en main propre à Saint-Denis.";
+  $("go").click();
+});
+$("nego").addEventListener("click", async ()=>{
+  const t = negoText();
+  try{ await navigator.clipboard.writeText(t); toast("Message copié, colle-le sur Leboncoin"); }
+  catch(e){ $("txt").value = t; toast("Copie impossible : le message est dans la zone de texte"); }
+});
+$("save").addEventListener("click", ()=>{
+  const R = compute(), P = perf(), D = load("deals", []);
+  D.push({id:Date.now(), gpu:S.gpu, cpu:S.cpu, price:R.price, fair:R.fair, ratio:R.ratio, fps:P.a2, s:JSON.parse(JSON.stringify(S))});
+  store("deals", D.slice(-30)); renderDeals(); toast("Annonce enregistrée");
+});
+$("deals").addEventListener("click", e=>{
+  if(e.target.id==="clear-deals"){ store("deals", []); renderDeals(); return; }
+  const d = e.target.closest(".deal"); if(!d) return;
+  const it = load("deals", []).find(x=>x.id===+d.dataset.id);
+  if(it){ S = Object.assign({}, DEF, it.s); $("txt").value = S.text||""; $("found").innerHTML=""; render(); window.scrollTo({top:0,behavior:"smooth"}); toast("Annonce rechargée"); }
+});
+$("to-duel").addEventListener("click", ()=>openDuel(true));
+
+/* ======================= Onglets ======================= */
+function openDuel(fromDeal){
+  const f = $("duel-f");
+  const q = new URLSearchParams({mode:"gpu", a:S.gpu, b:MY.gpu, cpu:S.cpu, res:"1440"});
+  const want = "duel.html?"+q.toString();
+  if(fromDeal || !f.getAttribute("src")) f.setAttribute("src", want);
+  show("duel");
+}
+function show(v){
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected", b.dataset.v===v));
+  $("v-an").hidden = v!=="an"; $("v-ck").hidden = v!=="ck"; $("v-duel").hidden = v!=="duel";
+  document.body.style.overflow = v==="duel" ? "hidden" : "";
+  if(v==="duel" && !$("duel-f").getAttribute("src")) openDuel(false);
+  if(v!=="duel") window.scrollTo(0,0);
+}
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click", ()=>show(b.dataset.v)));
+const setTop = ()=>document.documentElement.style.setProperty("--top-h", $("top").offsetHeight+"px");
+addEventListener("resize", setTop);
+
+/* ======================= Checklist ======================= */
+const CK = [
+  ["Avant de te déplacer", [
+    "Demander une capture du Gestionnaire des tâches › Performances (CPU, mémoire, GPU) avec le pseudo de l'annonce écrit sur un papier à côté",
+    "Demander la marque et le modèle exact de l'alimentation (photo de l'étiquette)",
+    "Demander l'âge du PC, la raison de la vente et s'il y a des factures",
+    "Comparer avec 2 ou 3 annonces similaires dans le coin",
+    "Prévoir une clé USB avec FurMark ou OCCT, HWiNFO et CrystalDiskInfo"
+  ]],
+  ["Sur place (20 minutes)", [
+    "Allumer le PC devant toi, depuis éteint",
+    "Vérifier dans Windows que processeur, RAM et carte graphique sont bien ceux de l'annonce",
+    "Brancher l'écran sur la carte graphique (pas sur la carte mère)",
+    "Lancer un test de charge 10 minutes : pas d'écran noir, pas de redémarrage, GPU sous 85 °C",
+    "Vérifier la santé du SSD avec CrystalDiskInfo (« Bon »)",
+    "Écouter les ventilateurs, regarder poussière, chocs et oxydation",
+    "Tester les ports USB, le son et le Wi-Fi s'il y en a"
+  ]],
+  ["Paiement", [
+    "Payer uniquement après les tests, en main propre (espèces ou virement instantané vérifié sur place)",
+    "Si envoi : uniquement le paiement sécurisé intégré à Leboncoin, jamais un lien reçu par SMS, mail ou WhatsApp",
+    "Récupérer les factures et les boîtes si possible (revente plus facile)"
+  ]]
+];
+let CKS = load("check", {});
+function renderCk(){
+  let n=0, done=0;
+  $("ck-blocks").innerHTML = CK.map(([title,items],bi)=>`<section class="card" style="margin-top:14px"><h2>${title}</h2><div class="ck">${items.map((t,ii)=>{
+    const id = bi+"-"+ii; n++; if(CKS[id]) done++;
+    return `<label><input type="checkbox" data-id="${id}"${CKS[id]?" checked":""}><span>${esc(t)}</span></label>`; }).join("")}</div></section>`).join("");
+  $("ck-prog").style.width = (done/n*100)+"%";
+  $("ck-count").textContent = `${done} / ${n} vérifié${done>1?"s":""}`;
+}
+$("ck-blocks").addEventListener("change", e=>{ const i=e.target.closest("input"); if(!i) return; CKS[i.dataset.id]=i.checked; store("check", CKS); renderCk(); });
+$("ck-reset").addEventListener("click", ()=>{ CKS={}; store("check", CKS); renderCk(); });
+
+/* ======================= Démarrage ======================= */
+fillSelects();
+$("txt").value = S.text || "";
+render(); renderCk(); setTop();
+</script>
+</body>
+</html>

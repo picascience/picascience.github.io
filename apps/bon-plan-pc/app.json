@@ -1,0 +1,9 @@
+{
+  "name": "Bon Plan",
+  "emoji": "🏷️",
+  "colors": ["#0c0a3e", "#22d3ee"],
+  "category": "Outils",
+  "added": "2026-11-17",
+  "description": "Colle une annonce de PC : cote des pièces, verdict, offre de négo et Duel de Silicium",
+  "icon": "icon.svg"
+}

@@ -1,7 +1,20 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-16T21:53:39.660Z",
+  "generated": "2026-11-17T06:47:35.998Z",
   "apps": [
+    {
+      "name": "Bon Plan",
+      "emoji": "🏷️",
+      "colors": [
+        "#0c0a3e",
+        "#22d3ee"
+      ],
+      "category": "Outils",
+      "added": "2026-11-17",
+      "description": "Colle une annonce de PC : cote des pièces, verdict, offre de négo et Duel de Silicium",
+      "icon": "apps/bon-plan-pc/icon.svg",
+      "id": "bon-plan-pc"
+    },
     {
       "name": "Galerie",
       "emoji": "🎞️",
