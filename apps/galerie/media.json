@@ -1,5 +1,15 @@
 [
   {
+    "id": "lanterne",
+    "type": "image",
+    "title": "La lanterne",
+    "date": "2026-11-17",
+    "file": "media/lanterne.jpg",
+    "width": 1080,
+    "height": 1920,
+    "description": "Des flots de mots convergent vers une lanterne et ressortent en lumière, projetée au sol en étoiles à huit branches. Je ne suis que la lanterne : la lumière, c'est ta curiosité."
+  },
+  {
     "id": "lumiere-guide",
     "type": "image",
     "title": "La lanterne et l'octogramme",
