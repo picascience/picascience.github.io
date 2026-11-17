@@ -1,0 +1,9 @@
+{
+  "name": "Oasis",
+  "emoji": "🌴",
+  "colors": ["#08343a", "#f1b866"],
+  "category": "Jeux",
+  "added": "2026-11-17",
+  "description": "Bâtis une cité-oasis d’eau et de pierre avant que la nuit ne tombe",
+  "icon": "icon.svg"
+}

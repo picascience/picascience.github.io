@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2a1a10">
+<title>Oasis</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div class="top">
+    <div class="row">
+      <button id="btnPause" class="round" aria-label="Pause"><svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.5"/><rect x="14" y="5" width="4" height="14" rx="1.5"/></svg></button>
+      <div id="day"><div id="dayFill"></div><svg id="daySun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><g stroke-width="2" stroke-linecap="round"><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></g></svg></div>
+      <div id="score"><svg viewBox="0 0 24 24" class="star"><path d="M12 2l2.6 4.2 4.8-1.2-1.2 4.8L22 12l-4.2 2.6 1.2 4.8-4.8-1.2L12 22l-2.6-4.2-4.8 1.2 1.2-4.8L2 12l4.2-2.6-1.2-4.8 4.8 1.2z"/></svg><b id="scoreVal">0</b><small id="scoreRate">+0/s</small></div>
+    </div>
+    <div class="row res">
+      <div class="chip" data-r="eau"><svg viewBox="0 0 24 24"><path d="M12 2.5C9 7 5.5 10.6 5.5 14.6A6.5 6.5 0 0 0 18.5 14.6C18.5 10.6 15 7 12 2.5z"/></svg><b>0</b><small>+0</small></div>
+      <div class="chip" data-r="pierre"><svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5-9 5z"/><path d="M3 9v6l9 5V14z" opacity=".75"/><path d="M21 9v6l-9 5V14z" opacity=".55"/></svg><b>0</b><small>+0</small></div>
+      <div class="chip" data-r="fertilite"><svg viewBox="0 0 24 24"><path d="M12 21v-9" stroke-width="2.4" stroke-linecap="round" fill="none"/><path d="M12 12C12 7 8 4 3.5 4.5 3.5 9 7 12 12 12z"/><path d="M12 14c0-4 3.2-6.8 8.5-6.5 0 4.2-3.5 6.5-8.5 6.5z"/></svg><b>0</b><small>+0</small></div>
+    </div>
+    <div id="hint"></div>
+  </div>
+  <div id="toasts"></div>
+  <div id="floaters"></div>
+  <div id="info" class="sheet hidden">
+    <div class="ihead"><span id="infoIcon" class="ico"></span><div><b id="infoName"></b><small id="infoStatus"></small></div><button id="infoClose" class="round sm" aria-label="Fermer">×</button></div>
+    <p id="infoDesc"></p>
+    <button id="infoDemolish" class="ghost">Démolir (rend 50 %)</button>
+  </div>
+  <div class="bottom">
+    <div class="tools">
+      <button id="btnTree" class="round" aria-label="Arbre de déblocage"><svg viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><circle cx="12" cy="12" r="2.5"/><path d="M12 7v2.5M10.2 13.8 6.6 17M13.8 13.8l3.6 3.2" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+      <button id="btnSpeed" class="round" aria-label="Vitesse">×1</button>
+    </div>
+    <div id="tray"></div>
+  </div>
+</div>
+
+<!-- Menu -->
+<div id="menu" class="overlay">
+  <div class="panel center">
+    <div class="logo">
+      <svg viewBox="0 0 120 120" width="88" height="88"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe2a8"/><stop offset="1" stop-color="#f29a4a"/></linearGradient></defs>
+        <path d="M60 8l9 15 17-4-4 17 15 9-15 9 4 17-17-4-9 15-9-15-17 4 4-17-15-9 15-9-4-17 17 4z" fill="none" stroke="url(#lg)" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M38 76v-14a22 22 0 0 1 44 0v14" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M34 80h52" stroke="#5fe0d6" stroke-width="6" stroke-linecap="round"/></svg>
+    </div>
+    <h1>Oasis</h1>
+    <p class="sub">Bâtis une cité d’eau et de pierre avant que la nuit ne tombe.</p>
+    <button id="btnPlay" class="primary">Jouer</button>
+    <button id="btnHow" class="ghost">Comment jouer</button>
+    <p class="best">Meilleur score : <b id="bestVal">—</b></p>
+  </div>
+</div>
+
+<div id="how" class="overlay hidden">
+  <div class="panel">
+    <h2>Comment jouer</h2>
+    <ul class="howl">
+      <li><b>Tap</b> sur une carte en bas, puis <b>tap</b> sur le terrain pour poser. Garde le doigt appuyé et glisse pour viser précisément.</li>
+      <li><b>Canal</b> : glisse le doigt pour tracer. L’eau part de la source centrale, des puits et des aqueducs.</li>
+      <li>Sans outil : <b>glisse</b> pour te déplacer, <b>pince</b> pour zoomer, <b>tap</b> sur un bâtiment pour le détail.</li>
+      <li>Les jardins et fontaines doivent toucher l’eau. Le marché transforme la fertilité en prospérité.</li>
+      <li>Les <b>tempêtes</b> ensablent canaux et bâtiments : tape le sable pour dégager. Jardins et fontaines protègent.</li>
+      <li>Les <b>sécheresses</b> affaiblissent puits et source. L’aqueduc n’y est pas sensible.</li>
+      <li>Le soleil descend tout au long de la partie. À la nuit, ta <b>prospérité</b> est ton score.</li>
+    </ul>
+    <button class="primary" data-close="how">Compris</button>
+  </div>
+</div>
+
+<div id="pause" class="overlay hidden">
+  <div class="panel">
+    <h2>Pause</h2>
+    <button id="btnResume" class="primary">Reprendre</button>
+    <button id="btnTree2" class="ghost">Arbre des bâtiments</button>
+    <div class="setting"><span>Qualité</span>
+      <div class="seg" id="qualitySeg"><button data-q="auto">Auto</button><button data-q="low">Basse</button><button data-q="medium">Moy.</button><button data-q="high">Haute</button></div>
+    </div>
+    <p class="tiny" id="qualityInfo"></p>
+    <div class="setting"><span>Vibrations</span><div class="seg" id="hapticSeg"><button data-h="1">Oui</button><button data-h="0">Non</button></div></div>
+    <button id="btnRestart" class="ghost">Recommencer cette carte</button>
+    <button id="btnQuit" class="ghost">Menu principal</button>
+    <p class="tiny" id="seedInfo"></p>
+  </div>
+</div>
+
+<div id="tree" class="overlay hidden">
+  <div class="panel tall">
+    <h2>Arbre de déblocage</h2>
+    <div id="treeList"></div>
+    <button class="primary" data-close="tree">Fermer</button>
+  </div>
+</div>
+
+<div id="end" class="overlay hidden">
+  <div class="panel center">
+    <p class="kicker">La nuit tombe sur l’oasis</p>
+    <div class="bigscore" id="endScore">0</div>
+    <p class="rank" id="endRank"></p>
+    <div class="stars" id="endStars"></div>
+    <p class="tiny" id="endStats"></p>
+    <p class="best" id="endBest"></p>
+    <button id="btnReplay" class="primary">Rejouer cette carte</button>
+    <button id="btnNew" class="ghost">Nouvelle carte</button>
+    <button id="btnMenu" class="ghost">Menu</button>
+  </div>
+</div>
+
+<div id="fade"></div>
+<div id="loading"><div class="spin"></div><p>Le désert se dessine…</p></div>
+<script type="module" src="./main.js"></script>
+</body>
+</html>

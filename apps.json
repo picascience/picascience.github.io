@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-17T11:29:12.302Z",
+  "generated": "2026-11-17T13:37:30.075Z",
   "apps": [
     {
       "name": "Bon Plan",
@@ -14,6 +14,19 @@
       "description": "Colle une annonce de PC : cote des pièces, verdict, offre de négo et Duel de Silicium",
       "icon": "apps/bon-plan-pc/icon.svg",
       "id": "bon-plan-pc"
+    },
+    {
+      "name": "Oasis",
+      "emoji": "🌴",
+      "colors": [
+        "#08343a",
+        "#f1b866"
+      ],
+      "category": "Jeux",
+      "added": "2026-11-17",
+      "description": "Bâtis une cité-oasis d’eau et de pierre avant que la nuit ne tombe",
+      "icon": "apps/oasis/icon.svg",
+      "id": "oasis"
     },
     {
       "name": "Surfaces 3D",
