@@ -484,7 +484,8 @@ document.getElementById("q").addEventListener("keydown",e=>{
   else if(e.key==="ArrowUp"){ e.preventDefault(); picker.act=Math.max(0,picker.act-1); drawList(); scrollAct(); }
   else if(e.key==="Enter"){ e.preventDefault(); if(picker.list[picker.act]) choose(picker.list[picker.act]); }
 });
-function scrollAct(){ const el=document.querySelector(".opt.act"); if(el) el.scrollIntoView({block:"nearest"}); }
+function scrollAct(){ const el=document.querySelector(".opt.act"), L=document.getElementById("list"); if(!el) return;
+  if(el.offsetTop < L.scrollTop) L.scrollTop = el.offsetTop; else if(el.offsetTop+el.offsetHeight > L.scrollTop+L.clientHeight) L.scrollTop = el.offsetTop+el.offsetHeight-L.clientHeight; }
 document.getElementById("list").addEventListener("click",e=>{ const b=e.target.closest(".opt"); if(b) choose(picker.list[+b.dataset.i]); });
 document.getElementById("flt").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b){ picker.vendor=b.dataset.v; picker.act=0; drawList(); document.getElementById("q").focus(); }});
 document.getElementById("close").addEventListener("click",closePicker);

@@ -686,7 +686,7 @@ $("go").addEventListener("click", ()=>{
   if(out.gpu) patch.gpu = out.gpu; if(out.cpu) patch.cpu = out.cpu;
   if(out.ddr) patch.ddr = out.ddr; if(out.price) patch.price = out.price;
   setS(patch);
-  setTimeout(()=>$("verdict").scrollIntoView({behavior:"smooth", block:"start"}), 120);
+  setTimeout(()=>scrollToEl($("verdict")), 120);
 });
 $("paste-btn").addEventListener("click", async ()=>{
   try{ const t = await navigator.clipboard.readText(); if(t){ $("txt").value = t; $("go").click(); } else toast("Presse-papiers vide"); }
@@ -713,6 +713,24 @@ $("deals").addEventListener("click", e=>{
   if(it){ S = Object.assign({}, DEF, it.s); $("txt").value = S.text||""; $("found").innerHTML=""; render(); window.scrollTo({top:0,behavior:"smooth"}); toast("Annonce rechargée"); }
 });
 $("to-duel").addEventListener("click", ()=>openDuel(true));
+
+/* ======================= Défilement sûr dans MK Apps =======================
+   scrollIntoView fait aussi défiler la fenêtre parente (le launcher) : l'appli glissait vers le haut.
+   On ne défile que notre propre page, et on remet le cadre du launcher en place s'il bouge. */
+function scrollToEl(el){
+  const y = el.getBoundingClientRect().top + window.scrollY - $("top").offsetHeight - 10;
+  window.scrollTo({top:Math.max(0,y), behavior:"smooth"});
+}
+(function guardParent(){
+  try{
+    if(window.parent===window) return;
+    const v = parent.document.getElementById("view");
+    const fix = ()=>{ if(v && (v.scrollTop||v.scrollLeft)){ v.scrollTop=0; v.scrollLeft=0; } };
+    if(v) v.addEventListener("scroll", fix, {passive:true});
+    addEventListener("focusout", ()=>setTimeout(fix,50));
+    fix();
+  }catch(e){}
+})();
 
 /* ======================= Onglets ======================= */
 function openDuel(fromDeal){
