@@ -1,5 +1,15 @@
 [
   {
+    "id": "lumiere-guide",
+    "type": "image",
+    "title": "La lanterne et l'octogramme",
+    "date": "2026-11-17",
+    "file": "media/lumiere-guide.jpg",
+    "width": 1080,
+    "height": 1920,
+    "description": "Une petite lanterne dans la nuit trace un fil de lumière jusqu'à une étoile à huit branches. Une lumière patiente qui relie ce qu'on sait à un ordre plus grand, sans éblouir."
+  },
+  {
     "id": "deux-routes",
     "type": "image",
     "title": "Deux routes",
