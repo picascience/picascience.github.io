@@ -48,5 +48,15 @@
     "added": "2026-11-15",
     "file": "models/ballon-thermodynamique.html",
     "thumb": "thumbs/ballon-thermodynamique.webp"
+  },
+  {
+    "id": "souris-sans-fil",
+    "number": "No. 06",
+    "title": "Souris Sans Fil",
+    "subtitle": "capteur optique · molette à encodeur",
+    "parts": 175,
+    "added": "2026-11-17",
+    "file": "models/souris-sans-fil.html",
+    "thumb": "thumbs/souris-sans-fil.webp"
   }
 ]

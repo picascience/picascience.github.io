@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Souris Sans Fil — CAD 3D</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<!-- CAD:HEAD · gabarit CAD 3D v2 — bloc commun à toutes les planches, ne pas modifier -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style id="cad-gabarit">
+  :root {
+    --paper:#F9F8F5; --ink:#18181A; --muted:#8E8D8A; --soft:#4A4A48; --line:#DEDCD3; --track:#E2E0D8;
+    --gap:16px;
+    --safe-t:max(14px, env(safe-area-inset-top));
+    --safe-b:max(60px, calc(env(safe-area-inset-bottom) + 28px)); /* barre de retour MK Apps */
+    --stage-t:0px; --stage-r:0px; --stage-b:0px; --stage-l:0px;
+    --serif:'Instrument Serif', Georgia, 'Times New Roman', serif;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
+    --cad-mode:col;
+  }
+  *, *::before, *::after { box-sizing:border-box; }
+  html, body { margin:0; padding:0; height:100%; overflow:hidden; overscroll-behavior:none; background:var(--paper); color:var(--ink);
+    font-family:var(--mono); -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%; -webkit-tap-highlight-color:transparent; }
+  #canvas-container { position:fixed; top:var(--stage-t); right:var(--stage-r); bottom:var(--stage-b); left:var(--stage-l);
+    touch-action:none; cursor:grab; overflow:hidden; }
+  #canvas-container:active { cursor:grabbing; }
+  #canvas-container canvas { display:block; }
+
+  /* ── En-tête : n° · titre · sous-titre · tracé ── */
+  .cad-hud { position:fixed; z-index:10; top:var(--safe-t); left:var(--gap); right:var(--gap); pointer-events:none; user-select:none; -webkit-user-select:none; }
+  .cad-tag { display:flex; align-items:center; gap:8px; min-width:0; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+  .cad-tag b { color:var(--ink); font-weight:600; flex:none; }
+  .cad-tag .cad-prompt { text-transform:none; letter-spacing:0; overflow:hidden; text-overflow:ellipsis; }
+  .cad-title { font-family:var(--serif); font-weight:400; font-size:30px; line-height:1.02; letter-spacing:-.01em; margin:6px 0 0; overflow-wrap:anywhere; }
+  .cad-sub { font-family:var(--serif); font-style:italic; font-size:17px; line-height:1.15; color:var(--soft); margin:2px 0 0; }
+  .cad-status { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:baseline; column-gap:12px;
+    margin-top:10px; padding-top:8px; border-top:1px solid var(--line); font-size:11px; color:var(--muted); }
+  .cad-group { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cad-group strong { color:var(--ink); font-weight:600; }
+  .cad-count { font-family:var(--serif); font-size:28px; line-height:1; color:var(--ink); white-space:nowrap; text-align:right; font-variant-numeric:tabular-nums; }
+  .cad-count small { font-family:var(--mono); font-size:11px; color:var(--muted); margin-left:4px; }
+  .cad-bar { grid-column:1 / -1; height:3px; margin:7px 0 5px; background:var(--track); border-radius:2px; overflow:hidden; }
+  .cad-bar i { display:block; height:100%; width:0; background:var(--ink); }
+  .cad-lines, .cad-pct { font-variant-numeric:tabular-nums; }
+  .cad-pct { text-align:right; }
+  .cad-specs { display:none; margin:16px 0 0; padding-top:10px; border-top:1px solid var(--line); font-size:10.5px; line-height:1.55; }
+  .cad-specs div { display:flex; justify-content:space-between; gap:12px; padding:3px 0; border-bottom:1px dashed var(--line); }
+  .cad-specs dt { color:var(--muted); text-transform:uppercase; letter-spacing:.08em; }
+  .cad-specs dd { margin:0; text-align:right; color:var(--ink); }
+
+  /* ── Dock de commandes : toujours la même forme ── */
+  .cad-dock { position:fixed; z-index:10; left:var(--gap); right:var(--gap); bottom:var(--safe-b); margin:0 auto; max-width:520px;
+    padding:10px 14px 4px; background:rgba(249,248,245,.95); border:1px solid var(--line); border-radius:16px;
+    box-shadow:0 10px 30px -16px rgba(24,24,26,.35); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    user-select:none; -webkit-user-select:none; }
+  .cad-actions { display:flex; gap:6px; margin-bottom:4px; overflow-x:auto; scrollbar-width:none; }
+  .cad-actions::-webkit-scrollbar { display:none; }
+  .cad-btn { flex:none; height:34px; padding:0 12px; display:inline-flex; align-items:center; gap:6px; border:1px solid rgba(24,24,26,.22);
+    border-radius:9px; background:transparent; color:var(--ink); font:600 11px/1 var(--mono); letter-spacing:.06em; text-transform:uppercase; cursor:pointer; }
+  .cad-btn:active { transform:scale(.97); }
+  .cad-btn.cad-primary { background:var(--ink); border-color:var(--ink); color:var(--paper); }
+  .cad-btn.on { border-color:var(--ink); background:rgba(24,24,26,.07); }
+  .cad-sep { flex:none; width:1px; margin:7px 2px; background:var(--line); }
+  .cad-row { display:grid; grid-template-columns:66px minmax(0,1fr) 50px; align-items:center; column-gap:10px; height:38px; }
+  .cad-row label { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--soft); }
+  .cad-row output { font-size:12px; text-align:right; font-variant-numeric:tabular-nums; color:var(--ink); }
+  .cad-range { -webkit-appearance:none; appearance:none; display:block; width:100%; height:34px; margin:0; background:transparent; cursor:pointer; --p:0%; touch-action:pan-y; }
+  .cad-range:focus { outline:none; }
+  .cad-range::-webkit-slider-runnable-track { height:3px; border-radius:2px; background:linear-gradient(var(--ink),var(--ink)) 0 0 / var(--p) 100% no-repeat, var(--track); }
+  .cad-range::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; margin-top:-9.5px; border-radius:50%; background:var(--paper); border:2px solid var(--ink); box-shadow:0 1px 4px rgba(24,24,26,.2); }
+  .cad-range:active::-webkit-slider-thumb { background:var(--ink); }
+  .cad-range::-moz-range-track { height:3px; border-radius:2px; background:var(--track); }
+  .cad-range::-moz-range-progress { height:3px; border-radius:2px; background:var(--ink); }
+  .cad-range::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:var(--paper); border:2px solid var(--ink); }
+
+  /* Grand écran : en-tête en colonne à droite, dock en bas à gauche */
+  @media (min-width:1000px) and (min-height:600px) {
+    :root { --cad-mode:wide; --safe-b:max(28px, calc(env(safe-area-inset-bottom) + 28px)); }
+    .cad-hud { left:auto; right:max(36px, 5vw); top:50%; transform:translateY(-50%); width:300px; }
+    .cad-title { font-size:46px; }
+    .cad-sub { font-size:22px; }
+    .cad-status { grid-template-columns:1fr auto; margin-top:22px; padding-top:12px; }
+    .cad-count { grid-column:1 / -1; text-align:left; font-size:68px; line-height:.9; margin-top:6px; }
+    .cad-specs { display:block; }
+    .cad-dock { left:max(28px, 4vw); right:auto; width:460px; margin:0; }
+  }
+  /* Téléphone à l'horizontale : en-tête à gauche, dock à droite */
+  @media (max-height:520px) and (orientation:landscape) {
+    :root { --cad-mode:land; --safe-b:max(14px, env(safe-area-inset-bottom)); }
+    .cad-hud { right:auto; width:min(270px, 34vw); left:max(var(--gap), env(safe-area-inset-left)); }
+    .cad-title { font-size:24px; }
+    .cad-dock { left:auto; right:max(var(--gap), env(safe-area-inset-right)); width:min(330px, 40vw); margin:0; padding-top:6px; }
+    .cad-row { height:32px; }
+  }
+</style>
+<!-- /CAD:HEAD -->
+</head>
+<body>
+<!-- CAD:UI -->
+<div id="canvas-container" aria-label="Vue CAO 3D interactive"></div>
+<header class="cad-hud" aria-live="polite">
+  <div class="cad-tag"><b id="ui-no">No. 00</b><span>·</span><span class="cad-prompt" id="ui-prompt">/anatomy</span></div>
+  <h1 class="cad-title" id="ui-title">Machine</h1>
+  <p class="cad-sub" id="ui-sub">sous-titre</p>
+  <div class="cad-status">
+    <div class="cad-group">Tracé · <strong id="ui-group">Initialisation…</strong></div>
+    <div class="cad-count"><span id="ui-parts">0</span><small>/ <span id="ui-total-parts">0</span> pièces</small></div>
+    <div class="cad-bar"><i id="ui-bar"></i></div>
+    <div class="cad-lines"><span id="ui-lines">0</span> / <span id="ui-total-lines">0</span> traits</div>
+    <div class="cad-pct" id="ui-pct">0%</div>
+  </div>
+  <dl class="cad-specs" id="ui-specs"></dl>
+</header>
+<nav class="cad-dock" aria-label="Commandes de la planche">
+  <div class="cad-actions" id="ui-actions">
+    <button type="button" class="cad-btn cad-primary" id="btn-replay">↻ Rejouer</button>
+  </div>
+  <div class="cad-row"><label for="slider-draw">Tracé</label><input class="cad-range" type="range" id="slider-draw" min="0" max="1" step="0.001" value="0"><output id="val-draw">0%</output></div>
+  <div class="cad-row"><label for="slider-explode">Éclaté</label><input class="cad-range" type="range" id="slider-explode" min="0" max="1" step="0.005" value="0"><output id="val-explode">0%</output></div>
+  <div class="cad-row"><label for="slider-speed">Vitesse</label><input class="cad-range" type="range" id="slider-speed" min="0" max="2.5" step="0.05" value="1" data-unit="x"><output id="val-speed">1.0×</output></div>
+</nav>
+<script>
+/* CADUI — gabarit CAD 3D v2. API :
+   CADUI.mount({ number, title, subtitle, prompt, specs:[[clé, valeur]…], views:[{id,label}…] })
+   CADUI.on('replay'|'draw'|'explode'|'speed'|'view', fn)      → valeurs 0..1 (vitesse 0..2.5)
+   CADUI.set('draw'|'explode'|'speed', v)                      → déplace le curseur (sans déclencher on)
+   CADUI.progress({ group, parts, totalParts, lines, totalLines, p })
+   CADUI.attach({ camera, renderer, controls, object, margin }) → cadre la machine dans la zone libre et gère le redimensionnement */
+const CADUI = (() => {
+  const $ = id => document.getElementById(id);
+  const root = document.documentElement;
+  const fr = n => Math.round(+n || 0).toLocaleString('fr-FR');
+  const handlers = {}, cache = {};
+  let rig = null, fitW = 0, fitH = 0;
+  const emit = (e, v) => (handlers[e] || []).forEach(fn => fn(v));
+  const text = (id, t) => { t = String(t); if (cache[id] !== t) { cache[id] = t; const el = $(id); if (el) el.textContent = t; } };
+  const paint = r => {
+    const p = (r.value - r.min) / (r.max - r.min) * 100;
+    r.style.setProperty('--p', p + '%');
+    text(r.id.replace('slider-', 'val-'), r.dataset.unit === 'x' ? (+r.value).toFixed(1) + '×' : Math.round(p) + '%');
+  };
+  const ranges = () => document.querySelectorAll('.cad-range');
+
+  function resize() {
+    if (!rig) return;
+    const el = $('canvas-container'), w = el.clientWidth, h = el.clientHeight;
+    if (!w || !h) return;
+    rig.renderer.setSize(w, h);
+    const c = rig.camera;
+    if (c.isOrthographicCamera && fitW && fitH) {
+      const a = w / h, fh = Math.max(fitH, fitW / a);
+      c.left = -fh * a / 2; c.right = fh * a / 2; c.top = fh / 2; c.bottom = -fh / 2;
+    } else if (c.isPerspectiveCamera) c.aspect = w / h;
+    c.updateProjectionMatrix();
+  }
+  function layout() {
+    const mode = getComputedStyle(root).getPropertyValue('--cad-mode').trim() || 'col';
+    const W = innerWidth, H = innerHeight;
+    const hud = document.querySelector('.cad-hud').getBoundingClientRect();
+    const dock = document.querySelector('.cad-dock').getBoundingClientRect();
+    let t = 0, r = 0, b = 0, l = 0;
+    if (mode === 'wide') { r = W - hud.left + 24; b = H - dock.top + 8; }
+    else if (mode === 'land') { l = hud.right + 8; r = W - dock.left + 8; }
+    else { t = hud.bottom + 6; b = H - dock.top + 6; }
+    [['t', t], ['r', r], ['b', b], ['l', l]].forEach(([k, v]) => root.style.setProperty('--stage-' + k, Math.max(0, Math.round(v)) + 'px'));
+    resize();
+    window.dispatchEvent(new Event('cad:stage'));
+  }
+  let raf = 0;
+  const relayout = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(layout); };
+
+  // Curseurs : remplissage + valeur toujours à jour, même quand le moteur les bouge lui-même
+  ranges().forEach(r => r.addEventListener('input', () => { paint(r); emit(r.id.replace('slider-', ''), +r.value); }));
+  (function sync() { ranges().forEach(paint); requestAnimationFrame(sync); })();
+  $('btn-replay').addEventListener('click', () => emit('replay'));
+  addEventListener('resize', relayout);
+  addEventListener('orientationchange', relayout);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(relayout);
+  if (window.ResizeObserver) new ResizeObserver(relayout).observe(document.querySelector('.cad-hud'));
+  relayout();
+
+  return {
+    on(e, fn) { (handlers[e] = handlers[e] || []).push(fn); return this; },
+    set(name, v) { const r = $('slider-' + name); if (r) { r.value = v; paint(r); } return this; },
+    get(name) { const r = $('slider-' + name); return r ? +r.value : 0; },
+    mount(cfg = {}) {
+      if (cfg.number) text('ui-no', cfg.number);
+      if (cfg.title) { text('ui-title', cfg.title); document.title = cfg.title + ' — CAD 3D'; }
+      if (cfg.subtitle) text('ui-sub', cfg.subtitle);
+      if (cfg.prompt) text('ui-prompt', cfg.prompt);
+      if (cfg.specs) $('ui-specs').innerHTML = cfg.specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+      if (cfg.views && cfg.views.length) {
+        const bar = $('ui-actions');
+        bar.insertAdjacentHTML('beforeend', '<span class="cad-sep"></span>' +
+          cfg.views.map((v, i) => `<button type="button" class="cad-btn${i ? '' : ' on'}" data-view="${v.id}">${v.label}</button>`).join(''));
+        bar.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
+          bar.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('on', x === b));
+          emit('view', b.dataset.view);
+        }));
+      }
+      relayout();
+      return this;
+    },
+    progress(s) {
+      if (s.group != null) text('ui-group', s.group);
+      if (s.parts != null) text('ui-parts', fr(s.parts));
+      if (s.totalParts != null) text('ui-total-parts', fr(s.totalParts));
+      if (s.lines != null) text('ui-lines', fr(s.lines));
+      if (s.totalLines != null) text('ui-total-lines', fr(s.totalLines));
+      if (s.p != null) {
+        const pct = Math.round(Math.max(0, Math.min(1, s.p)) * 100);
+        text('ui-pct', pct + '%');
+        const bar = $('ui-bar'); if (bar) bar.style.width = (s.p * 100).toFixed(2) + '%';
+      }
+      return this;
+    },
+    attach(o) {
+      rig = o;
+      if (o.object && o.camera.isOrthographicCamera) {
+        o.camera.updateMatrixWorld();
+        const box = new THREE.Box3().setFromObject(o.object);
+        if (o.controls && o.center !== false) {
+          const c = box.getCenter(new THREE.Vector3()), off = c.clone().sub(o.controls.target);
+          o.controls.target.copy(c); o.camera.position.add(off); o.camera.lookAt(c); o.camera.updateMatrixWorld();
+        }
+        const inv = o.camera.matrixWorldInverse;
+        const tc = (o.controls ? o.controls.target.clone() : box.getCenter(new THREE.Vector3())).applyMatrix4(inv);
+        let hx = 0, hy = 0;
+        for (let i = 0; i < 8; i++) {
+          const v = new THREE.Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z).applyMatrix4(inv);
+          hx = Math.max(hx, Math.abs(v.x - tc.x)); hy = Math.max(hy, Math.abs(v.y - tc.y));
+        }
+        const m = o.margin || 1.12;
+        fitW = 2 * hx * m; fitH = 2 * hy * m;
+        o.camera.zoom = 1;
+      }
+      layout();
+      return this;
+    }
+  };
+})();
+</script>
+<!-- /CAD:UI -->
+<script>
+/* ═══ Moteur de base (à garder tel quel) ═══ */
+class AnatomyEngine {
+  constructor(config = {}) {
+    this.parts = []; this.totalSegments = 0;
+    this.drawProgress = 0; this.isDrawing = true;
+    this.explodeFactor = 0; this.targetExplode = 0; this.autoExplode = config.autoExplode ?? 0.6; this.userExplode = false;
+    this.speed = 1; this.clock = new THREE.Clock(); this.elapsed = 0;
+    this.config = config;
+    CADUI.mount({ views: AnatomyEngine.VIEWS, ...config });
+    this.initScene();
+    CADUI.on('replay', () => { this.drawProgress = 0; this.isDrawing = true; })
+         .on('draw', v => { this.isDrawing = false; this.drawProgress = v; })
+         .on('explode', v => { this.userExplode = true; this.targetExplode = v; })
+         .on('speed', v => { this.speed = v; })
+         .on('view', id => this.setView(id));
+  }
+  initScene() {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0xF9F8F5);
+    this.camera = new THREE.OrthographicCamera(-10, 10, 10, -10, -200, 400);
+    this.camera.position.set(16, 13, 18);
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    document.getElementById('canvas-container').appendChild(this.renderer.domElement);
+    this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.enableDamping = true; this.controls.minZoom = 0.4; this.controls.maxZoom = 5;
+    this.occluderMat = new THREE.MeshBasicMaterial({ color: 0xF9F8F5, polygonOffset: true, polygonOffsetFactor: 1.5, polygonOffsetUnits: 2.0, side: THREE.DoubleSide });
+    this.root = new THREE.Group(); this.scene.add(this.root);
+  }
+  addPart(geometry, opts = {}) {
+    const group = new THREE.Group();
+    const basePos = new THREE.Vector3(...(opts.position || [0, 0, 0]));
+    const explodeVec = new THREE.Vector3(...(opts.explodeVec || [0, 0, 0]));
+    group.position.copy(basePos);
+    if (opts.rotation) group.rotation.set(...opts.rotation);
+    const mesh = new THREE.Mesh(geometry, this.occluderMat);
+    group.add(mesh);
+    const edgesGeo = new THREE.EdgesGeometry(geometry, opts.edgeThreshold || 18);
+    const lines = new THREE.LineSegments(edgesGeo, new THREE.LineBasicMaterial({ color: opts.color || 0x18181A, transparent: true, opacity: opts.opacity || 0.88 }));
+    const vertexCount = edgesGeo.attributes.position.count;
+    edgesGeo.setDrawRange(0, 0);
+    group.add(lines);
+    (opts.parent || this.root).add(group);
+    this.parts.push({ group, mesh, edgesGeo, vertexCount, name: opts.name || 'Composant', basePos, explodeVec, onUpdate: opts.onUpdate || null });
+    this.totalSegments += vertexCount / 2;
+    return group;
+  }
+  static VIEWS = [{ id: 'iso', label: 'Iso' }, { id: 'face', label: 'Face' }, { id: 'dessus', label: 'Dessus' }];
+  setView(id) {
+    const d = this.camera.position.distanceTo(this.controls.target), t = this.controls.target;
+    const dir = { iso: [16, 13, 18], face: [0, 0.01, 1], dessus: [0, 1, 0.001], cote: [1, 0.01, 0] }[id] || [16, 13, 18];
+    this.camera.position.copy(t).add(new THREE.Vector3(...dir).normalize().multiplyScalar(d));
+    this.camera.zoom = 1; this.camera.updateProjectionMatrix();
+  }
+  start() {
+    CADUI.progress({ totalParts: this.parts.length, totalLines: this.totalSegments });
+    // Cadrage calculé sur la vue éclatée automatique, pour que rien ne sorte de la zone libre
+    this.parts.forEach(p => p.group.position.copy(p.basePos).addScaledVector(p.explodeVec, this.autoExplode || 0));
+    CADUI.attach({ camera: this.camera, renderer: this.renderer, controls: this.controls, object: this.root, margin: this.config.margin || 1.08 });
+    this.parts.forEach(p => p.group.position.copy(p.basePos));
+    const loop = () => {
+      requestAnimationFrame(loop);
+      const dt = Math.min(this.clock.getDelta(), 0.05);
+      this.elapsed += dt * this.speed;
+      if (this.isDrawing) {
+        this.drawProgress += dt * 0.28;
+        if (this.drawProgress >= 1) {
+          this.drawProgress = 1; this.isDrawing = false;
+          if (!this.userExplode && this.autoExplode) this.targetExplode = this.autoExplode;
+        }
+        CADUI.set('draw', this.drawProgress);
+      }
+      this.explodeFactor += (this.targetExplode - this.explodeFactor) * Math.min(1, dt * 3);
+      if (!this.userExplode) CADUI.set('explode', this.explodeFactor);
+      const n = this.parts.length, exact = this.drawProgress * n, idx = Math.floor(exact);
+      let drawn = 0, group = 'Assemblage complet';
+      this.parts.forEach((p, i) => {
+        if (i < idx) { p.mesh.visible = true; p.edgesGeo.setDrawRange(0, p.vertexCount); drawn += p.vertexCount / 2; }
+        else if (i === idx) { const k = exact - idx, c = Math.floor(p.vertexCount * k / 2) * 2; p.mesh.visible = k > 0.2; p.edgesGeo.setDrawRange(0, c); drawn += c / 2; group = p.name; }
+        else { p.mesh.visible = false; p.edgesGeo.setDrawRange(0, 0); }
+        p.group.position.copy(p.basePos).addScaledVector(p.explodeVec, this.explodeFactor);
+        if (p.onUpdate) p.onUpdate(p.group, this.elapsed, dt * this.speed);
+      });
+      CADUI.progress({ group, parts: Math.min(n, Math.ceil(exact)), lines: drawn, p: this.drawProgress });
+      this.controls.update();
+      this.renderer.render(this.scene, this.camera);
+    };
+    loop();
+  }
+}
+
+/* ═══ Machine : souris optique sans fil ═══ */
+const engine = new AnatomyEngine({
+  number: 'No. 06', title: 'Souris Sans Fil', subtitle: 'capteur optique · molette à encodeur', prompt: '/anatomy souris d’ordinateur',
+  specs: [['Capteur', 'optique · 1 600 DPI'], ['Molette', 'encodeur optique · 12 crans'], ['Boutons', '6 · micro-switchs'], ['Liaison', '2,4 GHz · pile AAA'], ['Pièces', '175 · coque, carte, molette']],
+  autoExplode: 0.6, margin: 1.08
+});
+
+const PI = Math.PI;
+const box = (w, h, d, x = 0, y = 0, z = 0) => new THREE.BoxGeometry(w, h, d).translate(x, y, z);
+const cylY = (r, h, x = 0, y = 0, z = 0, seg = 24, open = false) => new THREE.CylinderGeometry(r, r, h, seg, 1, open).translate(x, y, z);
+const cylX = (r, h, x = 0, y = 0, z = 0, seg = 24, open = false) => new THREE.CylinderGeometry(r, r, h, seg, 1, open).rotateZ(PI / 2).translate(x, y, z);
+// Forme à plat : le plan (x, y) du Shape devient le plan (x, z) du monde, l'épaisseur monte de y à y+depth
+const flat = (shape, depth, y) => { const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: 24 }); g.rotateX(PI / 2); g.translate(0, y + depth, 0); return g; };
+const P = (geo, name, ex, o = {}) => engine.addPart(geo, { name, explodeVec: ex, ...o });
+
+/* ── Profil de la coque : demi-largeur hw(u), hauteur Hh(u), u ∈ [-1 (avant), 1 (arrière)] ── */
+const L = 6.4, HW = 3.5, Y0 = 0.95;
+const hw = u => HW * (0.8 + 0.1 * (u + 1)) * Math.sqrt(Math.max(0, 1 - Math.pow(Math.abs(u), 3)));
+const Hh = u => 1.0 + 2.6 * Math.exp(-Math.pow((u - 0.3) / 0.62, 2));
+const surf = (u, v, out = 1) => {
+  const uu = Math.max(-0.985, Math.min(0.985, u));
+  return new THREE.Vector3(v * hw(uu) * out, Y0 + Hh(uu) * Math.pow(Math.max(0, 1 - Math.pow(Math.abs(v), 2.4)), 0.6), uu * L);
+};
+function patch(u0, u1, vmap, nu, nv, out = 1, shift = [0, 0, 0]) {
+  const pos = [], idx = [];
+  for (let i = 0; i <= nu; i++) {
+    const u = u0 + (u1 - u0) * i / nu;
+    for (let j = 0; j <= nv; j++) { const p = surf(u, vmap(u, j / nv), out); pos.push(p.x - shift[0], p.y - shift[1], p.z - shift[2]); }
+  }
+  for (let i = 0; i < nu; i++) for (let j = 0; j < nv; j++) {
+    const a = i * (nv + 1) + j, b = a + 1, c = a + nv + 1, d = c + 1;
+    idx.push(a, b, c, b, d, c);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setIndex(idx); g.computeVertexNormals();
+  return g;
+}
+const outline = (sx, sz) => {
+  const pts = [], N = 28;
+  for (let k = 0; k <= N; k++) { const u = -Math.cos(PI * k / N) * 0.9995; pts.push(new THREE.Vector2(hw(u) * sx, u * L * sz)); }
+  for (let k = N; k >= 0; k--) { const u = -Math.cos(PI * k / N) * 0.9995; pts.push(new THREE.Vector2(-hw(u) * sx, u * L * sz)); }
+  return pts;
+};
+const ring = (x, z, r) => { const p = new THREE.Path(); p.absarc(x, z, r, 0, PI * 2, true); return p; };
+
+const SENS_Z = 0.6;               // position du capteur
+const WHEEL = [0, 1.85, -2.4];    // axe de la molette
+const spin = k => (g, t) => { g.rotation.x = t * k; };
+
+/* ───────── Dessous : coque inférieure, rebord, patins, vis ───────── */
+{
+  const s = new THREE.Shape(outline(1, 1)); s.holes.push(ring(0, SENS_Z, 0.58));
+  P(flat(s, 0.35, 0), 'Coque inférieure', [0, 0, 0]);
+  const r = new THREE.Shape(outline(1, 1)); r.holes.push(new THREE.Path(outline(0.93, 0.96)));
+  P(flat(r, 0.65, 0.35), 'Rebord de coque', [0, 0.5, 0]);
+  const pr = new THREE.Shape(); pr.absarc(0, SENS_Z, 0.98, 0, PI * 2, false); pr.holes.push(ring(0, SENS_Z, 0.66));
+  P(flat(pr, 0.1, -0.1), 'Patin central PTFE', [0, -2.4, 0]);
+  [[-1.7, -4.2, .55], [1.7, -4.2, .55], [-1.4, 4.5, .5], [1.4, 4.5, .5]].forEach(([x, z, r], i) =>
+    P(cylY(r, 0.1, x, -0.05, z, 28), 'Patin PTFE ' + (i + 1), [0, -2.4, 0]));
+  [[-2.2, -0.9], [2.2, -0.9], [-2.1, 1.7], [2.1, 1.7]].forEach(([x, z], i) =>
+    P(cylY(0.22, 0.12, x, -0.06, z, 20), 'Vis de coque ' + (i + 1), [0, -3.6, 0]));
+  P(box(0.9, 0.14, 0.45, 0, -0.07, 2.5), 'Interrupteur marche/arrêt', [0, -1.6, 0.8]);
+  P(box(0.3, 0.08, 0.3, 0.2, -0.18, 2.5), 'Curseur d’interrupteur', [0, -2.0, 0.8]);
+}
+
+/* ───────── Compartiment de pile AAA ───────── */
+{
+  const z = 3.6;
+  P(box(4.8, 0.08, 1.4, 0, 0.39, z), 'Fond du compartiment', [0, 1.0, 2.2]);
+  P(box(0.12, 0.9, 1.4, -2.45, 0.8, z), 'Paroi gauche', [0, 1.0, 2.2]);
+  P(box(0.12, 0.9, 1.4, 2.45, 0.8, z), 'Paroi droite', [0, 1.0, 2.2]);
+  P(box(4.8, 0.7, 0.1, 0, 0.75, z - 0.7), 'Paroi avant du compartiment', [0, 1.0, 2.2]);
+  P(box(4.8, 0.7, 0.1, 0, 0.75, z + 0.7), 'Paroi arrière du compartiment', [0, 1.0, 2.2]);
+  P(cylX(0.52, 4.4, 0, 0.99, z, 32), 'Pile AAA', [0, 2.4, 3.2]);
+  P(cylX(0.2, 0.2, 2.3, 0.99, z, 16), 'Plot positif', [0, 2.4, 3.2]);
+  P(box(0.06, 0.8, 0.9, 2.38, 0.85, z), 'Lame de contact +', [0, 1.6, 2.6]);
+  P(box(0.06, 0.8, 0.9, -2.38, 0.85, z), 'Lame de contact −', [0, 1.6, 2.6]);
+  const pts = []; for (let i = 0; i <= 60; i++) { const a = i / 60 * PI * 2 * 5; pts.push(new THREE.Vector3(-2.35 + i / 60 * 0.14, 0.99 + Math.cos(a) * 0.3, z + Math.sin(a) * 0.3)); }
+  P(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 90, 0.03, 4, false), 'Ressort de pile', [0, 2.4, 3.2]);
+}
+
+/* ───────── Capteur optique (sous la carte) ───────── */
+P(cylY(0.5, 0.58, 0, 0.34, SENS_Z, 28, true), 'Support de lentille', [0, -1.2, 0]);
+P(cylY(0.38, 0.06, 0, 0.14, SENS_Z, 28), 'Lentille', [0, -1.7, 0]);
+P(box(0.9, 0.22, 0.9, 0, 0.78, SENS_Z), 'Puce capteur optique', [0, 0.5, 0]);
+P(cylY(0.16, 0.3, 1.1, 0.75, SENS_Z, 16), 'LED du capteur', [0, 0.3, 0]);
+P(new THREE.SphereGeometry(0.16, 14, 8, 0, PI * 2, PI / 2, PI / 2).translate(1.1, 0.6, SENS_Z), 'Dôme de LED', [0, 0.1, 0]);
+
+/* ───────── Carte électronique ───────── */
+{
+  const pts = [[-1.8, -4.5], [1.8, -4.5], [2.4, -3.7], [2.5, 2.0], [1.6, 2.5], [-1.6, 2.5], [-2.5, 2.0], [-2.4, -3.7]].map(([x, z]) => new THREE.Vector2(x, z));
+  const s = new THREE.Shape(pts); s.holes.push(ring(0, SENS_Z, 0.5));
+  [[-2.2, -0.9], [2.2, -0.9], [-2.1, 1.7], [2.1, 1.7]].forEach(([x, z], i) => P(cylY(0.2, 0.55, x, 0.625, z, 16), 'Entretoise ' + (i + 1), [0, 0.8, 0]));
+  P(flat(s, 0.14, 0.9), 'Carte électronique (PCB)', [0, 1.2, 0]);
+}
+const TOP = 1.04, CE = [0, 1.8, 0];
+{ // Microcontrôleur QFP 32 broches
+  const mx = 1.45, mz = -0.6;
+  P(box(1.3, 0.22, 1.3, mx, TOP + 0.11, mz), 'Microcontrôleur 2,4 GHz', CE);
+  for (let i = 0; i < 8; i++) {
+    const o = -0.5 + i * 1 / 7;
+    P(box(0.28, 0.05, 0.08, mx - 0.79, TOP + 0.03, mz + o), 'Broche ' + (i + 1), CE);
+    P(box(0.28, 0.05, 0.08, mx + 0.79, TOP + 0.03, mz + o), 'Broche ' + (i + 9), CE);
+    P(box(0.08, 0.05, 0.28, mx + o, TOP + 0.03, mz - 0.79), 'Broche ' + (i + 17), CE);
+    P(box(0.08, 0.05, 0.28, mx + o, TOP + 0.03, mz + 0.79), 'Broche ' + (i + 25), CE);
+  }
+}
+P(box(0.5, 0.16, 0.32, -1.4, TOP + 0.08, -0.4), 'Quartz', CE);
+P(cylY(0.3, 0.22, -1.4, TOP + 0.11, 1.3, 20), 'Inductance', CE);
+[-1.5, -1.15, -0.85, 0.85, 1.15].forEach((x, i) => P(cylY(0.12, 0.22, x, TOP + 0.11, -4.3, 14), 'Condensateur ' + (i + 1), CE));
+for (let i = 0; i < 5; i++) P(cylY(0.12, 0.22, -2.0, TOP + 0.11, -3.0 + i * 0.4, 14), 'Condensateur ' + (i + 6), CE);
+for (let i = 0; i < 8; i++) P(box(0.3, 0.08, 0.15, -0.6 + (i % 4) * 0.4, TOP + 0.04, 1.6 + Math.floor(i / 4) * 0.3), 'Résistance ' + (i + 1), CE);
+for (let i = 0; i < 7; i++) P(box(i % 2 ? 0.05 : 0.5, 0.03, i % 2 ? 0.28 : 0.05, i % 2 ? -0.45 + (i >> 1) * 0.5 + (i % 4 === 1 ? 0 : 0.5) : -0.2 + (i >> 1) * 0.0, TOP + 0.02, 2.05 + (i >> 1) * 0.09), 'Piste d’antenne ' + (i + 1), CE);
+
+/* ───────── Micro-switchs (clic gauche / droit, DPI, boutons latéraux) ───────── */
+[[-1.5, 'gauche'], [1.5, 'droit']].forEach(([x, nom]) => {
+  P(box(1.0, 0.55, 0.9, x, TOP + 0.275, -3.7), 'Micro-switch ' + nom, [0, 2.4, 0]);
+  P(cylY(0.15, 0.5, x, TOP + 0.8, -3.7, 14), 'Poussoir ' + nom, [0, 2.9, 0]);
+  P(box(0.9, 0.05, 0.8, x, TOP + 1.08, -3.7), 'Lamelle de clic ' + nom, [0, 3.2, 0]);
+});
+P(box(0.6, 0.4, 0.6, 0, TOP + 0.2, -1.0), 'Micro-switch DPI', CE);
+P(cylY(0.15, 1.5, 0, TOP + 1.15, -1.0, 14), 'Tige du bouton DPI', [0, 3.0, 0]);
+[[-3.3, 'avant'], [-1.8, 'arrière']].forEach(([z, nom]) => {
+  P(box(0.55, 0.4, 0.5, -2.15, TOP + 0.2, z), 'Micro-switch latéral ' + nom, [-1.0, 1.8, 0]);
+  P(cylX(0.12, 0.35, -2.5, TOP + 0.2, z, 14), 'Poussoir latéral ' + nom, [-2.0, 1.8, 0]);
+});
+
+/* ───────── Molette à encodeur optique ───────── */
+{
+  P(box(0.12, 1.0, 0.5, -0.7, TOP + 0.5, WHEEL[2]), 'Bras de molette gauche', [0, 2.4, 0]);
+  P(box(0.12, 1.0, 0.5, 0.7, TOP + 0.5, WHEEL[2]), 'Bras de molette droit', [0, 2.4, 0]);
+  P(box(1.5, 0.1, 0.5, 0, TOP + 0.05, WHEEL[2]), 'Traverse de support', [0, 2.0, 0]);
+  P(cylX(0.1, 1.6, 0, WHEEL[1], WHEEL[2], 14), 'Axe de molette', [0, 3.2, 0]);
+  P(box(0.3, 0.2, 0.5, 0.5, TOP + 0.1, WHEEL[2]), 'Fourche optique (base)', [0, 2.2, 0]);
+  P(box(0.04, 0.5, 0.4, 0.42, TOP + 0.4, WHEEL[2]), 'Fourche optique (LED)', [0, 2.2, 0]);
+  P(box(0.04, 0.5, 0.4, 0.58, TOP + 0.4, WHEEL[2]), 'Fourche optique (capteur)', [0, 2.2, 0]);
+  const W = (geo, name, ex, k = 1.6) => P(geo, name, ex, { position: WHEEL, onUpdate: spin(k) });
+  W(cylX(0.25, 0.8, 0, 0, 0, 20), 'Moyeu de molette', [0, 3.2, 0]);
+  W(cylX(0.78, 0.7, 0, 0, 0, 36, true), 'Jante de molette', [0, 3.2, 0]);
+  for (let i = 0; i < 6; i++) W(box(0.1, 0.55, 0.1, 0, 0.52, 0).rotateX(i / 6 * PI * 2), 'Rayon ' + (i + 1), [0, 3.2, 0]);
+  for (let i = 0; i < 24; i++) W(box(0.7, 0.14, 0.16, 0, 0.85, 0).rotateX(i / 24 * PI * 2), 'Strie du pneu ' + (i + 1), [0, 3.2, 0]);
+  W(cylX(0.6, 0.1, 0.5, 0, 0, 32), 'Disque d’encodeur', [2.2, 3.2, 0]);
+  for (let i = 0; i < 12; i++) W(box(0.1, 0.1, 0.12, 0.5, 0.64, 0).rotateX(i / 12 * PI * 2), 'Fente d’encodeur ' + (i + 1), [2.2, 3.2, 0]);
+}
+
+/* ───────── Coque supérieure : boutons, palais, flancs ───────── */
+{
+  const PV = [0, 1.6, 0.5];                              // charnière des boutons
+  const vg = u => Math.min(0.8, 0.5 / hw(Math.max(-0.985, Math.min(0.985, u))));
+  const click = (sgn, nom, ph, ex) => P(
+    patch(-0.985, 0.08, (u, s) => sgn * (vg(u) + (1 - vg(u)) * s), 6, 5, 1, PV), 'Bouton ' + nom,
+    ex, { position: PV, edgeThreshold: 4, onUpdate: (g, t) => { g.rotation.x = -0.035 * Math.pow(Math.max(0, Math.sin(t * 1.4 + ph)), 14); } });
+  P(box(0.5, 0.5, 0.25, -1.6, 1.3, 0.7), 'Charnière gauche', [0, 2.2, 0]);
+  P(box(0.5, 0.5, 0.25, 1.6, 1.3, 0.7), 'Charnière droite', [0, 2.2, 0]);
+  click(-1, 'gauche', 0, [-1.2, 5.0, -0.8]);
+  click(1, 'droit', 2.2, [1.2, 5.0, -0.8]);
+  P(patch(0.095, 0.985, (u, s) => -1 + 2 * s, 7, 10), 'Coque supérieure (palais)', [0, 5.8, 2.2], { edgeThreshold: 4 });
+  P(cylY(0.3, 0.2, 0, 3.35, -1.0, 24), 'Bouton DPI', [0, 6.6, 0]);
+  [[-0.62, -0.42, 'avant'], [-0.38, -0.18, 'arrière']].forEach(([a, b, nom]) =>
+    P(patch(a, b, (u, s) => -(0.74 + 0.24 * s), 3, 4, 1.02), 'Bouton latéral ' + nom, [-4.2, 0.8, 0], { edgeThreshold: 4 }));
+  for (let i = 0; i < 5; i++) {
+    P(patch(-0.45 + 0.2 * i, -0.38 + 0.2 * i, (u, s) => 0.74 + 0.24 * s, 1, 4, 1.02), 'Strie de grip droit ' + (i + 1), [4.2, 0.8, 0], { edgeThreshold: 4 });
+    P(patch(0.02 + 0.17 * i, 0.09 + 0.17 * i, (u, s) => -(0.74 + 0.24 * s), 1, 4, 1.02), 'Strie de grip gauche ' + (i + 1), [-4.2, 0.8, 0], { edgeThreshold: 4 });
+  }
+}
+console.info('Pièces :', engine.parts.length);
+engine.start();
+</script>
+</body>
+</html>
