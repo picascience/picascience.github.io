@@ -1,0 +1,9 @@
+{
+  "name": "Tajweed",
+  "emoji": "📖",
+  "colors": ["#03241a", "#14745a"],
+  "category": "Coran",
+  "added": "2026-11-17",
+  "description": "Tajweed Pas à Pas : apprendre le tajweed (Ḥafṣ ʿan ʿÂṣim) du niveau zéro à la lecture du Coran",
+  "icon": "icon.svg"
+}

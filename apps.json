@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-17T13:37:30.075Z",
+  "generated": "2026-11-17T21:21:42.458Z",
   "apps": [
     {
       "name": "Bon Plan",
@@ -40,6 +40,19 @@
       "description": "Surface 3D de f(x, y) : curseurs x et y, rotation, dérivées partielles et plan tangent",
       "icon": "apps/surface-3d/icon.svg",
       "id": "surface-3d"
+    },
+    {
+      "name": "Tajweed",
+      "emoji": "📖",
+      "colors": [
+        "#03241a",
+        "#14745a"
+      ],
+      "category": "Coran",
+      "added": "2026-11-17",
+      "description": "Tajweed Pas à Pas : apprendre le tajweed (Ḥafṣ ʿan ʿÂṣim) du niveau zéro à la lecture du Coran",
+      "icon": "apps/tajweed/icon.svg",
+      "id": "tajweed"
     },
     {
       "name": "Galerie",

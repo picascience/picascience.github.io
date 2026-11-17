@@ -1,0 +1,166 @@
+{
+  "_info": "Règles colorées dans le texte. 'id' = nom de la règle dans les annotations cpfair/quran-tajweed (CC BY 4.0). Couleurs inspirées de la palette tajweed de GlobalQuran / AlQuran Cloud, éclaircies pour le mode sombre.",
+  "families": [
+    { "id": "silence", "fr": "Non prononcé", "rules": ["hamzat_wasl", "lam_shamsiyyah", "silent"] },
+    { "id": "madd", "fr": "Prolongations (madd)", "rules": ["madd_2", "madd_246", "madd_munfasil", "madd_muttasil", "madd_6"] },
+    { "id": "ghunna", "fr": "Nasalisation (ghunna) et fusions", "rules": ["ghunnah", "ikhfa", "ikhfa_shafawi", "idghaam_ghunnah", "idghaam_no_ghunnah", "idghaam_shafawi", "iqlab", "idghaam_mutajanisayn", "idghaam_mutaqaribayn"] },
+    { "id": "qalqala", "fr": "Rebond", "rules": ["qalqalah"] }
+  ],
+  "rules": {
+    "hamzat_wasl": {
+      "fr": "Hamza de liaison",
+      "ar": "هَمْزَةُ الوَصْل", "tr": "hamzat al-waṣl",
+      "color": "#8f949b", "dark": "#9ba1a8",
+      "short": "Alif marqué ٱ : on ne le prononce pas quand on enchaîne avec le mot d'avant.",
+      "explain": "Le petit signe sur l'alif (ٱ) indique une hamza de liaison. Si l'on commence la lecture par ce mot, on la prononce (avec la voyelle qui convient) ; si l'on vient du mot précédent, elle disparaît et on passe directement à la lettre suivante.",
+      "lesson": "m00-l5"
+    },
+    "lam_shamsiyyah": {
+      "fr": "Lam solaire (non prononcé)",
+      "ar": "اللَّامُ الشَّمْسِيَّة", "tr": "al-lām ash-shamsiyya",
+      "color": "#8f949b", "dark": "#9ba1a8",
+      "short": "Le lam de « al » se fond dans la lettre suivante, qui porte une shadda.",
+      "explain": "Devant l'une des 14 lettres solaires, le lam de l'article « al » n'est pas prononcé : il est assimilé (idghâm) dans la lettre suivante, qui est alors doublée (shadda). Exemple : ٱلشَّمْسِ se lit « ash-shams ».",
+      "lesson": "m05-l2"
+    },
+    "silent": {
+      "fr": "Lettre non prononcée",
+      "ar": "حَرْفٌ لَا يُنْطَق", "tr": "ḥarf lā yunṭaq",
+      "color": "#8f949b", "dark": "#9ba1a8",
+      "short": "Lettre écrite mais non prononcée (souvent marquée d'un petit zéro).",
+      "explain": "Certaines lettres sont écrites dans le mushaf mais ne se prononcent pas : par exemple l'alif après le waw du pluriel (قَالُوا۟) ou les lettres marquées du petit cercle ۟. Le petit rectangle ۠ (comme dans أَنَا۠) signale une lettre prononcée seulement à l'arrêt.",
+      "lesson": "m00-l5"
+    },
+    "madd_2": {
+      "fr": "Madd de 2 temps",
+      "ar": "مَدٌّ بِمِقْدَارِ حَرَكَتَيْن", "tr": "madd ḥarakatayn",
+      "color": "#c08a1e", "dark": "#e0b04a",
+      "short": "Prolongation de 2 temps, signalée par une petite lettre (alif suscrit ٰ, petit waw ۥ, petit ya ۦ).",
+      "explain": "Prolongation naturelle de 2 temps (ḥarakatayn). Dans la coloration automatique, elle est surtout signalée sur les petites lettres de prolongation : alif suscrit (ٰ), petit waw (ۥ) et petit ya (ۦ) de la ṣila. Les madds naturels écrits avec une lettre pleine (ا و ي) ne sont pas colorés, mais se prolongent aussi de 2 temps.",
+      "duree": "2 temps",
+      "lesson": "m07-l1"
+    },
+    "madd_246": {
+      "fr": "Madd à l'arrêt (2, 4 ou 6)",
+      "ar": "مَدٌّ عَارِضٌ لِلسُّكُون / مَدُّ اللِّين", "tr": "madd ʿāriḍ lis-sukūn / madd al-līn",
+      "color": "#e07a10", "dark": "#f59a3b",
+      "short": "Si l'on s'arrête ici, la prolongation peut durer 2, 4 ou 6 temps.",
+      "explain": "Une lettre de prolongation (ou de līn) suivie d'une lettre qui devient sâkina parce qu'on s'arrête dessus : c'est le madd ʿāriḍ lis-sukūn (ou le madd al-līn). On peut prolonger de 2, 4 ou 6 temps, en restant constant. Si l'on enchaîne sans s'arrêter, c'est un madd naturel de 2 temps (ou pas de madd pour le līn).",
+      "duree": "2, 4 ou 6 temps à l'arrêt",
+      "lesson": "m07-l4"
+    },
+    "madd_munfasil": {
+      "fr": "Madd séparé (munfaṣil)",
+      "ar": "المَدُّ الجَائِزُ المُنْفَصِل", "tr": "al-madd al-jāʾiz al-munfaṣil",
+      "color": "#d43a3a", "dark": "#f07070",
+      "short": "Lettre de madd en fin de mot, hamza au début du mot suivant : 4 ou 5 temps.",
+      "explain": "La lettre de prolongation termine un mot et une hamza commence le mot suivant (ex. يَٰٓأَيُّهَا, فِىٓ أَنفُسِكُمْ). Pour Ḥafṣ par la voie de ash-Shāṭibiyya : 4 ou 5 temps, de façon constante dans toute la lecture.",
+      "duree": "4 ou 5 temps",
+      "lesson": "m07-l3"
+    },
+    "madd_muttasil": {
+      "fr": "Madd lié (muttaṣil)",
+      "ar": "المَدُّ الوَاجِبُ المُتَّصِل", "tr": "al-madd al-wājib al-muttaṣil",
+      "color": "#b0182e", "dark": "#ff5a74",
+      "short": "Lettre de madd puis hamza dans le même mot : 4 ou 5 temps (6 possible à l'arrêt si la hamza est finale).",
+      "explain": "La lettre de prolongation et la hamza sont dans le même mot (ex. جَآءَ, ٱلسَّمَآءِ). Obligatoire : 4 ou 5 temps pour Ḥafṣ par ash-Shāṭibiyya. Si l'on s'arrête sur un mot qui finit par cette hamza, 6 temps sont aussi permis.",
+      "duree": "4 ou 5 temps (6 à l'arrêt sur hamza finale)",
+      "lesson": "m07-l3"
+    },
+    "madd_6": {
+      "fr": "Madd obligatoire (lâzim)",
+      "ar": "المَدُّ اللَّازِم", "tr": "al-madd al-lāzim",
+      "color": "#7a0f22", "dark": "#ff8fa3",
+      "short": "Lettre de madd suivie d'un sukûn ou d'une shadda permanents : 6 temps.",
+      "explain": "La lettre de prolongation est suivie d'une lettre sâkina de façon permanente (souvent une shadda), dans un mot (ٱلضَّآلِّينَ) ou dans les lettres isolées du début de certaines sourates (الٓمٓ). Toujours 6 temps.",
+      "duree": "6 temps",
+      "lesson": "m07-l5"
+    },
+    "ghunnah": {
+      "fr": "Ghunna (nûn/mîm avec shadda)",
+      "ar": "غُنَّة", "tr": "ghunna",
+      "color": "#e8660c", "dark": "#ff9447",
+      "short": "Nûn ou mîm avec shadda : nasalisation pleine de 2 temps.",
+      "explain": "Le nûn mushaddad (نّ) et le mîm mushaddad (مّ) se lisent avec une ghunna complète : un son nasal qui passe par le nez, tenu environ 2 temps.",
+      "duree": "≈ 2 temps",
+      "lesson": "m04-l3"
+    },
+    "ikhfa": {
+      "fr": "Ikhfâ' (dissimulation)",
+      "ar": "إِخْفَاء", "tr": "ikhfāʾ",
+      "color": "#8e2aa6", "dark": "#d48cf0",
+      "short": "Nûn sâkin ou tanwîn devant une des 15 lettres : son « caché » avec ghunna.",
+      "explain": "Le nûn sâkin ou le tanwîn devant l'une des 15 lettres de l'ikhfâ' n'est ni prononcé clairement, ni fusionné : on le « cache » en gardant une ghunna d'environ 2 temps, la langue se préparant déjà à la lettre suivante.",
+      "duree": "ghunna ≈ 2 temps",
+      "lesson": "m03-l4"
+    },
+    "ikhfa_shafawi": {
+      "fr": "Ikhfâ' labial (shafawî)",
+      "ar": "إِخْفَاءٌ شَفَوِيّ", "tr": "ikhfāʾ shafawī",
+      "color": "#c23aa8", "dark": "#f08ad8",
+      "short": "Mîm sâkin devant ب : lèvres jointes légèrement, avec ghunna.",
+      "explain": "Le mîm sâkin suivi d'un bâ' (ب) est « caché » : les lèvres se ferment en douceur, avec une ghunna d'environ 2 temps, puis on passe au bâ'.",
+      "duree": "ghunna ≈ 2 temps",
+      "lesson": "m04-l1"
+    },
+    "idghaam_ghunnah": {
+      "fr": "Idghâm avec ghunna",
+      "ar": "إِدْغَامٌ بِغُنَّة", "tr": "idghām bi-ghunna",
+      "color": "#14806a", "dark": "#3fd1b0",
+      "short": "Nûn sâkin ou tanwîn fusionné dans ي ن م و, avec ghunna.",
+      "explain": "Le nûn sâkin ou le tanwîn, en fin de mot, se fond dans la première lettre du mot suivant si c'est ي, ن, م ou و, en gardant la ghunna (≈ 2 temps).",
+      "duree": "ghunna ≈ 2 temps",
+      "lesson": "m03-l2"
+    },
+    "idghaam_no_ghunnah": {
+      "fr": "Idghâm sans ghunna",
+      "ar": "إِدْغَامٌ بِغَيْرِ غُنَّة", "tr": "idghām bi-ghayri ghunna",
+      "color": "#2f8a1a", "dark": "#7fd65a",
+      "short": "Nûn sâkin ou tanwîn fusionné complètement dans ل ou ر, sans ghunna.",
+      "explain": "Devant ل ou ر (au début du mot suivant), le nûn sâkin ou le tanwîn disparaît complètement dans la lettre suivante, sans nasalisation.",
+      "lesson": "m03-l2"
+    },
+    "idghaam_shafawi": {
+      "fr": "Idghâm labial (shafawî)",
+      "ar": "إِدْغَامٌ شَفَوِيّ", "tr": "idghām shafawī",
+      "color": "#4f9a00", "dark": "#9be04a",
+      "short": "Mîm sâkin devant un autre mîm : fusion avec ghunna.",
+      "explain": "Le mîm sâkin suivi d'un mîm se fond dans celui-ci : on prononce un seul mîm doublé, avec une ghunna d'environ 2 temps (aussi appelé idghâm mithlayn ṣaghîr).",
+      "duree": "ghunna ≈ 2 temps",
+      "lesson": "m04-l1"
+    },
+    "iqlab": {
+      "fr": "Iqlâb (conversion)",
+      "ar": "إِقْلَاب", "tr": "iqlāb",
+      "color": "#1a8fd0", "dark": "#5cc4ff",
+      "short": "Nûn sâkin ou tanwîn devant ب : devient un mîm caché, avec ghunna.",
+      "explain": "Devant un bâ' (ب), le nûn sâkin ou le tanwîn se transforme en mîm (le mushaf l'indique par un petit mîm ۢ), prononcé caché avec une ghunna d'environ 2 temps.",
+      "duree": "ghunna ≈ 2 temps",
+      "lesson": "m03-l3"
+    },
+    "idghaam_mutajanisayn": {
+      "fr": "Idghâm de lettres de même point",
+      "ar": "إِدْغَامُ المُتَجَانِسَيْن", "tr": "idghām al-mutajānisayn",
+      "color": "#6b7280", "dark": "#a3abb7",
+      "short": "Deux lettres du même point d'articulation : la première se fond dans la seconde.",
+      "explain": "Une lettre sâkina suivie d'une lettre qui sort du même point d'articulation mais de caractéristiques différentes (ex. ت puis ط, د puis ت, ذ puis ظ, ب puis م). La première se fond dans la seconde.",
+      "lesson": "m08-l4"
+    },
+    "idghaam_mutaqaribayn": {
+      "fr": "Idghâm de lettres proches",
+      "ar": "إِدْغَامُ المُتَقَارِبَيْن", "tr": "idghām al-mutaqāribayn",
+      "color": "#6b7280", "dark": "#a3abb7",
+      "short": "Deux lettres proches (ل→ر, ق→ك) : la première se fond dans la seconde.",
+      "explain": "Une lettre sâkina suivie d'une lettre au point d'articulation proche : par exemple le lam dans le ra (قُل رَّبِّ) ou le qâf dans le kâf (نَخْلُقكُّم).",
+      "lesson": "m08-l4"
+    },
+    "qalqalah": {
+      "fr": "Qalqala (rebond)",
+      "ar": "قَلْقَلَة", "tr": "qalqala",
+      "color": "#d0021b", "dark": "#ff6b6b",
+      "short": "ق ط ب ج د sans voyelle : léger rebond sonore.",
+      "explain": "Les lettres ق ط ب ج د, quand elles sont sâkina (ou qu'on s'arrête dessus), produisent un petit rebond sonore. Le rebond est plus fort à l'arrêt en fin de mot.",
+      "lesson": "m06-l1"
+    }
+  }
+}

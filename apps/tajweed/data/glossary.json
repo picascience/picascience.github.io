@@ -1,0 +1,352 @@
+[
+{
+"ar": "تَجْوِيد",
+"tr": "tajwîd",
+"fr": "Tajweed",
+"def": "« Rendre bien » : l'art de réciter le Coran en donnant à chaque lettre son droit (makhraj, ṣifât) et ses règles.",
+"lesson": "m00-l1"
+},
+{
+"ar": "تَلَقِّي",
+"tr": "talaqqî",
+"fr": "Apprentissage oral",
+"def": "Recevoir la récitation de la bouche d'un enseignant qualifié et la lui réciter. Indispensable : l'appli ne le remplace pas.",
+"lesson": null
+},
+{
+"ar": "رِوَايَة",
+"tr": "riwâya",
+"fr": "Transmission",
+"def": "Version transmise d'une lecture : ici la riwâya de Ḥafṣ ʿan ʿÂṣim.",
+"lesson": null
+},
+{
+"ar": "طَرِيق",
+"tr": "ṭarîq",
+"fr": "Voie",
+"def": "Chaîne de transmission à l'intérieur d'une riwâya : ici la voie de ash-Shâṭibiyya.",
+"lesson": null
+},
+{
+"ar": "حَرَكَة",
+"tr": "ḥaraka",
+"fr": "Voyelle / temps",
+"def": "Voyelle brève (fatḥa, kasra, ḍamma) ; aussi l'unité de durée des madds.",
+"lesson": "m00-l3"
+},
+{
+"ar": "فَتْحَة",
+"tr": "fatḥa",
+"fr": "Voyelle « a »",
+"def": "Petit trait au-dessus de la lettre.",
+"lesson": "m00-l3"
+},
+{
+"ar": "كَسْرَة",
+"tr": "kasra",
+"fr": "Voyelle « i »",
+"def": "Petit trait sous la lettre.",
+"lesson": "m00-l3"
+},
+{
+"ar": "ضَمَّة",
+"tr": "ḍamma",
+"fr": "Voyelle « ou »",
+"def": "Petite boucle au-dessus de la lettre.",
+"lesson": "m00-l3"
+},
+{
+"ar": "سُكُون",
+"tr": "sukûn",
+"fr": "Absence de voyelle",
+"def": "Signe indiquant qu'une lettre n'a pas de voyelle (lettre sâkina).",
+"lesson": "m00-l3"
+},
+{
+"ar": "شَدَّة",
+"tr": "shadda",
+"fr": "Doublement",
+"def": "Signe qui double la lettre (mushaddada).",
+"lesson": "m00-l4"
+},
+{
+"ar": "تَنْوِين",
+"tr": "tanwîn",
+"fr": "Nunation",
+"def": "Voyelle doublée en fin de nom : an / in / oun ; c'est un nûn sâkin non écrit.",
+"lesson": "m00-l4"
+},
+{
+"ar": "هَمْزَةُ الوَصْل",
+"tr": "hamzat al-waṣl",
+"fr": "Hamza de liaison",
+"def": "ٱ : prononcée seulement si l'on commence par le mot.",
+"lesson": "m00-l6"
+},
+{
+"ar": "هَمْزَةُ القَطْع",
+"tr": "hamzat al-qaṭʿ",
+"fr": "Hamza de coupure",
+"def": "أ / إ / ء : toujours prononcée.",
+"lesson": "m00-l6"
+},
+{
+"ar": "مَخْرَج",
+"tr": "makhraj",
+"fr": "Point de sortie",
+"def": "Lieu d'où sort une lettre. 17 points, 5 zones.",
+"lesson": "m01-l1"
+},
+{
+"ar": "جَوْف",
+"tr": "jawf",
+"fr": "Cavité",
+"def": "Vide de la bouche et de la gorge, d'où sortent les lettres de madd.",
+"lesson": "m01-l1"
+},
+{
+"ar": "حَلْق",
+"tr": "ḥalq",
+"fr": "Gorge",
+"def": "Zone de 6 lettres : ء ه ع ح غ خ.",
+"lesson": "m01-l2"
+},
+{
+"ar": "لِسَان",
+"tr": "lisân",
+"fr": "Langue",
+"def": "Zone de 10 points et 18 lettres.",
+"lesson": "m01-l3"
+},
+{
+"ar": "شَفَتَان",
+"tr": "shafatân",
+"fr": "Lèvres",
+"def": "Zone de ف ب م و.",
+"lesson": "m01-l5"
+},
+{
+"ar": "خَيْشُوم",
+"tr": "khayshûm",
+"fr": "Cavité nasale",
+"def": "Lieu de sortie de la ghunna.",
+"lesson": "m01-l5"
+},
+{
+"ar": "صِفَة",
+"tr": "ṣifa",
+"fr": "Caractéristique",
+"def": "Manière dont une lettre sonne (souffle, force, épaisseur…).",
+"lesson": "m02-l1"
+},
+{
+"ar": "هَمْس",
+"tr": "hams",
+"fr": "Souffle",
+"def": "Le souffle coule avec la lettre : فحثه شخص سكت.",
+"lesson": "m02-l1"
+},
+{
+"ar": "جَهْر",
+"tr": "jahr",
+"fr": "Voix affirmée",
+"def": "Le souffle est retenu.",
+"lesson": "m02-l1"
+},
+{
+"ar": "شِدَّة",
+"tr": "shidda",
+"fr": "Blocage",
+"def": "Le son est bloqué : أجد قط بكت.",
+"lesson": "m02-l1"
+},
+{
+"ar": "رَخَاوَة",
+"tr": "rakhâwa",
+"fr": "Fluidité",
+"def": "Le son coule librement.",
+"lesson": "m02-l1"
+},
+{
+"ar": "اسْتِعْلَاء",
+"tr": "istiʿlâʾ",
+"fr": "Élévation",
+"def": "L'arrière de la langue monte : lettres épaisses خص ضغط قظ.",
+"lesson": "m02-l2"
+},
+{
+"ar": "إِطْبَاق",
+"tr": "iṭbâq",
+"fr": "Recouvrement",
+"def": "La langue se plaque au palais : ص ض ط ظ.",
+"lesson": "m02-l2"
+},
+{
+"ar": "تَفْخِيم",
+"tr": "tafkhîm",
+"fr": "Épaississement",
+"def": "Prononcer une lettre épaisse, son grave.",
+"lesson": "m02-l4"
+},
+{
+"ar": "تَرْقِيق",
+"tr": "tarqîq",
+"fr": "Allègement",
+"def": "Prononcer une lettre légère, son clair.",
+"lesson": "m02-l4"
+},
+{
+"ar": "إِظْهَار",
+"tr": "iẓhâr / idh-hâr",
+"fr": "Clarté",
+"def": "Prononcer nettement le nûn ou le mîm sâkin.",
+"lesson": "m03-l1"
+},
+{
+"ar": "إِدْغَام",
+"tr": "idghâm",
+"fr": "Fusion",
+"def": "Faire entrer une lettre sâkina dans la suivante.",
+"lesson": "m03-l2"
+},
+{
+"ar": "إِقْلَاب",
+"tr": "iqlâb",
+"fr": "Conversion",
+"def": "Nûn sâkin / tanwîn devant ب → mîm caché.",
+"lesson": "m03-l3"
+},
+{
+"ar": "إِخْفَاء",
+"tr": "ikhfâʾ",
+"fr": "Dissimulation",
+"def": "Nûn sâkin / tanwîn caché avec ghunna devant 15 lettres.",
+"lesson": "m03-l4"
+},
+{
+"ar": "غُنَّة",
+"tr": "ghunna",
+"fr": "Nasalisation",
+"def": "Son nasal du nûn et du mîm (≈2 temps quand elle est allongée).",
+"lesson": "m04-l3"
+},
+{
+"ar": "قَلْقَلَة",
+"tr": "qalqala",
+"fr": "Rebond",
+"def": "Rebond sonore de ق ط ب ج د sâkina.",
+"lesson": "m06-l1"
+},
+{
+"ar": "مَدّ",
+"tr": "madd",
+"fr": "Prolongation",
+"def": "Allonger le son d'une lettre de madd (ا و ي).",
+"lesson": "m07-l1"
+},
+{
+"ar": "مُتَّصِل",
+"tr": "muttaṣil",
+"fr": "Lié",
+"def": "Madd + hamza dans le même mot : 4 ou 5 temps.",
+"lesson": "m07-l3"
+},
+{
+"ar": "مُنْفَصِل",
+"tr": "munfaṣil",
+"fr": "Séparé",
+"def": "Madd en fin de mot + hamza au mot suivant : 4 ou 5 temps.",
+"lesson": "m07-l3"
+},
+{
+"ar": "لَازِم",
+"tr": "lâzim",
+"fr": "Obligatoire",
+"def": "Madd suivi d'un sukûn permanent : 6 temps.",
+"lesson": "m07-l5"
+},
+{
+"ar": "عَارِض لِلسُّكُون",
+"tr": "ʿâriḍ lis-sukûn",
+"fr": "Dû à l'arrêt",
+"def": "Madd suivi d'un sukûn d'arrêt : 2, 4 ou 6.",
+"lesson": "m07-l4"
+},
+{
+"ar": "لِين",
+"tr": "lîn",
+"fr": "Souplesse",
+"def": "و / ي sâkin après fatḥa.",
+"lesson": "m07-l4"
+},
+{
+"ar": "بَدَل",
+"tr": "badal",
+"fr": "Substitution",
+"def": "Hamza puis lettre de madd : 2 temps pour Ḥafṣ.",
+"lesson": "m07-l2"
+},
+{
+"ar": "صِلَة",
+"tr": "ṣila",
+"fr": "Liaison",
+"def": "Prolongation du hâʾ du pronom entre deux voyelles.",
+"lesson": "m07-l2"
+},
+{
+"ar": "إِشْمَام",
+"tr": "ishmâm",
+"fr": "Arrondi des lèvres",
+"def": "Arrondir les lèvres sans prononcer de ḍamma (تأمنّا, 12:11).",
+"lesson": "m08-l1"
+},
+{
+"ar": "إِمَالَة",
+"tr": "imâla",
+"fr": "Inclinaison",
+"def": "Fatḥa inclinée vers la kasra (مجريها, 11:41).",
+"lesson": "m08-l1"
+},
+{
+"ar": "تَسْهِيل",
+"tr": "tashîl",
+"fr": "Adoucissement",
+"def": "Hamza prononcée entre hamza et alif (ءأعجمي, 41:44).",
+"lesson": "m08-l1"
+},
+{
+"ar": "سَكْتَة",
+"tr": "sakta",
+"fr": "Pause brève",
+"def": "Couper le son ~2 temps sans respirer (4 endroits obligatoires pour Ḥafṣ).",
+"lesson": "m08-l2"
+},
+{
+"ar": "وَقْف",
+"tr": "waqf",
+"fr": "Arrêt",
+"def": "Couper la voix et reprendre son souffle.",
+"lesson": "m09-l1"
+},
+{
+"ar": "ابْتِدَاء",
+"tr": "ibtidâʾ",
+"fr": "Reprise",
+"def": "Reprendre la lecture après un arrêt.",
+"lesson": "m09-l4"
+},
+{
+"ar": "رَوْم",
+"tr": "rawm",
+"fr": "Voyelle effleurée",
+"def": "À l'arrêt, prononcer brièvement une partie de la voyelle finale.",
+"lesson": "m09-l3"
+},
+{
+"ar": "مُصْحَف",
+"tr": "muṣḥaf",
+"fr": "Exemplaire écrit du Coran",
+"def": "Ici le mushaf de Médine (Complexe du roi Fahd).",
+"lesson": null
+}
+]

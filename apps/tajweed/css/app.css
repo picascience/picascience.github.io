@@ -1,0 +1,248 @@
+@font-face { font-family: "AmiriQuran"; src: url("../fonts/amiri-quran.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Amiri"; src: url("../fonts/amiri.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Amiri"; src: url("../fonts/amiri-bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+
+:root {
+  --bg: #f6f2e7; --surface: #fffdf8; --surface2: #f0ebdc; --line: #e2dac4;
+  --text: #1b2420; --muted: #5f6b63; --faint: #8c958e;
+  --green: #0b3d2e; --green2: #14614a; --greenSoft: #e3efe8;
+  --gold: #a87a1f; --goldSoft: #f5ead0; --gold2: #d6ad55;
+  --ok: #1d7a46; --okSoft: #def3e5; --bad: #b42323; --badSoft: #fbe3e1;
+  --focus: #e8b93a;
+  --radius: 16px; --shadow: 0 1px 2px rgba(20,30,25,.06), 0 6px 18px rgba(20,30,25,.06);
+  --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px);
+  --tabbar-h: 62px;
+  --ar-size: 30px;
+}
+[data-theme="dark"] {
+  --bg: #0a110e; --surface: #111b17; --surface2: #17241f; --line: #23332c;
+  --text: #e8ece6; --muted: #a2ada6; --faint: #75817a;
+  --green: #4fb38b; --green2: #6bc9a1; --greenSoft: #15302a;
+  --gold: #d8b25c; --goldSoft: #2b2615; --gold2: #e6c477;
+  --ok: #5fd08f; --okSoft: #143223; --bad: #ff7b72; --badSoft: #3a1715;
+  --shadow: 0 1px 2px rgba(0,0,0,.3);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body {
+  font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh; overscroll-behavior-y: none;
+}
+button { font: inherit; color: inherit; }
+a { color: var(--green2); }
+h1, h2, h3 { line-height: 1.25; margin: 0 0 .4em; }
+h1 { font-size: 1.5rem; } h2 { font-size: 1.2rem; } h3 { font-size: 1.05rem; }
+p { margin: .5em 0; }
+
+/* ---------- barres ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 6px;
+  padding: calc(var(--safe-t) + 6px) 10px 6px; min-height: 52px;
+  background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-title { flex: 1; font-weight: 700; font-size: 1.02rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 4px; }
+.iconbtn { width: 40px; height: 40px; border: 0; background: transparent; border-radius: 12px; display: grid; place-items: center; cursor: pointer; color: var(--text); flex: none; }
+.iconbtn:active { background: var(--surface2); }
+.iconbtn svg { width: 24px; height: 24px; }
+.legend-btn { background: var(--surface); border: 1px solid var(--line); }
+
+#view { padding: 14px 14px calc(var(--tabbar-h) + var(--safe-b) + 44px); max-width: 720px; margin: 0 auto; outline: none; }
+
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; display: flex; justify-content: space-around;
+  padding: 6px 4px calc(var(--safe-b) + 34px);
+  background: color-mix(in srgb, var(--surface) 94%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--line);
+}
+.tabbar a { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: var(--faint); font-size: 11px; font-weight: 600; padding: 4px 0; }
+.tabbar a svg { width: 24px; height: 24px; }
+.tabbar a.active { color: var(--green); }
+.badge { position: absolute; top: 0; left: calc(50% + 6px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--gold); color: #fff; font-size: 11px; line-height: 18px; text-align: center; }
+body.immersive .tabbar { display: none; }
+body.immersive #view { padding-bottom: calc(var(--safe-b) + 120px); }
+
+/* ---------- cartes ---------- */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin: 0 0 12px; box-shadow: var(--shadow); }
+.card.flat { box-shadow: none; }
+.muted { color: var(--muted); } .faint { color: var(--faint); } .small { font-size: .88rem; }
+.row { display: flex; align-items: center; gap: 10px; }
+.grow { flex: 1; min-width: 0; }
+.stack > * + * { margin-top: 10px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 99px; background: var(--surface2); font-size: .82rem; font-weight: 600; color: var(--muted); }
+.pill.gold { background: var(--goldSoft); color: var(--gold); }
+.pill.green { background: var(--greenSoft); color: var(--green2); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); font-weight: 700; cursor: pointer; text-decoration: none; color: var(--text); }
+.btn.primary { background: var(--green); border-color: var(--green); color: #fff; }
+[data-theme="dark"] .btn.primary { color: #06140f; }
+.btn.gold { background: var(--gold); border-color: var(--gold); color: #fff; }
+.btn.block { width: 100%; }
+.btn:disabled { opacity: .45; }
+.btn:active:not(:disabled) { transform: scale(.985); }
+.btn svg { width: 20px; height: 20px; }
+.btnrow { display: flex; gap: 10px; } .btnrow > * { flex: 1; }
+
+/* ---------- accueil ---------- */
+.hero { background: linear-gradient(135deg, #062a1f, #0b3d2e 55%, #155c45); color: #f4efe0; border: 0; position: relative; overflow: hidden; }
+.hero::after { content: ""; position: absolute; right: -40px; top: -40px; width: 180px; height: 180px; opacity: .12;
+  background: conic-gradient(from 22.5deg, #d6ad55 0 12.5%, transparent 0 25%, #d6ad55 0 37.5%, transparent 0 50%, #d6ad55 0 62.5%, transparent 0 75%, #d6ad55 0 87.5%, transparent 0); border-radius: 50%; }
+.hero h1 { color: #fff; }
+.hero .muted { color: #c9d6cd; }
+.hero .btn { background: #d6ad55; border-color: #d6ad55; color: #1d1606; }
+.streak { display: flex; gap: 14px; margin: 10px 0 14px; }
+.streak div { background: rgba(255,255,255,.08); border-radius: 12px; padding: 8px 12px; flex: 1; }
+.streak b { display: block; font-size: 1.3rem; color: #f6d98a; }
+.streak span { font-size: .78rem; color: #c9d6cd; }
+
+.module { display: flex; gap: 12px; align-items: center; text-decoration: none; color: inherit; }
+.module .num { width: 46px; height: 46px; flex: none; border-radius: 14px; display: grid; place-items: center; font-weight: 800; font-size: 1.1rem; background: var(--greenSoft); color: var(--green2); }
+.module.locked { opacity: .55; }
+.module.locked .num { background: var(--surface2); color: var(--faint); }
+.module.passed .num { background: var(--green); color: #fff; }
+[data-theme="dark"] .module.passed .num { color: #06140f; }
+.module .t { font-weight: 700; }
+.module .ar { font-family: Amiri, serif; font-size: 1.1rem; color: var(--gold); direction: rtl; }
+.bar { height: 6px; border-radius: 3px; background: var(--surface2); overflow: hidden; margin-top: 6px; }
+.bar i { display: block; height: 100%; background: var(--gold); border-radius: 3px; }
+
+.lessonitem { display: flex; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); text-decoration: none; color: inherit; }
+.lessonitem:first-child { border-top: 0; }
+.lessonitem .dot { width: 30px; height: 30px; flex: none; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: .8rem; font-weight: 700; color: var(--faint); }
+.lessonitem.done .dot { background: var(--green); border-color: var(--green); color: #fff; }
+.lessonitem.locked { opacity: .5; pointer-events: none; }
+
+/* ---------- texte arabe ---------- */
+.ar, [lang="ar"] { direction: rtl; unicode-bidi: isolate; }
+.term-ar { font-family: Amiri, "AmiriQuran", serif; font-size: 1.25em; color: var(--gold); font-weight: 700; }
+.tr { font-style: italic; color: var(--muted); }
+.quran {
+  font-family: "AmiriQuran", Amiri, serif; font-size: var(--ar-size); line-height: 2.25; direction: rtl; text-align: right;
+  word-spacing: .06em; color: var(--text);
+}
+.quran .w { border-radius: 8px; padding: 0 1px; cursor: pointer; transition: background .15s; }
+.quran .w:active { background: var(--surface2); }
+.quran .w.sel { background: var(--goldSoft); outline: 2px solid var(--gold2); }
+.quran .w.focus { background: var(--goldSoft); box-shadow: inset 0 -3px 0 var(--gold2); }
+.quran .w.good { background: var(--okSoft); outline: 2px solid var(--ok); }
+.quran .w.miss { background: var(--goldSoft); outline: 2px dashed var(--gold); }
+.quran .w.wrong { background: var(--badSoft); outline: 2px solid var(--bad); }
+.quran .vnum { font-family: "AmiriQuran", serif; color: var(--gold); font-size: .85em; padding: 0 4px; }
+.quran .waqf { color: var(--gold); }
+.basmala { text-align: center; font-family: "AmiriQuran", serif; font-size: calc(var(--ar-size) * .9); color: var(--green2); margin: 4px 0 10px; direction: rtl; }
+.letters { font-family: Amiri, serif; font-size: 2rem; direction: rtl; line-height: 1.9; }
+.bigar { font-family: "AmiriQuran", Amiri, serif; font-size: 3.2rem; line-height: 1.7; text-align: center; direction: rtl; }
+
+.verse-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 14px 8px; margin: 10px 0; }
+.verse-head { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--muted); font-weight: 600; }
+.verse-note { font-size: .9rem; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 6px; margin-top: 2px; }
+.playbtn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--greenSoft); color: var(--green2); display: grid; place-items: center; cursor: pointer; flex: none; }
+.playbtn svg { width: 18px; height: 18px; }
+.playbtn.playing { background: var(--green); color: #fff; }
+
+/* ---------- blocs de leçon ---------- */
+.lesson h2 { margin-top: 18px; }
+.lesson .lead { font-size: 1.05rem; }
+.term { display: flex; flex-direction: column; gap: 2px; background: var(--goldSoft); border-radius: 12px; padding: 10px 12px; margin: 10px 0; }
+.term .term-ar { font-size: 1.4em; }
+.callout { border-left: 4px solid var(--green2); background: var(--greenSoft); padding: 10px 12px; border-radius: 0 12px 12px 0; margin: 10px 0; }
+.doubt { border-left: 4px solid var(--gold); background: var(--goldSoft); padding: 10px 12px; border-radius: 0 12px 12px 0; margin: 10px 0; font-size: .93rem; }
+.doubt b { color: var(--gold); }
+table.t { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: .92rem; }
+table.t th, table.t td { border-bottom: 1px solid var(--line); padding: 8px 6px; text-align: left; vertical-align: top; }
+table.t th { color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; }
+table.t td.arc { font-family: Amiri, serif; font-size: 1.35rem; direction: rtl; text-align: right; color: var(--text); white-space: nowrap; }
+.lettergrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; margin: 10px 0; }
+.lettergrid.wide { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.lettergrid .lt { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 6px 4px 8px; text-align: center; }
+.lettergrid .lt .l { font-family: Amiri, serif; font-size: 2.1rem; line-height: 1.6; color: var(--green2); }
+.lettergrid .lt .n { font-size: .8rem; font-weight: 700; }
+.lettergrid .lt .x { font-size: .72rem; color: var(--muted); line-height: 1.25; }
+.forms { display: flex; justify-content: space-between; direction: rtl; font-family: Amiri, serif; font-size: 1.7rem; margin-top: 2px; }
+.forms span { flex: 1; text-align: center; }
+.formslabel { display: flex; justify-content: space-between; direction: rtl; font-size: .66rem; color: var(--faint); }
+.formslabel span { flex: 1; text-align: center; }
+
+.steps { display: flex; gap: 4px; margin: 0 0 12px; }
+.steps i { flex: 1; height: 5px; border-radius: 3px; background: var(--surface2); }
+.steps i.on { background: var(--gold); }
+.steps i.ok { background: var(--ok); }
+.steps i.ko { background: var(--bad); }
+
+/* ---------- exercices ---------- */
+.ex-q { font-weight: 700; font-size: 1.05rem; margin: 4px 0 12px; }
+.choices { display: grid; gap: 10px; }
+.choice { text-align: left; min-height: 52px; padding: 12px 14px; border-radius: 14px; border: 2px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 600; }
+.choice .ar-in { font-family: Amiri, "AmiriQuran", serif; font-size: 1.45rem; }
+.choice.picked { border-color: var(--gold2); background: var(--goldSoft); }
+.choice.right { border-color: var(--ok); background: var(--okSoft); }
+.choice.wrong { border-color: var(--bad); background: var(--badSoft); }
+.choice:disabled { cursor: default; }
+.feedback { border-radius: 14px; padding: 12px 14px; margin: 14px 0 8px; }
+.feedback.ok { background: var(--okSoft); } .feedback.ko { background: var(--badSoft); }
+.feedback b.h { display: block; margin-bottom: 4px; }
+.feedback.ok b.h { color: var(--ok); } .feedback.ko b.h { color: var(--bad); }
+
+.match { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.match .col { display: grid; gap: 8px; align-content: start; }
+.mitem { min-height: 54px; padding: 8px 10px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 600; font-size: .92rem; text-align: center; }
+.mitem.arx { font-family: Amiri, "AmiriQuran", serif; font-size: 1.4rem; font-weight: 400; }
+.mitem.picked { border-color: var(--gold2); background: var(--goldSoft); }
+.mitem.done { border-color: var(--ok); background: var(--okSoft); opacity: .7; cursor: default; }
+.mitem.shake { animation: shake .3s; border-color: var(--bad); }
+@keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+.order-target { min-height: 60px; border: 2px dashed var(--line); border-radius: 14px; padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.order-pool { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { padding: 10px 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); font-weight: 600; cursor: pointer; }
+.chip.arx { font-family: Amiri, serif; font-size: 1.3rem; font-weight: 400; }
+.chip.right { border-color: var(--ok); background: var(--okSoft); }
+.chip.wrong { border-color: var(--bad); background: var(--badSoft); }
+
+.result { text-align: center; padding: 20px 10px; }
+.result .score { font-size: 3rem; font-weight: 800; color: var(--green2); }
+.result.fail .score { color: var(--bad); }
+.recap { background: var(--surface); border: 2px solid var(--gold2); border-radius: var(--radius); padding: 14px 16px; }
+.recap h3 { color: var(--gold); }
+.recap ul { margin: 6px 0; padding-left: 20px; }
+.recap li { margin: 4px 0; }
+
+/* ---------- feuille du bas ---------- */
+.sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 40; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 41; max-height: 82vh; overflow-y: auto; background: var(--surface);
+  border-radius: 22px 22px 0 0; padding: 8px 18px calc(var(--safe-b) + 40px); box-shadow: 0 -10px 30px rgba(0,0,0,.2); max-width: 720px; margin: 0 auto;
+  animation: up .22s ease-out; }
+@keyframes up { from { transform: translateY(40px); opacity: .5; } }
+.sheet-grip { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 4px auto 12px; }
+.legend-item { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.legend-item .sw { width: 18px; height: 18px; border-radius: 5px; flex: none; margin-top: 3px; }
+.legend-item .ln { font-weight: 700; }
+.legend-fam { margin: 14px 0 2px; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+
+.toast { position: fixed; left: 50%; bottom: calc(var(--tabbar-h) + var(--safe-b) + 50px); transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 12px; z-index: 60; font-weight: 600; font-size: .9rem; max-width: 90vw; }
+
+/* ---------- lecture ---------- */
+.search { width: 100%; height: 46px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); padding: 0 14px; font: inherit; color: var(--text); }
+.surahlist a { display: flex; gap: 12px; align-items: center; padding: 10px 2px; border-bottom: 1px solid var(--line); text-decoration: none; color: inherit; }
+.surahlist .sn { width: 36px; height: 36px; border-radius: 10px; background: var(--greenSoft); color: var(--green2); display: grid; place-items: center; font-weight: 700; font-size: .85rem; flex: none; }
+.surahlist .sa { font-family: Amiri, serif; font-size: 1.3rem; color: var(--gold); }
+.verse-line { padding: 8px 0; border-bottom: 1px solid var(--line); }
+.verse-line.cur { background: var(--goldSoft); border-radius: 10px; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+select.sel { height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); padding: 0 10px; font: inherit; font-size: .9rem; max-width: 100%; }
+.seg { display: inline-flex; background: var(--surface2); border-radius: 12px; padding: 3px; }
+.seg button { border: 0; background: transparent; padding: 7px 12px; border-radius: 9px; font-weight: 600; font-size: .85rem; cursor: pointer; color: var(--muted); }
+.seg button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.ruleline { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--line); }
+.ruleline .sw { width: 14px; height: 14px; border-radius: 4px; margin-top: 5px; flex: none; }
+
+.gloss-item { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.gloss-item .h { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.statgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.stat b { display: block; font-size: 1.5rem; color: var(--green2); }
+.stat span { font-size: .8rem; color: var(--muted); }
+.warn { background: var(--goldSoft); border: 1px solid var(--gold2); border-radius: 14px; padding: 12px 14px; font-size: .92rem; }
+.empty { text-align: center; color: var(--muted); padding: 30px 10px; }
+.kbd-ar { font-family: Amiri, serif; font-size: 1.15em; }
