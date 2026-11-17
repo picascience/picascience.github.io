@@ -1,0 +1,9 @@
+{
+  "name": "Surfaces 3D",
+  "emoji": "📈",
+  "colors": ["#1e1b4b", "#22d3ee"],
+  "category": "Dauphine",
+  "added": "2026-11-17",
+  "description": "Surface 3D de f(x, y) : curseurs x et y, rotation, dérivées partielles et plan tangent",
+  "icon": "icon.svg"
+}

@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-17T10:12:40.482Z",
+  "generated": "2026-11-17T10:23:46.820Z",
   "apps": [
     {
       "name": "Bon Plan",
@@ -14,6 +14,19 @@
       "description": "Colle une annonce de PC : cote des pièces, verdict, offre de négo et Duel de Silicium",
       "icon": "apps/bon-plan-pc/icon.svg",
       "id": "bon-plan-pc"
+    },
+    {
+      "name": "Surfaces 3D",
+      "emoji": "📈",
+      "colors": [
+        "#1e1b4b",
+        "#22d3ee"
+      ],
+      "category": "Dauphine",
+      "added": "2026-11-17",
+      "description": "Surface 3D de f(x, y) : curseurs x et y, rotation, dérivées partielles et plan tangent",
+      "icon": "apps/surface-3d/icon.svg",
+      "id": "surface-3d"
     },
     {
       "name": "Galerie",
