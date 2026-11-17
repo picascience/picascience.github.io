@@ -4,6 +4,7 @@
 // Sorties : apps.json + copie de secours embarquée dans index.html.
 // Usage : node scripts/build.mjs        (échoue avec un message clair si quelque chose cloche)
 import { readFileSync, writeFileSync, readdirSync, existsSync, statSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -81,4 +82,38 @@ const html = readFileSync(idx, "utf8");
 const next = html.replace(/\/\*APPS_START\*\/[\s\S]*?\/\*APPS_END\*\//, () => `/*APPS_START*/${JSON.stringify(registry).replace(/</g, "\\u003c")}/*APPS_END*/`);
 if (next === html && !html.includes("/*APPS_START*/")) { console.error("❌ marqueurs APPS_START/APPS_END introuvables dans index.html"); process.exit(1); }
 writeFileSync(idx, next);
+
+// 4) Hors ligne : liste des fichiers à précacher, écrite dans sw.js (entre les marqueurs).
+//    Exclus : dossiers source/, fichiers cachés, > 1 Mo (vidéos…), cartes .map.
+const MAX_BYTES = 1024 * 1024;
+const SKIP_DIR = new Set(["source", "node_modules"]);
+const walk = (dir, rel = "") => readdirSync(dir).sort().flatMap(name => {
+  if (name.startsWith(".")) return [];
+  const full = join(dir, name), r = rel ? `${rel}/${name}` : name;
+  const st = statSync(full);
+  if (st.isDirectory()) return SKIP_DIR.has(name) ? [] : walk(full, r);
+  return st.size <= MAX_BYTES && !/\.(map|md)$/i.test(name) ? [r] : [];
+});
+const files = ["./", "index.html", "apps.json", "manifest.webmanifest", "apple-touch-icon.png", ...walk(join(ROOT, "assets"), "assets"), ...(existsSync(join(ROOT, "icons")) ? walk(join(ROOT, "icons"), "icons") : [])];
+const externals = new Set();
+const scanExternal = text => { for (const m of text.matchAll(/(?:href|src)=["'](https:\/\/[^"']+)["']/g)) if (/\.(css|js)(\?|$)|\/css2?\?/.test(m[1])) externals.add(m[1].replace(/&amp;/g, "&")); };
+for (const a of apps.filter(a => !a.url)) {
+  const dir = join(ROOT, "apps", a.id);
+  files.push(`apps/${a.id}/`);
+  for (const f of walk(dir)) {
+    if (f === "app.json") continue;
+    files.push(`apps/${a.id}/${f}`);
+    if (/\.html$/i.test(f)) scanExternal(readFileSync(join(dir, f), "utf8"));
+  }
+}
+scanExternal(readFileSync(idx, "utf8"));
+const sha = createHash("sha1");
+for (const f of files) if (!f.endsWith("/")) sha.update(f).update(readFileSync(join(ROOT, f)));
+const build = sha.digest("hex").slice(0, 10);
+const swPath = join(ROOT, "sw.js");
+const sw = readFileSync(swPath, "utf8");
+const block = `/*PRECACHE_START*/\nconst BUILD = ${JSON.stringify(build)};\nconst FILES = ${JSON.stringify(files, null, 1).replace(/\n\s*/g, " ").replace(/\[ /, "[").replace(/ \]$/, "]")};\nconst EXTERNAL = ${JSON.stringify([...externals].sort(), null, 1).replace(/\n\s*/g, " ").replace(/\[ /, "[").replace(/ \]$/, "]")};\n/*PRECACHE_END*/`;
+if (!sw.includes("/*PRECACHE_START*/")) { console.error("❌ marqueurs PRECACHE_START/PRECACHE_END introuvables dans sw.js"); process.exit(1); }
+writeFileSync(swPath, sw.replace(/\/\*PRECACHE_START\*\/[\s\S]*?\/\*PRECACHE_END\*\//, () => block));
+console.log(`📴 hors ligne : ${files.length} fichiers + ${externals.size} ressources externes (cache ${build}).`);
 console.log(`✅ ${apps.length} applis dans le registre (${apps.filter(a => !a.url).length} ici, ${apps.filter(a => a.url).length} externes).`);

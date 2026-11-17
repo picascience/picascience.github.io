@@ -30,6 +30,15 @@ Fiche `app.json` :
 
 Options : `"dock": true` (4 max), `"icon": "icon.svg"` (remplace l'emoji), `"open": "tab"` (ouvre hors du launcher).
 
+## Hors ligne
+
+Le launcher **et toutes les applis hébergées ici** marchent sans réseau (service worker `sw.js`).
+- À la première ouverture avec du réseau, tout est téléchargé (≈ 2 Mo + polices/bibliothèques externes comme KaTeX ou Three.js).
+- Ensuite : « réseau d'abord » (dernière version si tu es en ligne), cache si le réseau est absent ou lent (> 3 s).
+- `node scripts/build.mjs` réécrit tout seul la liste des fichiers dans `sw.js` : rien à faire de plus quand tu ajoutes une appli.
+- Exclus du précache : fichiers > 1 Mo (vidéos…), dossiers `source/`. Une image ou page déjà ouverte reste gardée ; les vidéos nécessitent du réseau.
+- Les applis qui appellent une API en ligne (ex. Top Skills → GitHub) s'ouvrent, mais leurs données en direct demandent du réseau.
+
 ## Gestes
 
 - Toucher : ouvre l'appli en plein écran dans le launcher.
