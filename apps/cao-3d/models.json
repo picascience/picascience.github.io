@@ -58,5 +58,15 @@
     "added": "2026-11-17",
     "file": "models/souris-sans-fil.html",
     "thumb": "thumbs/souris-sans-fil.webp"
+  },
+  {
+    "id": "ferme-porte",
+    "number": "No. 07",
+    "title": "Ferme-porte",
+    "subtitle": "bras à glissière · came & hydraulique",
+    "parts": 77,
+    "added": "2026-11-18",
+    "file": "models/ferme-porte.html",
+    "thumb": "thumbs/ferme-porte.webp"
   }
 ]
