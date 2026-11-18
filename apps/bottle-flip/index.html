@@ -228,7 +228,7 @@ function collide() {
     if (!best) return;
     if (state === 'air') {
       if (classify()) return;
-      state = 'tumble';
+      state = 'tumble'; announceFail();
     }
     resolve(best, bd);
   }
@@ -242,15 +242,24 @@ function physics(dt) {
     tumbleT += dt;
     const sp = Math.hypot(b.vx, b.vy);
     if (sp < 12 * u && Math.abs(b.w) < .5) restT += dt; else restT = 0;
-    if (restT > .35 || tumbleT > 3.5) settle();
+    if (restT > .25 || tumbleT > 1.2) settle();
   }
   if ((state === 'air' || state === 'tumble') && b.y > H + 250 * u) { offTable = true; finish(false); }
+}
+
+let announced = false;
+function announceFail() {
+  announced = true;
+  const was = streak; streak = 0; hud();
+  say('RATÉ', feedback() + (was >= 3 ? '  (série perdue : ' + was + ')' : ''), 'bad');
+  sfx.lose();
+  if (navigator.vibrate) try { navigator.vibrate(60); } catch (e) {}
 }
 
 function settle() {
   const e0 = Math.abs(normAngle(b.a)), eC = Math.abs(normAngle(b.a - PI));
   b.vx = b.vy = b.w = 0;
-  if (e0 < .15 || eC < .15) { standType = e0 < .15 ? 'bottom' : 'cap'; finish(true, true); }
+  if (!announced && (e0 < .15 || eC < .15)) { standType = e0 < .15 ? 'bottom' : 'cap'; finish(true, true); }
   else finish(false);
 }
 
@@ -263,6 +272,8 @@ function feedback() {
 
 function finish(ok, lucky) {
   state = 'result'; resultT = 0; resultOk = ok;
+  if (!ok && announced) { announced = false; return; }
+  announced = false;
   if (ok) {
     const perfect = !lucky && Math.abs(standErr) < .12;
     let pts = (standType === 'cap' ? 3 : mode.mult) + (perfect ? 1 : 0);
@@ -277,10 +288,7 @@ function finish(ok, lucky) {
     (perfect || standType === 'cap' ? sfx.perfect : sfx.win)();
     if (navigator.vibrate) try { navigator.vibrate(perfect ? [20, 40, 20] : 25); } catch (e) {}
   } else {
-    const was = streak; streak = 0; hud();
-    say('RATÉ', feedback() + (was >= 3 ? '  (série perdue : ' + was + ')' : ''), 'bad');
-    sfx.lose();
-    if (navigator.vibrate) try { navigator.vibrate(60); } catch (e) {}
+    announceFail(); announced = false;
   }
 }
 
@@ -304,7 +312,7 @@ function update(dt) {
     if (standT > 1.1) { b.a = standBase; finish(true); }
   } else if (state === 'result') {
     resultT += dt;
-    if (resultT > (resultOk ? 1.3 : 1.7)) reset();
+    if (resultT > (resultOk ? 1.3 : .5)) reset();
   }
   for (const t of trail) t.l -= dt * 2.2;
   trail = trail.filter(t => t.l > 0);
