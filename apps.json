@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-18T18:24:34.065Z",
+  "generated": "2026-11-18T21:49:57.899Z",
   "apps": [
     {
       "name": "Bottle Flip",
@@ -14,6 +14,19 @@
       "description": "Lance la bouteille d'un swipe et réussis le bottle flip : atterris debout !",
       "icon": "apps/bottle-flip/icon.svg",
       "id": "bottle-flip"
+    },
+    {
+      "name": "Cristaux",
+      "emoji": "💎",
+      "colors": [
+        "#0b1236",
+        "#22d3ee"
+      ],
+      "category": "Jeux",
+      "added": "2026-11-18",
+      "description": "Un cristal par ligne, colonne et couleur, sans qu'ils se touchent : 200 niveaux, défi du jour et mode infini",
+      "icon": "apps/cristaux/icon.svg",
+      "id": "cristaux"
     },
     {
       "name": "Fitra 40",

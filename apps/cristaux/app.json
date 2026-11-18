@@ -1,0 +1,9 @@
+{
+  "name": "Cristaux",
+  "emoji": "💎",
+  "colors": ["#0b1236", "#22d3ee"],
+  "category": "Jeux",
+  "added": "2026-11-18",
+  "description": "Un cristal par ligne, colonne et couleur, sans qu'ils se touchent : 200 niveaux, défi du jour et mode infini",
+  "icon": "icon.svg"
+}
