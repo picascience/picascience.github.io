@@ -1,0 +1,9 @@
+{
+  "name": "Bottle Flip",
+  "emoji": "🍾",
+  "colors": ["#082f49", "#0ea5e9"],
+  "category": "Jeux",
+  "added": "2026-11-18",
+  "description": "Lance la bouteille d'un swipe et réussis le bottle flip : atterris debout !",
+  "icon": "icon.svg"
+}
