@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1a0614">
+<title>Fitra 40</title>
+<style>
+:root{
+  --bg:#14050f; --panel:rgba(255,255,255,.045); --line:rgba(255,214,170,.14);
+  --cream:#fbeee6; --mute:#c3a6b2; --dim:#8c6f7b; --rose:#f0507f; --gold:#fde68a;
+  --ok:#34d399; --warn:#fbbf24; --late:#f87171;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --ar:"Geeza Pro","Noto Naskh Arabic","Amiri","Traditional Arabic",serif;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--cream);font-family:var(--sans);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+body{background:
+  radial-gradient(110% 55% at 50% -12%,rgba(240,80,127,.30),transparent 62%),
+  radial-gradient(80% 40% at 100% 100%,rgba(253,230,138,.08),transparent 60%),
+  linear-gradient(180deg,#260a1c 0%,#14050f 60%,#0d030a 100%) fixed;}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer}
+main{max-width:520px;margin:0 auto;padding:calc(var(--sat) + 22px) 18px calc(var(--sab) + 60px)}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:700}
+h1{font-size:30px;margin:6px 0 0;letter-spacing:-.02em;font-weight:800}
+.sub{color:var(--mute);font-size:14px;margin-top:4px}
+
+/* Hero */
+.hero{margin:22px 0 8px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.ring{position:relative;width:224px;height:224px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .n{font-size:68px;font-weight:800;line-height:1;letter-spacing:-.04em}
+.ring .u{font-size:13px;color:var(--mute);margin-top:4px;letter-spacing:.04em}
+.hero .lim{margin-top:14px;font-size:15px;color:var(--mute)}
+.hero .lim b{color:var(--cream);font-weight:700}
+.hero .what{margin-top:4px;font-size:13px;color:var(--dim)}
+
+.all{display:block;width:100%;margin:22px 0 6px;padding:17px;border-radius:18px;font-weight:800;font-size:17px;text-align:center;
+  background:linear-gradient(135deg,#f0507f,#f59e6b);color:#1a0510;box-shadow:0 10px 30px -10px rgba(240,80,127,.7);transition:transform .12s}
+.all:active{transform:scale(.97)}
+
+/* Cards */
+.h2{margin:26px 2px 10px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);font-weight:700}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px;backdrop-filter:blur(8px)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.t{font-weight:750;font-size:17px}
+.tag{font-size:12px;font-weight:700;padding:5px 10px;border-radius:99px;white-space:nowrap}
+.tag.ok{background:rgba(52,211,153,.14);color:var(--ok)}
+.tag.warn{background:rgba(251,191,36,.15);color:var(--warn)}
+.tag.late{background:rgba(248,113,113,.16);color:var(--late)}
+.tag.none{background:rgba(255,255,255,.07);color:var(--mute)}
+.bar{height:6px;border-radius:9px;background:rgba(255,255,255,.07);margin:12px 0 12px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:9px;transition:width .5s ease}
+.meta{display:flex;gap:10px;align-items:stretch}
+.field{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.field span{font-size:11px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase;font-weight:700}
+input[type=date]{width:100%;min-height:42px;padding:9px 10px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--cream);font:inherit;font-size:15px;-webkit-appearance:none;appearance:none;color-scheme:dark}
+.lim2{flex:1;display:flex;flex-direction:column;gap:4px}
+.lim2 b{min-height:42px;display:flex;align-items:center;font-size:15px;font-weight:700}
+.done{margin-top:12px;width:100%;padding:12px;border-radius:13px;font-weight:750;font-size:15px;text-align:center;
+  background:rgba(240,80,127,.14);color:#ffc2d4;border:1px solid rgba(240,80,127,.35);transition:transform .12s,background .2s}
+.done:active{transform:scale(.97)}
+.done.just{background:rgba(52,211,153,.16);border-color:rgba(52,211,153,.4);color:var(--ok)}
+
+/* Hadith */
+.hadith{margin-top:26px;padding:18px;border-radius:20px;border:1px solid var(--line);background:linear-gradient(160deg,rgba(253,230,138,.07),rgba(255,255,255,.02))}
+.ar{font-family:var(--ar);direction:rtl;text-align:right;font-size:21px;line-height:1.9;color:var(--gold)}
+.fr{margin-top:10px;font-size:14.5px;line-height:1.55;color:var(--cream)}
+.src{margin-top:8px;font-size:12px;color:var(--dim)}
+.note{margin-top:14px;font-size:12.5px;line-height:1.5;color:var(--dim);text-align:center}
+
+.toast{position:fixed;left:50%;bottom:calc(var(--sab) + 50px);transform:translate(-50%,20px);opacity:0;background:#2a0d1f;border:1px solid var(--line);
+  padding:11px 18px;border-radius:99px;font-size:14px;font-weight:650;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Sunna de la fitra</div>
+  <h1>Fitra 40</h1>
+  <div class="sub">Ne pas dépasser 40 nuits</div>
+
+  <section class="hero">
+    <div class="ring">
+      <svg viewBox="0 0 224 224">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0507f"/><stop offset="1" stop-color="#fde68a"/></linearGradient></defs>
+        <circle cx="112" cy="112" r="98" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="16"/>
+        <circle id="arc" cx="112" cy="112" r="98" fill="none" stroke="url(#g)" stroke-width="16" stroke-linecap="round" stroke-dasharray="615.75" stroke-dashoffset="615.75" style="transition:stroke-dashoffset .7s ease,stroke .3s"/>
+      </svg>
+      <div class="c"><div class="n" id="heroN">–</div><div class="u" id="heroU">jours restants</div></div>
+    </div>
+    <div class="lim" id="heroLim">Entre la date de ta dernière fois</div>
+    <div class="what" id="heroWhat"></div>
+  </section>
+
+  <button class="all" id="allBtn">Tout fait aujourd'hui</button>
+
+  <div class="h2">Détail</div>
+  <div id="list"></div>
+
+  <section class="hadith">
+    <div class="ar">وُقِّتَ لَنَا فِي قَصِّ الشَّارِبِ وَتَقْلِيمِ الأَظْفَارِ وَنَتْفِ الإِبِطِ وَحَلْقِ الْعَانَةِ أَنْ لاَ نَتْرُكَ أَكْثَرَ مِنْ أَرْبَعِينَ لَيْلَةً</div>
+    <div class="fr">Anas (qu'Allah l'agrée) a dit : « On nous a fixé une limite pour tailler la moustache, couper les ongles, épiler les aisselles et raser le pubis : ne pas laisser cela plus de quarante nuits. »</div>
+    <div class="src">Rapporté par Muslim (n° 258)</div>
+  </section>
+  <div class="note">Tes dates restent sur ce téléphone uniquement.</div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY = 'fitra-40:dates';
+const ITEMS = [
+  {id:'ongles',    name:'Ongles'},
+  {id:'moustache', name:'Moustache'},
+  {id:'aisselles', name:'Aisselles'},
+  {id:'pubis',     name:'Pubis'},
+];
+const LIMIT = 40, DAY = 864e5;
+
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; } }
+function save(d){ try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){} }
+let data = load();
+
+// Dates en "AAAA-MM-JJ", calculées en heure locale (pas d'UTC)
+function todayStr(){ const d=new Date(); return iso(d); }
+function iso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function parse(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function addDays(s,n){ const d=parse(s); d.setDate(d.getDate()+n); return iso(d); }
+function diffDays(a,b){ return Math.round((parse(b)-parse(a))/DAY); } // b - a
+const fmt = new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+const fmtShort = new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'short',year:'numeric'});
+function nice(s){ const t=fmt.format(parse(s)); return t.charAt(0).toUpperCase()+t.slice(1); }
+
+function status(last){
+  if(!last) return null;
+  const today = todayStr();
+  const deadline = addDays(last, LIMIT);
+  const left = diffDays(today, deadline);
+  const elapsed = diffDays(last, today);
+  let cls = left < 0 ? 'late' : left <= 7 ? 'warn' : 'ok';
+  return {deadline,left,elapsed,cls};
+}
+function colorOf(cls){ return cls==='late'?'var(--late)':cls==='warn'?'var(--warn)':'var(--ok)'; }
+function tagText(s){
+  if(!s) return 'Pas de date';
+  if(s.left < 0) return 'En retard de '+(-s.left)+' j';
+  if(s.left === 0) return "Dernier jour aujourd'hui";
+  return s.left+' j restants';
+}
+
+function render(){
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  const today = todayStr();
+  ITEMS.forEach(it=>{
+    const last = data[it.id] || '';
+    const s = status(last);
+    const pct = s ? Math.min(100, Math.max(0, s.elapsed/LIMIT*100)) : 0;
+    const el = document.createElement('div');
+    el.className='card';
+    el.innerHTML = `
+      <div class="row"><div class="t">${it.name}</div><div class="tag ${s?s.cls:'none'}">${tagText(s)}</div></div>
+      <div class="bar"><i style="width:${pct}%;background:${s?colorOf(s.cls):'transparent'}"></i></div>
+      <div class="meta">
+        <label class="field"><span>Dernière fois</span><input type="date" max="${today}" value="${last}" data-id="${it.id}"></label>
+        <div class="lim2"><span class="field"><span>Limite</span></span><b style="color:${s?colorOf(s.cls):'var(--dim)'}">${s?fmtShort.format(parse(s.deadline)):'—'}</b></div>
+      </div>
+      <button class="done ${last===today?'just':''}" data-done="${it.id}">${last===today?"✓ Fait aujourd'hui":"Fait aujourd'hui"}</button>`;
+    list.appendChild(el);
+  });
+  list.querySelectorAll('input[type=date]').forEach(inp=>{
+    inp.addEventListener('change',e=>{
+      const v=e.target.value;
+      if(v && v>todayStr()){ toast('Date dans le futur ?'); render(); return; }
+      if(v) data[e.target.dataset.id]=v; else delete data[e.target.dataset.id];
+      save(data); render();
+    });
+  });
+  list.querySelectorAll('[data-done]').forEach(b=>{
+    b.addEventListener('click',()=>{ data[b.dataset.done]=todayStr(); save(data); render(); toast('Noté. Prochaine limite : '+fmtShort.format(parse(addDays(todayStr(),LIMIT)))); });
+  });
+  renderHero();
+}
+
+function renderHero(){
+  const arc=document.getElementById('arc'), C=615.75;
+  const withDates = ITEMS.map(it=>({it, s:status(data[it.id])})).filter(x=>x.s);
+  const n=document.getElementById('heroN'), u=document.getElementById('heroU'), lim=document.getElementById('heroLim'), what=document.getElementById('heroWhat');
+  if(!withDates.length){
+    n.textContent='40'; u.textContent='nuits max';
+    lim.innerHTML='Entre la date de ta dernière fois en dessous';
+    what.textContent=''; arc.style.strokeDashoffset=C; return;
+  }
+  const minLeft = Math.min(...withDates.map(x=>x.s.left));
+  const urgent = withDates.filter(x=>x.s.left===minLeft);
+  const s = urgent[0].s;
+  const missing = ITEMS.length - withDates.length;
+  if(s.left<0){ n.textContent=-s.left; u.textContent= -s.left>1?'jours de retard':'jour de retard'; arc.style.stroke='var(--late)'; }
+  else { n.textContent=s.left; u.textContent= s.left>1?'jours restants':(s.left===1?'jour restant':"c'est aujourd'hui"); arc.style.stroke=''; }
+  const frac = Math.min(1, Math.max(0, s.elapsed/LIMIT));
+  arc.style.strokeDashoffset = C*(1-frac);
+  lim.innerHTML = (s.left<0?'Limite dépassée depuis le ':'À faire au plus tard le ')+'<b>'+nice(s.deadline)+'</b>';
+  what.textContent = urgent.map(x=>x.it.name).join(' · ') + (missing? ' — '+missing+' sans date':'');
+}
+
+document.getElementById('allBtn').addEventListener('click',()=>{
+  const t=todayStr(); ITEMS.forEach(it=>data[it.id]=t); save(data); render();
+  toast('Tout noté. Prochaine limite : '+fmtShort.format(parse(addDays(t,LIMIT))));
+});
+
+let tt; function toast(m){ const el=document.getElementById('toast'); el.textContent=m; el.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove('on'),2400); }
+
+render();
+// Recalcule au retour sur l'appli (changement de jour)
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) render(); });
+</script>
+</body>
+</html>

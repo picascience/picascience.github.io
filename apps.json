@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-18T14:24:23.381Z",
+  "generated": "2026-11-18T18:24:34.065Z",
   "apps": [
     {
       "name": "Bottle Flip",
@@ -14,6 +14,19 @@
       "description": "Lance la bouteille d'un swipe et réussis le bottle flip : atterris debout !",
       "icon": "apps/bottle-flip/icon.svg",
       "id": "bottle-flip"
+    },
+    {
+      "name": "Fitra 40",
+      "emoji": "✂️",
+      "colors": [
+        "#2b0a1e",
+        "#e11d74"
+      ],
+      "category": "Outils",
+      "added": "2026-11-18",
+      "description": "Ongles, moustache, aisselles, pubis : la date limite des 40 nuits (hadith de Muslim)",
+      "icon": "apps/fitra-40/icon.svg",
+      "id": "fitra-40"
     },
     {
       "name": "Bon Plan",
