@@ -1,5 +1,15 @@
 [
   {
+    "id": "porte-cle-astronaute-vente",
+    "type": "image",
+    "title": "Affiche de vente — porte-clé",
+    "date": "2026-11-18",
+    "file": "media/porte-cle-astronaute-vente.jpg",
+    "width": 1080,
+    "height": 1350,
+    "description": "Affiche de vente du porte-clé astronaute, avec la photo réelle de l'objet posé sur le bureau."
+  },
+  {
     "id": "porte-cle-astronaute",
     "type": "image",
     "title": "Porte-clé astronaute",
