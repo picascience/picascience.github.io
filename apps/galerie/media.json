@@ -1,5 +1,15 @@
 [
   {
+    "id": "porte-cle-astronaute",
+    "type": "image",
+    "title": "Porte-clé astronaute",
+    "date": "2026-11-18",
+    "file": "media/porte-cle-astronaute.jpg",
+    "width": 1080,
+    "height": 1528,
+    "description": "Affiche de vente d'un porte-clé astronaute : son visage est la Lune, PLAY sur le torse. Photo réelle à côté d'une clé USB, fond jaune-vert tiré de l'éclair de l'objet."
+  },
+  {
     "id": "fait-de-vos-mots",
     "type": "image",
     "title": "Fait de vos mots",
