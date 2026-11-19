@@ -47,18 +47,199 @@ ul{padding-left:20px;margin:6px 0}
 li{margin:4px 0}
 details{border-top:1px solid var(--line);padding:10px 0}
 summary{font-weight:600;cursor:pointer}
+nav{position:sticky;top:calc(env(safe-area-inset-top) + 4px);z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+nav button{font-size:13px;padding:9px 2px}
+.card h2{margin:4px 0 6px}
+.hero{border:1.5px solid var(--acc)}
+.big3{font-size:17px;font-weight:700;line-height:1.45}
+.step{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--acc);color:#fff;align-items:center;justify-content:center;font-weight:800;font-size:13px;margin-right:6px;flex:none}
+@media (prefers-color-scheme:dark){.step{color:#06201c}}
+.steps p{display:flex;align-items:flex-start;gap:4px}
+tr.tot th,tr.tot td{font-weight:700;background:var(--bg)}
+td.m{color:var(--mut);font-size:13px}
+.k{font-size:13.5px}
+.qi{border-top:1px solid var(--line);padding:10px 0}
+.ql{display:block;font-size:15px;margin-bottom:6px}
+.inr{display:flex;align-items:center;gap:8px}
+.inr input,.inr select{flex:1;min-width:0;font:inherit;font-size:17px;padding:9px 11px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-variant-numeric:tabular-nums}
+.u{color:var(--mut);font-size:14px;min-width:26px}
+.mk{width:18px;font-weight:800}
+.qi.good input,.qi.good select{border-color:var(--ok)}.qi.good .mk{color:var(--ok)}
+.qi.bad input,.qi.bad select{border-color:var(--ko)}.qi.bad .mk{color:var(--ko)}
+.sol{font-size:14px;margin-top:6px;color:var(--mut)}.sol b{color:var(--ink)}
+details.mod{border:0;padding:4px 0}details.mod summary{color:var(--acc);font-size:14px}
+details.mod div{font-size:14.5px;border-left:4px solid var(--acc);padding:6px 10px;margin-top:6px;background:var(--bg);border-radius:0 8px 8px 0}
+.ch.sel{border-color:var(--acc);box-shadow:inset 0 0 0 1.5px var(--acc)}
+.en{border:0;padding:6px 0}.en table{font-size:13.5px}
+.ok{color:var(--ok);font-weight:700}.ko{color:var(--ko);font-weight:700}
 </style>
 </head>
 <body>
 <main>
 <h1>Compta Fi</h1>
-<p class="sub">L1 Dauphine · Comprendre les états financiers · Modules 1 à 3</p>
+<p class="sub">L1 Dauphine · Spécial CC · méthode, annales corrigées, entraînement infini</p>
 <nav>
-<button data-v="quiz" class="on">QCM</button>
-<button data-v="fiche">Fiche express</button>
-<button data-v="cas">Cas chiffrés</button>
+<button data-v="methode" class="on">Méthode</button>
+<button data-v="annales">Annales</button>
+<button data-v="drill">Drill ∞</button>
+<button data-v="quiz">QCM</button>
+<button data-v="fiche">Fiche</button>
 </nav>
-<section id="quiz"></section>
+
+<section id="methode">
+<div class="card hero">
+<span class="tag">Si tu ne retiens qu'une chose</span>
+<p class="big3">Ordre : ① Compte de résultat → ② Bilan → ③ État des flux.</p>
+<div class="steps">
+<p><span class="step">1</span><span>Le <b>compte de résultat</b> donne le <b>résultat net</b> et l'<b>impôt</b>.</span></p>
+<p><span class="step">2</span><span>Le résultat net va dans les <b>capitaux propres</b> du bilan. L'impôt pas encore payé devient une <b>dette fiscale</b>. La case « ? » se trouve par différence : total − tout le reste.</span></p>
+<p><span class="step">3</span><span>L'<b>état des flux</b> explique comment la trésorerie est passée du début à la fin de l'année. On n'y met que de l'argent qui bouge vraiment.</span></p>
+</div>
+<p class="sub">Exemples chiffrés : ton CC 2025 (cas Artist) et le CC 2020 (SuperExtra). Toutes les conventions ci-dessous sont celles que le prof a comptées justes dans les corrigés.</p>
+</div>
+
+<div class="card">
+<span class="tag">① Compte de résultat · la cascade</span>
+<p>Toujours le même ordre, de haut en bas. Chaque « = » est un résultat intermédiaire qui rapporte des points.</p>
+<div class="wrap"><table>
+<tr><th>Ligne</th><th>Comment l'obtenir</th><th class="n">Artist</th></tr>
+<tr><td>Chiffre d'affaires</td><td class="m">Ventes de l'année, encaissées ou non</td><td class="n">6 250</td></tr>
+<tr><td>− Coût d'achat des marchandises vendues</td><td class="m">48 % × 6 250. Seulement ce qui est vendu</td><td class="n">−3 000</td></tr>
+<tr><td>− Charges de personnel</td><td class="m">20 % × 6 250</td><td class="n">−1 250</td></tr>
+<tr><td>− Frais de gestion</td><td class="m">Donné</td><td class="n">−813</td></tr>
+<tr><td>− Amortissements</td><td class="m">Charge sans sortie d'argent</td><td class="n">−190</td></tr>
+<tr class="tot"><td>= Résultat d'exploitation</td><td></td><td class="n">997</td></tr>
+<tr><td>− Intérêts</td><td class="m">Emprunt × taux</td><td class="n">−29</td></tr>
+<tr class="tot"><td>= Résultat avant impôt (imposable)</td><td></td><td class="n">968</td></tr>
+<tr><td>− Impôt</td><td class="m">25 % × 968</td><td class="n">−242</td></tr>
+<tr class="tot"><td>= Résultat net</td><td></td><td class="n">726</td></tr>
+</table></div>
+<p><b>Présentation en colonnes</b> (comme dans les sujets) : charges + résultat net à gauche, chiffre d'affaires à droite ; les deux totaux sont égaux au chiffre d'affaires.</p>
+<p><b>Inconnues classiques :</b> emprunt = intérêts / taux (SuperExtra : 26 / 2 % = 1 300). Taux d'impôt = impôt / résultat imposable (Lou : 12 / 40 = 30 %).</p>
+</div>
+
+<div class="card">
+<span class="tag">② Bilan · photo au 31/12</span>
+<div class="wrap"><table>
+<tr><th colspan="2">Actif (ce qu'elle possède)</th><th colspan="2">Capitaux propres et passifs (d'où vient l'argent)</th></tr>
+<tr><td>Bâtiments</td><td class="n">1 781</td><td>Capital</td><td class="n">1 200</td></tr>
+<tr><td>Équipements</td><td class="n">1 212</td><td>Réserves</td><td class="n">863</td></tr>
+<tr class="tot"><td>Immobilisations</td><td class="n">2 993</td><td>Résultat net ← ①</td><td class="n">726</td></tr>
+<tr><td>Stocks</td><td class="n">453</td><td class="tot"><b>Capitaux propres</b></td><td class="n"><b>2 789</b></td></tr>
+<tr><td>Créances</td><td class="n">800</td><td>Emprunt</td><td class="n">1 450</td></tr>
+<tr><td>Trésorerie</td><td class="n">417</td><td>Fournisseurs</td><td class="n">182</td></tr>
+<tr class="tot"><td>Actifs circulants</td><td class="n">1 670</td><td>Dettes fiscales ← impôt</td><td class="n">242</td></tr>
+<tr><td></td><td></td><td><b>Passifs</b></td><td class="n"><b>1 874</b></td></tr>
+<tr class="tot"><td>Total</td><td class="n">4 663</td><td>Total</td><td class="n">4 663</td></tr>
+</table></div>
+<ul>
+<li><b>Actif</b>, du moins liquide au plus liquide : immobilisations (bâtiments, matériels, équipements, brevets achetés, participations) puis actifs circulants (stocks, créances clients, acomptes versés, trésorerie).</li>
+<li><b>Passif</b>, du moins exigible au plus exigible : capitaux propres (capital, réserves, résultat net) puis passifs (emprunt, fournisseurs, dettes fiscales, acomptes reçus, dividendes à payer).</li>
+<li>Total actif = total passif, toujours. C'est ta vérification.</li>
+</ul>
+</div>
+
+<div class="card">
+<span class="tag">③ État des flux · l'argent qui bouge</span>
+<div class="wrap"><table>
+<tr><th>Ligne</th><th class="n">SuperExtra 20x9</th></tr>
+<tr><td>+ Encaissements clients</td><td class="n">5 580</td></tr>
+<tr><td>− Fournisseurs payés</td><td class="n">−3 582</td></tr>
+<tr><td>− Salaires payés</td><td class="n">−1 285</td></tr>
+<tr><td>− Impôt payé</td><td class="n">−48</td></tr>
+<tr class="tot"><td>= Flux d'exploitation</td><td class="n">665</td></tr>
+<tr><td>− Acquisitions d'immobilisations</td><td class="n">−860</td></tr>
+<tr><td>+ Cessions d'immobilisations</td><td class="n">78</td></tr>
+<tr class="tot"><td>= Flux d'investissement</td><td class="n">−782</td></tr>
+<tr><td>− Dividendes versés</td><td class="n">−144</td></tr>
+<tr><td>− Intérêts versés</td><td class="n">−24</td></tr>
+<tr><td>− Remboursement d'emprunt</td><td class="n">−300</td></tr>
+<tr><td>+ Nouvel emprunt (ou augmentation de capital)</td><td class="n">350</td></tr>
+<tr class="tot"><td>= Flux de financement</td><td class="n">−118</td></tr>
+<tr class="tot"><td>Variation de trésorerie (somme des 3)</td><td class="n">−235</td></tr>
+<tr><td>Trésorerie de début</td><td class="n">328</td></tr>
+<tr class="tot"><td>Trésorerie de fin</td><td class="n">93</td></tr>
+</table></div>
+<ul>
+<li><b>Jamais dans les flux</b> : amortissement, vente pas encore encaissée, achat pas encore payé, impôt de l'année payé l'an prochain, mise en réserve.</li>
+<li><b>Convention du corrigé 2020</b> : intérêts et dividendes en financement, impôt en exploitation.</li>
+<li>Le corrigé 2020 affiche −41 en financement : c'est une coquille. Seul −118 donne la variation de −235 du même corrigé.</li>
+<li><b>Tableau à trous</b> (cas Jour-J) : variation = trésorerie fin − début ; un flux manquant = variation − les deux autres ; trésorerie de fin d'une année = trésorerie de début de la suivante.</li>
+</ul>
+</div>
+
+<div class="card">
+<span class="tag">Les formules de l'analyse</span>
+<div class="wrap"><table>
+<tr><th>À calculer</th><th>Formule</th><th class="n">Artist</th></tr>
+<tr><td>BFR</td><td class="m">(stocks + créances) − (fournisseurs + dettes fiscales)</td><td class="n">829</td></tr>
+<tr><td>Taux d'intérêt</td><td class="m">intérêts / emprunt</td><td class="n">2 %</td></tr>
+<tr><td>Coût effectif de l'emprunt</td><td class="m">taux × (1 − taux d'impôt)</td><td class="n">1,5 %</td></tr>
+<tr><td>ROA (rentabilité économique)</td><td class="m">résultat d'exploitation / total actif</td><td class="n">21,4 %</td></tr>
+<tr><td>ROE (rentabilité financière)</td><td class="m">résultat net / (capital + réserves)</td><td class="n">35,2 %</td></tr>
+<tr><td>Résultat net sans emprunt</td><td class="m">résultat d'exploitation × (1 − taux d'impôt)</td><td class="n">747,75</td></tr>
+<tr><td>ROE sans emprunt</td><td class="m">RN sans emprunt / (capital + réserves + emprunt)</td><td class="n">21,3 %</td></tr>
+<tr><td>Profitabilité</td><td class="m">résultat net / chiffre d'affaires</td><td class="n">11,6 %</td></tr>
+</table></div>
+<p><b>ROE :</b> dans les deux corrigés, le prof divise par capital + réserves, sans le résultat de l'année (2020 : 144 / 2 204 = 6,5 %).</p>
+<p><b>Effet de levier :</b> si ROA &gt; taux d'intérêt, l'emprunt fait monter le ROE, donc on garde l'emprunt et on refuse le conseil de rembourser. Si ROA &lt; taux, c'est l'inverse.</p>
+<p><b>Rembourser l'emprunt ne laisse pas le résultat net inchangé</b> : il n'y a plus d'intérêts, donc il monte. C'est l'erreur de ta copie 2025 qui t'a coûté des points.</p>
+</div>
+
+<div class="card">
+<span class="tag">Phrases qui rapportent les points d'interprétation</span>
+<ul>
+<li><b>ROA</b> : « Pour 1 € investi dans ses actifs, l'entreprise dégage 21,4 centimes de résultat d'exploitation. »</li>
+<li><b>ROE</b> : « Pour 1 € de fonds propres investi par les actionnaires, 35,2 centimes de résultat net leur reviennent. »</li>
+<li><b>Coût effectif</b> : « Les intérêts sont déductibles : ils réduisent l'impôt de 25 %. Emprunter à 2 % ne coûte donc que 2 % × 0,75 = 1,5 % aux actionnaires. »</li>
+<li><b>Levier</b> : « L'entreprise emprunte à 2 % et cet argent lui rapporte 21,4 % (ROA). L'écart revient aux actionnaires. Remplacer l'emprunt par du capital supprime ce gain : le ROE passe de 35,2 % à 21,3 %. Je n'approuve pas. »</li>
+<li><b>Bénéfice</b> : « Résultat net positif : les produits dépassent les charges. Les actionnaires se sont enrichis de X sur l'année. »</li>
+<li><b>Fonds propres</b> : « Réserves &gt; capital : ils viennent surtout de fonds indirectement investis (bénéfices passés non distribués). »</li>
+</ul>
+</div>
+
+<div class="card">
+<span class="tag">Dividendes · tous les effets à écrire</span>
+<p>Artist décide, début N+1, de distribuer la moitié de 726, soit 363. Ta copie a eu 0,25 point parce qu'il manquait des effets.</p>
+<ul>
+<li>Le résultat net de 726 disparaît des capitaux propres : 363 vont en <b>réserves</b> (863 → 1 226), 363 deviennent une dette <b>« dividendes à payer »</b> (passif).</li>
+<li>Capitaux propres : 2 789 → 2 426. Passifs : 1 874 → 2 237. Total du bilan inchangé tant que ce n'est pas payé.</li>
+<li>Au paiement : trésorerie 417 → 54, la dette disparaît, total 4 300. Flux de financement N+1 : −363.</li>
+<li>Aucun effet sur le compte de résultat : un dividende n'est pas une charge.</li>
+<li>S'il est payé tout de suite (SuperExtra, 2 janvier) : capitaux propres −72, trésorerie −72, créances inchangées.</li>
+</ul>
+</div>
+
+<div class="card">
+<span class="tag">Commentaire de trésorerie en 4 phrases</span>
+<ol style="padding-left:20px">
+<li><b>Exploitation</b> : positive ? en hausse ou en baisse par rapport à N−1 ? L'activité génère-t-elle de la trésorerie ?</li>
+<li><b>Investissement</b> : acquisitions &gt; cessions ? L'entreprise investit-elle plus ou moins qu'avant ?</li>
+<li><b>Financement</b> : dividendes, emprunts, remboursements : qui reçoit l'argent ?</li>
+<li><b>Conclusion</b> : le flux d'exploitation couvre-t-il l'investissement et le financement ? D'où la hausse ou la baisse.</li>
+</ol>
+<p class="k"><b>Artist N :</b> l'exploitation dégage 560 (contre 770). L'investissement tombe à −92 (contre −560). Le financement se limite aux dividendes (−378). Le flux d'exploitation couvre l'investissement et les dividendes (560 &gt; 92 + 378), d'où +90 ; mais la hausse vient surtout du faible investissement, pas d'une meilleure activité.</p>
+</div>
+
+<div class="card">
+<span class="tag">Stratégie pour le CC</span>
+<p>Format 2025 : <b>QCM 5 pts</b> + <b>cas 15 pts</b> (élaboration des états 6, analyse 5, trésorerie 4). Calculatrice simple, documents interdits.</p>
+<ol style="padding-left:20px">
+<li><b>Commence par la partie 1</b> (compte de résultat + bilan + montants) : c'est mécanique, ce sont tes points les plus sûrs.</li>
+<li><b>Puis le tableau des flux</b> (partie 3) : mécanique aussi.</li>
+<li><b>Puis l'analyse</b> (ROA, ROE, levier, dividendes).</li>
+<li><b>QCM à la fin</b>, en 10 à 12 minutes.</li>
+<li>Garde 5 minutes pour vérifier : total actif = total passif, signes des flux, unités (K€).</li>
+</ol>
+<p><b>Sur chaque calcul</b>, écris formule en mots + chiffres + résultat + unité. La justification est notée : même avec un chiffre faux, la formule rapporte.</p>
+<p><b>QCM</b> : une case fausse annule une case juste. Dans ta copie 2025, 4 questions sur 7 sont tombées à 0 à cause d'une case en trop. Ne coche que ce dont tu es sûr. Méfie-toi de « toujours », « exclusivement », « si et seulement si », « uniquement ».</p>
+<p><b>Ne laisse rien vide</b> : écris au moins la formule.</p>
+</div>
+</section>
+
+<section id="drill" hidden></section>
+
+<section id="quiz" hidden></section>
 <section id="fiche" hidden>
 <div class="card">
 <span class="tag">Modules 1 et 2 en bref</span>
@@ -181,9 +362,35 @@ summary{font-weight:600;cursor:pointer}
 <p>Séparation des exercices (résultat calculé par période de 12 mois maximum). Reconnaissance des produits (enregistrés quand les engagements contractuels sont remplis). Rattachement des charges aux produits (seules les charges qui ont permis de générer ces produits).</p></details>
 <p class="sub">Réponses rédigées à partir des vidéos : le corrigé officiel n'est pas publié sur Moodle.</p>
 </div>
+
+<div class="card">
+<span class="tag">Questions de cours du CC 2020 (1,5 pt chacune)</span>
+<p class="sub">Les mots-clés en gras sont ceux du corrigé officiel. 4 lignes maximum : place-les tous.</p>
+<details><summary>En quoi les fonds propres se différencient-ils des passifs ?</summary>
+<p><b>Exigibilité</b> : les fonds propres ne sont jamais remboursés par l'entreprise, les dettes doivent l'être à l'échéance. <b>Rémunération</b> : l'actionnaire reçoit le résultat net, variable et résiduel ; le prêteur reçoit un intérêt fixé au contrat. <b>Nature du droit</b> : l'actionnaire est propriétaire et contrôle les décisions (vote) ; le prêteur a seulement un droit de créance.</p></details>
+<details><summary>Pourquoi les dettes d'exploitation sont-elles des ressources ?</summary>
+<p>Quand un fournisseur livre sans être payé tout de suite, l'entreprise obtient un actif (stock) sans décaisser : elle <b>maintient sa trésorerie</b>. Cette dette finance une partie de l'actif sans avoir à <b>augmenter les ressources financières</b> (ni emprunt ni apport). C'est une <b>augmentation temporaire de l'actif</b> financée par le fournisseur.</p></details>
+<details><summary>Deux arguments : pourquoi la variation de trésorerie ≠ le résultat ?</summary>
+<p>Il existe des <b>charges sans décaissement</b> (amortissement, achat non encore payé) et des <b>produits sans encaissement</b> (vente à crédit). Il existe aussi des <b>décaissements sans charge</b> (achat d'une immobilisation, remboursement d'emprunt, dividendes) et des <b>encaissements sans produit</b> (nouvel emprunt, augmentation de capital, acompte reçu). Donne un exemple chiffré à chaque fois.</p></details>
+</div>
+
+<div class="card">
+<span class="tag">Information comptable · ce qui est tombé au QCM 2025</span>
+<div class="wrap"><table>
+<tr><th></th><th>Sélection adverse</th><th>Aléa moral</th></tr>
+<tr><td>Quand ?</td><td>Avant la signature du contrat</td><td>Après la signature</td></tr>
+<tr><td>Problème</td><td>L'investisseur ne sait pas distinguer bonnes et mauvaises entreprises</td><td>Les actionnaires subissent les décisions des dirigeants, qu'ils ne peuvent pas observer</td></tr>
+<tr><td>Ce qui aide</td><td>États financiers publiés pour évaluer</td><td>États financiers pour contrôler après coup, audit</td></tr>
+</table></div>
+<p><b>Normalisation comptable</b> : imposer un cadre commun à toutes les entreprises pour <b>réduire l'asymétrie d'information</b> et le <b>risque de divulgation sélective</b>. Elle ne sert pas à maximiser le résultat.</p>
+<p><b>Liquidité</b> : les actifs liquides couvrent-ils les passifs à court terme ? <b>Illiquide</b> = les passifs liquides ne peuvent pas être couverts par les actifs liquides. <b>Insolvable</b> = passifs &gt; actifs (capitaux propres négatifs).</p>
+<p><b>BFR</b> : les ressources nécessaires pour financer le cycle d'exploitation = (stocks + créances) − (dettes fournisseurs + fiscales).</p>
+</div>
 </section>
 
-<section id="cas" hidden>
+<section id="annales" hidden>
+<div id="annBox"></div>
+<h2>Cas de TD · module 3</h2>
 <div class="note">Les énoncés viennent du PDF de TD du module 3. Le corrigé officiel est verrouillé sur Moodle : les solutions ci-dessous sont calculées avec la méthode des vidéos, à comparer avec la correction du TD.</div>
 
 <div class="card">
@@ -346,6 +553,13 @@ function home(){
   const pool=mpool.filter(i=>theme==='all'||Q[i].t===theme);
   const w=[...wrong].filter(i=>i<Q.length);
   $('#quiz').innerHTML=`
+  <div class="card hero">
+    <span class="tag">QCM type CC · 5 points</span>
+    <p>Plusieurs réponses possibles, et chaque case fausse annule une bonne réponse, comme le jour J.</p>
+    <button class="big" id="bx7">Le QCM du CC 2025 · 7 questions</button>
+    <button class="big alt" id="bxa">Série type CC complète · ${X.length} questions</button>
+    <p class="sub">Réponses du CC 2025 déduites de ta copie corrigée et du cours (pas de corrigé officiel du QCM).</p>
+  </div>
   <div class="row" style="margin:0 0 4px">
     ${[[1,'Module 1'],[2,'Module 2'],[3,'Module 3'],[0,'Tout']].map(([k,v])=>`<button class="chip ${mod===k?'on':''}" data-m="${k}">${v}</button>`).join('')}
   </div>
@@ -364,6 +578,8 @@ function home(){
     <button class="big alt" id="bw" ${w.length?'':'disabled'}>Refaire mes erreurs · ${w.length}</button>
     <p class="sub">${seen.size} question${seen.size>1?'s':''} vue${seen.size>1?'s':''} sur ${Q.length}</p>
   </div>`;
+  $('#bx7').onclick=()=>startX([0,1,2,3,4,5,6]);
+  $('#bxa').onclick=()=>startX(sh(X.map((_,i)=>i)));
   $('#b3').onclick=()=>start(sh(mpool).slice(0,3));
   $('#ball').onclick=()=>start(sh(pool));
   $('#bw').onclick=()=>start(sh(w));
@@ -399,10 +615,287 @@ function end(){
   $('#again').onclick=()=>start(sh(Q.map((_,i)=>i).filter(inMod)).slice(0,3));
   $('#back').onclick=home;
 }
+/* ===================== Outils communs ===================== */
+const f=(x,d=2)=>Number(x).toLocaleString('fr-FR',{maximumFractionDigits:d}).replace('-','−');
+const num=s=>{s=String(s??'').replace(/[\s  ]|k€|K€|€|%/g,'').replace(',','.').replace('−','-');return s===''?NaN:+s};
+function okNum(x,a,u){if(isNaN(x))return false;const tol=u==='%'?0.15:Math.max(0.6,Math.abs(a)*0.003);return Math.abs(x-a)<=tol||(u==='%'&&Math.abs(x*100-a)<=tol)}
+function qsHTML(items,pre){return items.map((it,i)=>{
+  if(it.h)return `<h3>${it.h}</h3>`;
+  if(it.k==='t')return `<div class="qi"><span class="ql">${it.l}</span><details class="mod"><summary>Réponse modèle</summary><div>${it.m}</div></details></div>`;
+  if(it.k==='c')return `<div class="qi" data-i="${i}"><label class="ql" for="${pre}${i}">${it.l}</label><div class="inr"><select id="${pre}${i}"><option value="">Choisir…</option>${it.o.map((o,k)=>`<option value="${k}">${o}</option>`).join('')}</select><span class="mk"></span></div><div class="sol" hidden></div></div>`;
+  return `<div class="qi" data-i="${i}"><label class="ql" for="${pre}${i}">${it.l}</label><div class="inr"><input id="${pre}${i}" inputmode="decimal" autocomplete="off" placeholder="?"><span class="u">${it.u||'K€'}</span><span class="mk"></span></div><div class="sol" hidden></div></div>`;
+}).join('')}
+function check(box,items){let ok=0,n=0;box.querySelectorAll('.qi[data-i]').forEach(d=>{
+  const it=items[+d.dataset.i];n++;const el=d.querySelector('input,select');let g;
+  if(it.k==='c')g=el.value!==''&&+el.value===it.a;else g=okNum(num(el.value),it.a,it.u);
+  if(g)ok++;d.classList.toggle('good',g);d.classList.toggle('bad',!g);d.querySelector('.mk').textContent=g?'✓':'✗';
+  const s=d.querySelector('.sol');s.hidden=false;
+  s.innerHTML=it.k==='c'?`<b>${it.o[it.a]}</b> · ${it.j||''}`:`<b>${f(it.a)} ${it.u||'K€'}</b> · ${it.j||''}`;
+});box.querySelectorAll('details.mod').forEach(x=>x.open=true);return[ok,n]}
+const tb=rows=>`<div class="wrap"><table>${rows.map(r=>`<tr${r[2]?' class="tot"':''}><td>${r[0]}</td><td class="n">${r[1]}</td></tr>`).join('')}</table></div>`;
+const bil=(L,R)=>{L=L.slice();R=R.slice();const n=Math.max(L.length,R.length);[L,R].forEach(s=>{while(s.length<n)s.splice(s.length-1,0,['',''])});
+  const c=(x,cl)=>`<td class="${cl}"${x[2]?' style="font-weight:700;background:var(--bg)"':''}>${x[cl?1:0]}</td>`;
+  let h='<div class="wrap"><table><tr><th colspan="2">Actif</th><th colspan="2">Capitaux propres et passifs</th></tr>';
+  for(let i=0;i<n;i++)h+=`<tr>${c(L[i],'')}${c(L[i],'n')}${c(R[i],'')}${c(R[i],'n')}</tr>`;return h+'</table></div>'};
+
+/* ===================== Annales corrigées ===================== */
+const LEV='Effet de levier : comparer le ROA au taux d\'intérêt.';
+const A=[
+{id:'artist',tag:'CC 2025 · 20 pts',t:'Cas Artist',s:'Ton dernier CC. Partie 1 : 6 pts, partie 2 : 5 pts, partie 3 : 4 pts (+ QCM 5 pts dans l\'onglet QCM).',
+e:`<p>Impression d'œuvres d'art sur papeterie. Bilan incomplet au 31/12/N (K€) :</p>${bil([['Bâtiments','1 781'],['Équipements','1 212'],['Stocks','453'],['Créances','800'],['Trésorerie','417'],['Total','4 663',1]],[['Capital','1 200'],['Réserves','863'],['Résultat net','?'],['Emprunt','1 450'],['Fournisseurs','182'],['Dettes fiscales','?'],['Total','4 663',1]])}
+<p>Année N : chiffre d'affaires 6 250 K€. Coût d'achat des marchandises vendues 48 % du CA, charges de personnel 20 % du CA. Frais de gestion 813 K€, amortissements 190 K€, intérêts 29 K€. Impôt 25 %.</p>
+<p>Trésorerie N−1 : exploitation 770, investissement −560, financement −346, variation −136, trésorerie de début 363.<br>Année N : encaissements d'exploitation 5 100, décaissements d'exploitation 4 540, achats d'équipements au comptant 132, cession d'un équipement 40, dividendes versés sur le résultat N−1 : 378. Ni remboursement d'emprunt ni augmentation de capital.</p>`,
+q:[{h:'Partie 1 · Élaboration des états (6 pts)'},
+{l:'Résultat d\'exploitation',a:997,j:'6 250 − 3 000 (48 %) − 1 250 (20 %) − 813 − 190'},
+{l:'Impôt',a:242,j:'25 % × (997 − 29) = 25 % × 968'},
+{l:'Résultat net',a:726,j:'968 − 242'},
+{l:'Dettes fiscales (case « ? » du bilan)',a:242,j:'L\'impôt de N n\'est pas encore payé. Vérif : 4 663 − 1 200 − 863 − 726 − 1 450 − 182 = 242'},
+{l:'Montant des immobilisations',a:2993,j:'Bâtiments + équipements = 1 781 + 1 212'},
+{l:'Montant des actifs circulants',a:1670,j:'Stocks + créances + trésorerie = 453 + 800 + 417'},
+{l:'Montant des fonds propres',a:2789,j:'Capital + réserves + résultat net = 1 200 + 863 + 726'},
+{l:'Montant des passifs',a:1874,j:'Emprunt + fournisseurs + dettes fiscales = 1 450 + 182 + 242'},
+{l:'BFR',a:829,j:'(Stocks + créances) − (fournisseurs + dettes fiscales) = 1 253 − 424'},
+{l:'Taux d\'intérêt de l\'emprunt',a:2,u:'%',j:'Intérêts / emprunt = 29 / 1 450'},
+{l:'Coût effectif de l\'emprunt',a:1.5,u:'%',j:'2 % × (1 − 25 %). Autre calcul : (RN sans emprunt − RN avec) / emprunt = (747,75 − 726) / 1 450'},
+{h:'Partie 2 · Analyse (5 pts)'},
+{l:'Rentabilité économique (ROA)',a:21.38,u:'%',j:'Résultat d\'exploitation / total actif = 997 / 4 663. Pour 1 € investi dans l\'actif, 21,4 centimes de résultat d\'exploitation.'},
+{l:'Rentabilité financière (ROE)',a:35.19,u:'%',j:'Résultat net / (capital + réserves) = 726 / 2 063. Pour 1 € de fonds propres, 35,2 centimes de résultat net pour les actionnaires.'},
+{k:'t',l:'Q2 · Distribution début N+1 de la moitié du résultat N : impact sur les états financiers ?',m:'Dividende = 726 / 2 = 363. Le résultat net (726) quitte les capitaux propres : 363 en réserves (863 → 1 226), 363 en dette « dividendes à payer ». Capitaux propres 2 789 → 2 426, passifs 1 874 → 2 237, total inchangé (4 663). Au paiement : trésorerie 417 → 54, la dette disparaît, total 4 300 ; flux de financement N+1 : −363. Pas d\'effet sur le compte de résultat : le dividende n\'est pas une charge.'},
+{l:'Q3 · Résultat net si l\'emprunt avait été remboursé début N',a:747.75,j:'Plus d\'intérêts : résultat imposable = 997, impôt 249,25, RN = 997 × 75 %. Le RN AUGMENTE (erreur de ta copie : « il ne change pas »).'},
+{l:'Q3 · ROE dans ce cas',a:21.29,u:'%',j:'747,75 / (1 200 + 863 + 1 450) = 747,75 / 3 513'},
+{k:'t',l:'Q3 · Approuvez-vous le conseil du dirigeant ?',m:'Non. Le RN monte un peu (+21,75) mais les fonds propres augmentent beaucoup plus (2 063 → 3 513) : le ROE tombe de 35,2 % à 21,3 %. L\'entreprise emprunte à 2 % (1,5 % après impôt) et cet argent lui rapporte 21,4 % (ROA) : l\'écart revient aux actionnaires. C\'est l\'effet de levier ; rembourser l\'emprunt le supprime.'},
+{h:'Partie 3 · Trésorerie (4 pts)'},
+{l:'Flux d\'exploitation N',a:560,j:'5 100 − 4 540'},
+{l:'Flux d\'investissement N',a:-92,j:'−132 + 40'},
+{l:'Flux de financement N',a:-378,j:'Dividendes versés'},
+{l:'Variation de trésorerie N',a:90,j:'560 − 92 − 378'},
+{l:'Trésorerie de début N',a:227,j:'= trésorerie de fin N−1 = 363 − 136'},
+{l:'Trésorerie de fin N',a:317,j:'227 + 90'},
+{k:'t',l:'Q2 · Commentez l\'évolution de la trésorerie',m:'La trésorerie augmente de 90 en N après avoir baissé de 136 en N−1. L\'exploitation dégage toujours de la trésorerie, mais moins (560 contre 770). La vraie différence vient de l\'investissement : −92 contre −560, l\'entreprise a très peu investi. Le financement reste négatif (−378 contre −346), uniquement des dividendes. Conclusion : en N, l\'exploitation couvre l\'investissement et les dividendes (560 &gt; 92 + 378), mais la hausse tient surtout au faible investissement, pas à une meilleure activité.'}]},
+
+{id:'superextra',tag:'CC 2020 · 17 pts',t:'Cas SuperExtra',s:'Questions de cours 4,5 pts (onglet Fiche) + problème 12,5 pts. Corrigé officiel fourni.',
+e:`<p>Négoce d'articles de sport. Compte de résultat 20x8 (K€) :</p>${tb([['Achat des articles vendus','2 977'],['Salaires','1 232'],['Frais divers de gestion','878'],['Amortissement','162'],['Intérêts','26'],['Impôt','?'],['Résultat net','?'],['Chiffre d\'affaires (produits)','5 467',1]])}
+<p>Bilan fin 20x8 :</p>${bil([['Bâtiments','1 450'],['Matériels','853'],['Stocks','465'],['Créances','800'],['Trésorerie','328'],['Total','3 896',1]],[['Capital','864'],['Réserves','1 340'],['Résultat net','?'],['Emprunt','?'],['Fournisseurs','248'],['Total','?',1]])}
+<p>Taux d'intérêt 2 %, emprunt constant sur l'année. Impôt 25 %.</p>
+<p>20x9 : totalité du résultat 20x8 distribuée, pas d'augmentation de capital. Encaissé des clients 5 580 ; versé aux fournisseurs 3 582 ; salaires 1 285 ; intérêts 24 ; impôt 48 ; nouveaux matériels 860 ; cession d'anciens matériels 78 ; amortissements 158 ; remboursement d'emprunt 300 ; nouvel emprunt 350.</p>`,
+q:[{h:'Q1 · Déterminez (1,5 pt)'},
+{l:'Montant de l\'emprunt',a:1300,j:'Intérêts / taux = 26 / 2 %'},
+{l:'Montant de l\'impôt',a:48,j:'25 % × (5 467 − 2 977 − 1 232 − 878 − 162 − 26) = 25 % × 192'},
+{l:'Résultat net',a:144,j:'192 − 48'},
+{l:'Résultat d\'exploitation',a:218,j:'5 467 − 2 977 − 1 232 − 878 − 162 (ou 144 + 48 + 26)'},
+{l:'Immobilisations',a:2303,j:'1 450 + 853'},
+{l:'Actifs circulants',a:1593,j:'465 + 800 + 328'},
+{l:'Fonds propres',a:2348,j:'864 + 1 340 + 144'},
+{l:'Passifs',a:1548,j:'1 300 + 248. Vérif : 2 348 + 1 548 = 3 896'},
+{k:'t',l:'Q2 · Bénéfice ou perte ? Pourquoi ? Qu\'est-ce que cela signifie ?',m:'Bénéfice de 144 : le résultat net est positif, les produits (5 467) dépassent les charges (5 323). Cela signifie un enrichissement des actionnaires de 144 sur l\'année : les capitaux propres augmentent d\'autant avant toute distribution.'},
+{k:'t',l:'Q3 · Fonds propres directement ou indirectement investis ?',m:'Principalement indirectement investis : les réserves (1 340), bénéfices passés que les actionnaires ont laissés dans l\'entreprise, dépassent le capital (864) apporté directement.'},
+{l:'Q4 · Coût effectif de l\'emprunt',a:1.5,u:'%',j:'2 % × (1 − 25 %). Les intérêts (26) réduisent l\'impôt de 6,5 : coût net 19,5 / 1 300'},
+{h:'Q5 · Moitié du résultat distribuée le 2 janvier 20x9'},
+{l:'Fonds propres après distribution',a:2276,j:'2 348 − 72'},
+{l:'Créances après distribution',a:800,j:'Inchangées : le dividende ne touche pas les clients'},
+{l:'Trésorerie après distribution',a:256,j:'328 − 72'},
+{h:'Q6 · Remplacer l\'emprunt par une augmentation de capital (3,5 pts)'},
+{l:'Résultat net 20x8 sans emprunt',a:163.5,j:'Actif inchangé donc résultat d\'exploitation inchangé : 218 × (1 − 25 %)'},
+{l:'ROE avec emprunt',a:6.53,u:'%',j:'144 / (864 + 1 340) = 144 / 2 204'},
+{l:'ROE sans emprunt',a:4.67,u:'%',j:'163,5 / (2 204 + 1 300) = 163,5 / 3 504'},
+{k:'t',l:'Les actionnaires doivent-ils suivre le conseil ?',m:'Non. Le ROE est plus élevé avec le financement mixte (6,5 % contre 4,7 %). Le ROA (218 / 3 896 = 5,6 %) dépasse le taux d\'intérêt (2 %) : chaque euro emprunté rapporte plus qu\'il ne coûte, l\'écart revient aux actionnaires.'},
+{h:'Q7 · État des flux 20x9 (4 pts)'},
+{l:'Flux d\'exploitation',a:665,j:'5 580 − 3 582 − 1 285 − 48'},
+{l:'Flux d\'investissement',a:-782,j:'−860 + 78. L\'amortissement (158) n\'est PAS un flux'},
+{l:'Flux de financement',a:-118,j:'−144 (dividendes) − 24 (intérêts) − 300 + 350. Le corrigé affiche −41 : coquille'},
+{l:'Variation de trésorerie',a:-235,j:'665 − 782 − 118'},
+{l:'Trésorerie finale',a:93,j:'328 − 235'},
+{k:'t',l:'Impact de l\'affectation du résultat 20x8 sur la trésorerie (1 pt)',m:'Distribuer les 144 fait sortir 144 de trésorerie (flux de financement). Mis en réserve, ils seraient restés dans l\'entreprise : variation −91 au lieu de −235, trésorerie finale 237 au lieu de 93. Ici, l\'exploitation (665) ne couvre déjà pas l\'investissement (782) : la distribution aggrave la baisse.'}]},
+
+{id:'baba',tag:'CC 2019',t:'Cas BABA',s:'Bilan à compléter + levier. Énoncé sans corrigé : solution calculée avec la méthode des corrigés 2020 et 2025.',
+e:`<p>Formations en comptabilité. Aucun stock, aucune dette fournisseur. Bilan incomplet au 31/12/2018 (K€) :</p>${bil([['Bâtiments (nets)','3 085'],['Équipements (nets)','893'],['Créances','150'],['Trésorerie','?'],['Total','?',1]],[['Capital','1 220'],['Réserves','1 452'],['Résultat net','?'],['Emprunt','1 200'],['Total','?',1]])}
+<p>2018 : formations vendues 1,8 M€. Charges d'exploitation 76 % du CA. Charge d'intérêt 36 000 €. Impôt 25 %.</p>
+<p>Q3 : le dirigeant propose d'augmenter le capital de 1 M€ pour réduire l'emprunt du même montant, début 2018.</p>`,
+q:[{h:'Q1 · Compte de résultat et bilan'},
+{l:'Résultat d\'exploitation',a:432,j:'1 800 − 76 % × 1 800 = 1 800 − 1 368'},
+{l:'Résultat imposable',a:396,j:'432 − 36'},
+{l:'Impôt',a:99,j:'25 % × 396'},
+{l:'Résultat net',a:297,j:'396 − 99'},
+{l:'Capitaux propres',a:2969,j:'1 220 + 1 452 + 297'},
+{l:'Total du bilan',a:4169,j:'Capitaux propres + emprunt = 2 969 + 1 200'},
+{l:'Trésorerie',a:41,j:'Par différence : 4 169 − 3 085 − 893 − 150'},
+{h:'Q2'},
+{l:'Taux d\'intérêt',a:3,u:'%',j:'36 / 1 200'},
+{l:'Coût effectif',a:2.25,u:'%',j:'3 % × (1 − 25 %)'},
+{h:'Q3 et Q4 · Augmentation de capital de 1 000'},
+{l:'Résultat net 2018 après l\'opération',a:319.5,j:'Emprunt 200, intérêts 3 % × 200 = 6, imposable 426, impôt 106,5, RN 319,5. Le dirigeant a raison : le RN monte (+22,5)…'},
+{l:'ROE 2018 sans l\'opération',a:11.12,u:'%',j:'297 / (1 220 + 1 452) = 297 / 2 672'},
+{l:'ROE 2018 avec l\'opération',a:8.70,u:'%',j:'319,5 / (2 672 + 1 000) = 319,5 / 3 672'},
+{k:'t',l:'Q4 · Les actionnaires ont-ils intérêt à suivre le conseil ?',m:'Non, si leur objectif est le ROE : il baisse de 11,1 % à 8,7 %. Le RN augmente, mais moins vite que les fonds propres. ROA = 432 / 4 169 = 10,4 % &gt; 3 % : l\'emprunt crée un effet de levier positif qu\'il vaut mieux garder.'}]},
+
+{id:'lou',tag:'CC 2019',t:'Cas Lou',s:'Lecture du bilan et du compte de résultat.',
+e:`<p>Négoce de VTT électriques. Bilan fin 20x5 (K€) :</p>${bil([['Bâtiments','322'],['Matériels','53'],['Stocks','217'],['Créances','35'],['Trésorerie','18'],['Total','645',1]],[['Capital','82'],['Réserves','274'],['Résultat net','28'],['Emprunt','239'],['Fournisseurs','22'],['Total','645',1]])}
+<p>Compte de résultat 20x5 : coût d'achat des VTT vendus 976, salaires 356, frais divers 197, amortissement 26, intérêts 9, impôt 12, résultat net 28. Chiffre d'affaires 1 604.</p>`,
+q:[{l:'Immobilisations',a:375,j:'322 + 53'},
+{l:'Actifs circulants',a:270,j:'217 + 35 + 18'},
+{l:'Fonds propres',a:384,j:'82 + 274 + 28'},
+{l:'Passifs',a:261,j:'239 + 22'},
+{l:'Résultat d\'exploitation',a:49,j:'1 604 − 976 − 356 − 197 − 26'},
+{l:'Résultat imposable',a:40,j:'49 − 9'},
+{l:'Taux d\'imposition',a:30,u:'%',j:'12 / 40'},
+{k:'t',l:'Bénéfice ou perte ? Pourquoi ?',m:'Bénéfice de 28 : les produits (1 604) dépassent les charges (1 576). Les actionnaires se sont enrichis de 28.'},
+{k:'t',l:'Fonds propres directement ou indirectement investis ?',m:'Indirectement : les réserves (274) dépassent largement le capital (82). Les actionnaires ont surtout laissé leurs bénéfices passés dans l\'entreprise au lieu de les prélever en dividendes.'}]},
+
+{id:'jourj',tag:'CC 2019',t:'Cas Jour-J',s:'Tableau des flux à trous.',
+e:`<div class="wrap"><table><tr><th></th><th class="n">20x3</th><th class="n">20x2</th><th class="n">20x1</th></tr>
+<tr><td>Flux d'exploitation</td><td class="n">?</td><td class="n">34 743</td><td class="n">35 222</td></tr>
+<tr><td>Flux d'investissement</td><td class="n">−19 680</td><td class="n">−21 250</td><td class="n">−21 449</td></tr>
+<tr><td>Flux de financement</td><td class="n">−17 673</td><td class="n">?</td><td class="n">−15 849</td></tr>
+<tr><td>Variation</td><td class="n">?</td><td class="n">1 844</td><td class="n">?</td></tr>
+<tr><td>Trésorerie début</td><td class="n">3 045</td><td class="n">?</td><td class="n">?</td></tr>
+<tr><td>Trésorerie fin</td><td class="n">1 792</td><td class="n">?</td><td class="n">1 201</td></tr></table></div>`,
+q:[{l:'Variation 20x3',a:-1253,j:'Fin − début = 1 792 − 3 045'},
+{l:'Flux d\'exploitation 20x3',a:36100,j:'−1 253 + 19 680 + 17 673'},
+{l:'Trésorerie fin 20x2',a:3045,j:'= début 20x3'},
+{l:'Trésorerie début 20x2',a:1201,j:'3 045 − 1 844 (= fin 20x1 ✓)'},
+{l:'Flux de financement 20x2',a:-11649,j:'1 844 − 34 743 + 21 250'},
+{l:'Variation 20x1',a:-2076,j:'35 222 − 21 449 − 15 849'},
+{l:'Trésorerie début 20x1',a:3277,j:'1 201 + 2 076'},
+{k:'t',l:'Pourquoi la trésorerie monte en 20x2 et baisse en 20x3 ?',m:'En 20x2, l\'exploitation (34 743) couvre l\'investissement (21 250) et le financement (11 649) : +1 844. En 20x3, l\'exploitation progresse (36 100) et on investit un peu moins, mais le financement sort beaucoup plus (−17 673 contre −11 649 : plus de remboursements ou de dividendes). L\'exploitation ne couvre plus les deux : −1 253.'}]}
+];
+let annSel=0;
+function annales(){
+  const c=A[annSel];
+  $('#annBox').innerHTML=`<div class="row" style="margin:0 0 4px">${A.map((x,i)=>`<button class="chip ${i===annSel?'on':''}" data-a="${i}">${x.t.replace('Cas ','')} <span style="opacity:.6">${x.tag.slice(3,7)}</span></button>`).join('')}</div>
+  <div class="card" id="anc"><span class="tag">${c.tag}</span><h2>${c.t}</h2><p class="sub">${c.s}</p>
+  <details class="en" open><summary>Énoncé (données)</summary>${c.e}</details>
+  <p class="sub">Tape tes réponses (virgule ou point acceptés, % sans le signe), puis corrige.</p>
+  ${qsHTML(c.q,'a_')}<button class="big" id="acor">Corriger</button><div id="asc"></div></div>`;
+  document.querySelectorAll('.chip[data-a]').forEach(b=>b.onclick=()=>{annSel=+b.dataset.a;annales()});
+  $('#acor').onclick=()=>{const[ok,n]=check($('#anc'),c.q);$('#asc').innerHTML=`<div class="score">${ok} / ${n}</div><p class="sub" style="text-align:center">calculs justes. Compare aussi tes rédactions aux réponses modèles.</p><button class="big alt" id="are">Recommencer à zéro</button>`;$('#are').onclick=annales;$('#asc').scrollIntoView({behavior:'smooth'})};
+}
+
+/* ===================== Drill : cas aléatoire infini ===================== */
+const Rn=(a,b,s=1)=>{a=Math.ceil(a/s)*s;b=Math.floor(b/s)*s;return a+s*Math.floor(Math.random()*((b-a)/s+1))};
+const Pk=a=>a[Math.random()*a.length|0];
+const r2=x=>Math.round(x*100)/100;
+function gen(){
+  for(let k=0;k<2000;k++){
+    const CA=Rn(2000,9000,100),pA=Pk([40,42,45,48,50,52,55]),pP=Pk([15,18,20,22,25]);
+    const ach=CA*pA/100,pers=CA*pP/100,fr=Rn(CA*.05,CA*.12),am=Rn(CA*.015,CA*.04);
+    const RE=CA-ach-pers-fr-am;if(RE<CA*.03)continue;
+    const E=Rn(400,3000,100),ti=Pk([2,3,4,5,6,8]),it=E*ti/100,t=Pk([25,25,30]);
+    const RAI=RE-it;if(RAI<=0)continue;
+    const imp=r2(RAI*t/100),RN=r2(RAI-imp);
+    const C=Rn(300,2000,10),Rs=Rn(200,2500,10),F=Rn(CA*.025,CA*.07);
+    const TP=C+Rs+RAI+E+F;
+    const S=Rn(CA*.05,CA*.1),Cr=Rn(CA*.07,CA*.14),T=Rn(TP*.03,TP*.09);
+    const im=TP-S-Cr-T;if(im<TP*.25)continue;
+    const B=Math.round(im*Rn(55,70)/100),Q=im-B;
+    const enc=CA-Rn(-CA*.03,CA*.05),fo=ach+Rn(-CA*.02,CA*.03),sal=pers-Rn(0,pers*.02),impP=Rn(imp*.5,imp*1.3),acq=Rn(CA*.02,CA*.15),ces=Pk([0,Rn(5,CA*.02)]),div=Rn(Math.min(50,RN*.2),RN*.8);
+    const FE=enc-fo-sal-fr-impP,FI=ces-acq,FF=-div-it,V=FE+FI+FF,deb=T-V;if(deb<30||FE<=0)continue;
+    const ROA=RE/TP*100,ROE=RN/(C+Rs)*100,RNs=r2(RE*(1-t/100)),ROEs=RNs/(C+Rs+E)*100;
+    return{nom:Pk(['Artemis','Boréal','Cobalt','Delta','Éole','Fjord','Gamma','Hélios','Iris','Jade','Kappa','Mistral','Nova','Opale','Zénith']),CA,pA,pP,ach,pers,fr,am,RE,E,ti,it,t,RAI,imp,RN,C,Rs,F,TP,S,Cr,T,im,B,Q,enc,fo,sal,impP,acq,ces,div,FE,FI,FF,V,deb,ROA,ROE,RNs,ROEs};
+  }
+}
+let D=null;
+function drill(fresh){
+  if(fresh||!D)D=gen();const d=D;
+  const qs=[{h:'Partie 1 · Élaboration des états'},
+  {l:'Résultat d\'exploitation',a:d.RE,j:`${f(d.CA)} − ${f(d.ach)} (${d.pA} %) − ${f(d.pers)} (${d.pP} %) − ${f(d.fr)} − ${f(d.am)}`},
+  {l:'Résultat imposable (avant impôt)',a:d.RAI,j:`${f(d.RE)} − ${f(d.it)}`},
+  {l:'Impôt',a:d.imp,j:`${d.t} % × ${f(d.RAI)}`},
+  {l:'Résultat net',a:d.RN,j:`${f(d.RAI)} − ${f(d.imp)}`},
+  {l:'Dettes fiscales (case « ? »)',a:d.imp,j:'Impôt de N pas encore payé'},
+  {l:'Immobilisations',a:d.im,j:`${f(d.B)} + ${f(d.Q)}`},
+  {l:'Actifs circulants',a:d.S+d.Cr+d.T,j:`${f(d.S)} + ${f(d.Cr)} + ${f(d.T)}`},
+  {l:'Fonds propres',a:d.C+d.Rs+d.RN,j:`${f(d.C)} + ${f(d.Rs)} + ${f(d.RN)}`},
+  {l:'Passifs',a:d.E+d.F+d.imp,j:`${f(d.E)} + ${f(d.F)} + ${f(d.imp)}`},
+  {l:'BFR',a:d.S+d.Cr-d.F-d.imp,j:`(${f(d.S)} + ${f(d.Cr)}) − (${f(d.F)} + ${f(d.imp)})`},
+  {l:'Taux d\'intérêt',a:d.ti,u:'%',j:`${f(d.it)} / ${f(d.E)}`},
+  {l:'Coût effectif de l\'emprunt',a:d.ti*(1-d.t/100),u:'%',j:`${d.ti} % × (1 − ${d.t} %)`},
+  {h:'Partie 2 · Analyse'},
+  {l:'ROA',a:d.ROA,u:'%',j:`${f(d.RE)} / ${f(d.TP)}`},
+  {l:'ROE',a:d.ROE,u:'%',j:`${f(d.RN)} / (${f(d.C)} + ${f(d.Rs)})`},
+  {l:'Résultat net si l\'emprunt était remplacé par du capital',a:d.RNs,j:`${f(d.RE)} × (1 − ${d.t} %)`},
+  {l:'ROE dans ce cas',a:d.ROEs,u:'%',j:`${f(d.RNs)} / (${f(d.C)} + ${f(d.Rs)} + ${f(d.E)})`},
+  {k:'c',l:'Faut-il rembourser l\'emprunt par une augmentation de capital ?',o:['Oui, rembourser','Non, garder l\'emprunt'],a:d.ROEs>d.ROE?0:1,j:`ROA ${f(d.ROA,1)} % ${d.ROA>d.ti?'&gt;':'&lt;'} taux ${d.ti} % : ROE ${f(d.ROE,1)} % avec emprunt contre ${f(d.ROEs,1)} % sans.`},
+  {h:'Partie 3 · Trésorerie'},
+  {l:'Flux d\'exploitation',a:d.FE,j:`${f(d.enc)} − ${f(d.fo)} − ${f(d.sal)} − ${f(d.fr)} − ${f(d.impP)}. Pas l'amortissement !`},
+  {l:'Flux d\'investissement',a:d.FI,j:`${d.ces?f(d.ces)+' − ':'−'}${f(d.acq)}`},
+  {l:'Flux de financement',a:d.FF,j:`−${f(d.div)} (dividendes) − ${f(d.it)} (intérêts)`},
+  {l:'Variation de trésorerie',a:d.V,j:`${f(d.FE)} + (${f(d.FI)}) + (${f(d.FF)})`},
+  {l:'Trésorerie de début N',a:d.deb,j:`Trésorerie fin (bilan) − variation = ${f(d.T)} − (${f(d.V)})`}];
+  const full=`<h3>Les 3 tableaux complets</h3><p class="tag">Compte de résultat</p>${tb([['Chiffre d\'affaires',f(d.CA)],['− Achats des marchandises vendues','−'+f(d.ach)],['− Personnel','−'+f(d.pers)],['− Frais de gestion','−'+f(d.fr)],['− Amortissements','−'+f(d.am)],['= Résultat d\'exploitation',f(d.RE),1],['− Intérêts','−'+f(d.it)],['= Résultat imposable',f(d.RAI),1],['− Impôt','−'+f(d.imp)],['= Résultat net',f(d.RN),1]])}
+  <p class="tag">Bilan</p>${bil([['Bâtiments',f(d.B)],['Équipements',f(d.Q)],['Immobilisations',f(d.im),1],['Stocks',f(d.S)],['Créances',f(d.Cr)],['Trésorerie',f(d.T)],['Actifs circulants',f(d.S+d.Cr+d.T),1],['Total',f(d.TP),1]],[['Capital',f(d.C)],['Réserves',f(d.Rs)],['Résultat net',f(d.RN)],['Capitaux propres',f(d.C+d.Rs+d.RN),1],['Emprunt',f(d.E)],['Fournisseurs',f(d.F)],['Dettes fiscales',f(d.imp)],['Total',f(d.TP),1]])}
+  <p class="tag">État des flux</p>${tb([['Encaissements clients',f(d.enc)],['Fournisseurs','−'+f(d.fo)],['Salaires','−'+f(d.sal)],['Frais de gestion','−'+f(d.fr)],['Impôt payé (N−1)','−'+f(d.impP)],['Flux d\'exploitation',f(d.FE),1],['Acquisitions','−'+f(d.acq)],['Cessions',f(d.ces)],['Flux d\'investissement',f(d.FI),1],['Dividendes','−'+f(d.div)],['Intérêts','−'+f(d.it)],['Flux de financement',f(d.FF),1],['Variation',f(d.V),1],['Trésorerie début',f(d.deb)],['Trésorerie fin',f(d.T),1]])}`;
+  $('#drill').innerHTML=`<div class="card"><span class="tag">Entraînement infini · format du CC 2025</span><p class="sub">Un nouveau cas à chaque fois, avec les mêmes questions que l'examen. Fais-en jusqu'à tout réussir sans regarder la méthode.</p><button class="big alt" id="dnew">Nouveau cas</button></div>
+  <div class="card" id="dc"><span class="tag">Cas ${d.nom} (K€)</span>
+  <p>En N, chiffre d'affaires ${f(d.CA)}. Coût d'achat des marchandises vendues ${d.pA} % du CA, charges de personnel ${d.pP} % du CA. Frais de gestion ${f(d.fr)}, amortissements ${f(d.am)}, charge d'intérêt ${f(d.it)}. Impôt ${d.t} %, payé l'année suivante. L'emprunt n'a pas varié pendant l'année.</p>
+  ${bil([['Bâtiments',f(d.B)],['Équipements',f(d.Q)],['Stocks',f(d.S)],['Créances',f(d.Cr)],['Trésorerie',f(d.T)],['Total',f(d.TP),1]],[['Capital',f(d.C)],['Réserves',f(d.Rs)],['Résultat net','?'],['Emprunt',f(d.E)],['Fournisseurs',f(d.F)],['Dettes fiscales','?'],['Total',f(d.TP),1]])}
+  <p>Pendant N : encaissé des clients ${f(d.enc)} ; payé aux fournisseurs ${f(d.fo)} ; salaires payés ${f(d.sal)} ; frais de gestion payés ${f(d.fr)} ; impôt de N−1 payé ${f(d.impP)} ; intérêts versés ${f(d.it)} ; amortissements ${f(d.am)} ; équipements achetés au comptant ${f(d.acq)}${d.ces?` ; cession d'un équipement ${f(d.ces)}`:''} ; dividendes versés ${f(d.div)}.</p>
+  ${qsHTML(qs,'d_')}<button class="big" id="dcor">Corriger</button><div id="dsc"></div></div>`;
+  $('#dnew').onclick=()=>{drill(true);window.scrollTo(0,0)};
+  $('#dcor').onclick=()=>{const[ok,n]=check($('#dc'),qs);$('#dsc').innerHTML=`<div class="score">${ok} / ${n}</div>${full}<button class="big" id="dnew2">Cas suivant</button>`;$('#dnew2').onclick=()=>{drill(true);window.scrollTo(0,0)};$('#dsc').scrollIntoView({behavior:'smooth'})};
+}
+
+/* ===================== QCM type CC (plusieurs réponses) ===================== */
+// c : indices des bonnes réponses. src : 'CC 2025' si question du sujet.
+const X=[
+{src:'CC 2025',q:'L\'aléa moral en comptabilité financière correspond à :',o:['l\'asymétrie d\'information entre les parties prenantes externes et les actionnaires de l\'entreprise','une sous-estimation des risques encourus par les actionnaires en raison des décisions prises par les dirigeants','un écart significatif entre le résultat prévisionnel et le résultat définitif d\'une entreprise','un risque encouru par les actionnaires, à la signature du contrat, en raison des décisions des dirigeants','la difficulté à contrôler l\'action des parties prenantes externes à l\'égard de l\'entreprise'],c:[3],e:'En signant, les actionnaires acceptent de subir les décisions futures des dirigeants, qu\'ils ne peuvent pas observer. L\'asymétrie avant contrat, c\'est la sélection adverse. Les deux premières cases ont été comptées fausses dans ta copie.'},
+{src:'CC 2025',q:'La normalisation comptable :',o:['a pour objectif d\'encadrer les pratiques comptables pour permettre aux entreprises de maximiser leur résultat','a pour objectif de réduire l\'asymétrie d\'information en imposant un cadre normatif à toutes les entreprises','a pour objectif de réduire le coût de l\'information en permettant d\'établir un seul jeu de comptes','a pour objectif de réduire le risque de divulgation sélective des informations financières émises par l\'entreprise','n\'a pas vocation à perdurer dans le futur en raison d\'un modèle comptable international'],c:[1,3],e:'Cadre commun = moins d\'asymétrie et pas de communication « à la carte ». Dans ta copie, la case « un seul jeu de comptes » a été pénalisée : tu n\'as eu que 0,5.'},
+{src:'CC 2025',q:'Pourquoi le résultat net d\'un exercice est-il différent du flux net de trésorerie de la même période ?',o:['Cette affirmation est fausse : ils sont égaux si et seulement si les charges ne comportent pas d\'amortissement','Cette différence s\'explique en partie par les délais d\'encaissement et de décaissement des flux impactant la trésorerie sur une période donnée','Le résultat est toujours inférieur au flux net de trésorerie car il inclut plus de charges','Le résultat net est un indicateur comptable alors que le flux net de trésorerie est un indicateur financier, ils ne mesurent donc pas la même chose','Cette différence s\'explique exclusivement par la prise en compte des charges d\'amortissement'],c:[1],e:'« En partie » : délais clients/fournisseurs, mais aussi investissements, emprunts, dividendes, amortissements. « Si et seulement si », « toujours », « exclusivement » sont faux. La 4e case a été pénalisée dans ta copie.'},
+{src:'CC 2025',q:'Une entreprise se trouve en situation d\'illiquidité :',o:['Lorsque la valeur des actifs liquides excède celle des passifs liquides','Lorsque la valeur des passifs excède celle des actifs','Lorsque la valeur des passifs liquides ne peut être recouverte par les actifs liquides','Lorsqu\'elle n\'est plus en mesure de rembourser ses intérêts d\'emprunt','Lorsque ses passifs dépassent la valeur de ses fonds propres'],c:[2],e:'Illiquidité = court terme : les dettes exigibles bientôt ne sont pas couvertes par les actifs vite transformables en argent. Passifs &gt; actifs, c\'est l\'insolvabilité.'},
+{src:'CC 2025',q:'Si le flux net de trésorerie d\'investissement est négatif, cela signifie généralement que :',o:['La valeur des immobilisations cédées est plus importante que celle des immobilisations acquises','La valeur des immobilisations acquises est plus importante que celle des immobilisations cédées','L\'entreprise a diminué sa dette financière en remboursant tout ou partie de ses emprunts','L\'entreprise a acquis des immobilisations au comptant','L\'entreprise a diminué le montant des dividendes versés'],c:[1],e:'Flux d\'investissement = cessions − acquisitions. Négatif ⇒ acquisitions &gt; cessions. Emprunts et dividendes sont du financement. « Au comptant » a été pénalisé dans ta copie.'},
+{src:'CC 2025',q:'Quelles sont les différences entre les notions de charge et d\'investissement ?',o:['Une charge génère un appauvrissement du patrimoine car elle diminue automatiquement le résultat, ce n\'est pas le cas de l\'investissement','Une charge génère une diminution immédiate ou différée de la trésorerie alors que l\'investissement impacte immédiatement la trésorerie','Un investissement aura des effets sur le long terme alors que la charge a uniquement un effet à court terme','Les investissements sont essentiellement financés par les dettes financières alors que les charges sont financées par la trésorerie disponible','Seul l\'investissement a un impact sur le bilan'],c:[0,2],e:'Charge = appauvrissement de la période (baisse du résultat). Investissement = échange contre un actif durable, consommé sur plusieurs années par l\'amortissement. Les cases 2 et 4 ont été comptées fausses dans ta copie (l\'amortissement ne sort jamais d\'argent, un investissement peut être payé à crédit).'},
+{src:'CC 2025',q:'La notion de besoin en fonds de roulement peut être définie comme :',o:['La différence entre les actifs circulants et les passifs','Le décalage entre les encaissements et les décaissements liés au cycle d\'exploitation de l\'entreprise','La trésorerie disponible diminuée des dettes d\'exploitation','Les ressources nécessaires au financement du cycle d\'exploitation de l\'entreprise','Un indicateur mesurant la performance de l\'entreprise en matière de recouvrement des dettes d\'exploitation'],c:[3],e:'BFR = (stocks + créances) − dettes d\'exploitation : l\'argent à mobiliser pour faire tourner l\'exploitation. Le « décalage » en est la cause, pas la définition : cette case t\'a fait perdre la question.'},
+{q:'La sélection adverse :',o:['résulte d\'une asymétrie d\'information avant la signature du contrat','apparaît après la signature, quand les dirigeants agissent dans leur propre intérêt','peut conduire les investisseurs à exiger une rentabilité plus élevée de toutes les entreprises','est totalement éliminée par la publication d\'états financiers','ne concerne que les banques'],c:[0,2],e:'Avant le contrat, l\'investisseur ne distingue pas bonnes et mauvaises entreprises : il se protège en exigeant plus de tout le monde. La publication la réduit, sans l\'éliminer. Après le contrat, c\'est l\'aléa moral.'},
+{q:'Les états financiers publiés permettent :',o:['de réduire l\'asymétrie d\'information entre dirigeants et apporteurs de fonds','de contrôler après coup l\'action des dirigeants','de garantir la rentabilité future de l\'entreprise','d\'évaluer l\'entreprise avant d\'y investir','de supprimer tout risque pour les actionnaires'],c:[0,1,3],e:'Ils servent avant le contrat (évaluer : sélection adverse) et après (contrôler : aléa moral). Ils ne garantissent rien.'},
+{q:'Sont des actifs circulants :',o:['les stocks','les créances clients','la trésorerie','les matériels','les dettes fournisseurs'],c:[0,1,2],e:'Matériels = immobilisations. Dettes fournisseurs = passif.'},
+{q:'Avec la convention du corrigé 2020, sont des flux de financement :',o:['les dividendes versés','un nouvel emprunt','les intérêts versés','la cession d\'un matériel','l\'impôt payé'],c:[0,1,2],e:'Cession = investissement ; impôt = exploitation.'},
+{q:'Ne sont PAS des flux de trésorerie :',o:['l\'amortissement','une vente non encaissée','l\'impôt de l\'année qui sera payé l\'an prochain','le remboursement d\'un emprunt','l\'achat d\'un matériel au comptant'],c:[0,1,2],e:'Aucun argent ne bouge pour les trois premiers. Remboursement et achat au comptant font sortir de l\'argent.'},
+{q:'Le versement (payé) d\'un dividende :',o:['diminue les capitaux propres','diminue la trésorerie','diminue le résultat net de l\'année','diminue les créances','donne un flux de financement négatif'],c:[0,1,4],e:'Un dividende n\'est pas une charge : il partage le résultat, il ne le réduit pas. Les créances ne bougent pas (SuperExtra Q5).'},
+{q:'Une augmentation de capital qui sert à rembourser l\'emprunt, avec ROA &gt; taux d\'intérêt :',o:['augmente le résultat net','fait baisser le ROE','laisse le total du bilan inchangé','change le résultat d\'exploitation','fait baisser la trésorerie'],c:[0,1,2],e:'Plus d\'intérêts donc RN plus haut, mais fonds propres beaucoup plus hauts donc ROE plus bas. Capital +E, emprunt −E : total inchangé. L\'argent entre puis ressort : trésorerie inchangée. L\'actif ne change pas : RE inchangé.'},
+{q:'Les intérêts d\'emprunt :',o:['sont déductibles fiscalement','ont un coût effectif égal à taux × (1 − taux d\'impôt)','font partie des charges d\'exploitation','varient avec le résultat de l\'entreprise','sont retirés avant le calcul de l\'impôt'],c:[0,1,4],e:'Ils viennent après le résultat d\'exploitation et avant l\'impôt. Ils sont fixés par le contrat.'},
+{q:'Fonds propres et dettes :',o:['les fonds propres ne sont jamais exigibles','la rémunération de l\'actionnaire est variable et résiduelle','les prêteurs ont un droit de vote','les dettes ont une échéance','les réserves sont une dette envers les actionnaires'],c:[0,1,3],e:'Exigibilité, rémunération, nature du droit : les 3 mots-clés du corrigé 2020. Les réserves sont des capitaux propres.'},
+{q:'Les dettes fournisseurs :',o:['sont une ressource d\'exploitation','diminuent le BFR','sont un actif circulant','permettent de préserver la trésorerie','sont des capitaux propres'],c:[0,1,3],e:'Elles financent les stocks à la place de l\'entreprise : c\'est la question de cours 2 du CC 2020.'},
+{q:'Une entreprise insolvable :',o:['a des capitaux propres négatifs','a des passifs supérieurs à la valeur de ses actifs','n\'a forcément plus de trésorerie','l\'est dès que son résultat de l\'année est négatif','peut encore avoir de la trésorerie'],c:[0,1,4],e:'L\'insolvabilité se lit sur tout le bilan. Une perte d\'une année ne suffit pas si les capitaux propres restent positifs.'},
+{q:'Un résultat net positif signifie que :',o:['les actionnaires se sont enrichis','les produits dépassent les charges','la trésorerie a augmenté','des dividendes seront versés','les capitaux propres augmentent (avant distribution)'],c:[0,1,4],e:'Résultat ≠ trésorerie. Distribuer ou non est une décision séparée.'},
+{q:'L\'effet de levier de l\'endettement est favorable aux actionnaires lorsque :',o:['le ROA est supérieur au taux d\'intérêt','le ROA est inférieur au taux d\'intérêt','l\'entreprise n\'a aucune dette','l\'argent emprunté rapporte plus qu\'il ne coûte','le résultat net augmente quand on rembourse l\'emprunt'],c:[0,3],e:'Si l\'argent emprunté rapporte (ROA) plus qu\'il ne coûte (taux), l\'écart revient aux actionnaires. Le RN augmente toujours quand on rembourse : ce n\'est pas le critère, regarde le ROE.'},
+{q:'Au bilan :',o:['les actifs sont classés par liquidité croissante','les capitaux propres et passifs sont classés par exigibilité croissante','le résultat net figure dans les passifs','la trésorerie est en haut de l\'actif','les dividendes à payer sont un passif'],c:[0,1,4],e:'Le résultat net est dans les capitaux propres. La trésorerie, la plus liquide, est en bas.'},
+{q:'Les réserves :',o:['sont des bénéfices passés non distribués','sont des fonds indirectement investis par les actionnaires','sont de l\'argent disponible en caisse','sont une dette','augmentent quand le résultat est mis en réserve'],c:[0,1,4],e:'Une réserve n\'est pas de l\'argent : l\'argent est dans les actifs (trésorerie ou autres).'},
+{q:'Le BFR augmente quand :',o:['les stocks augmentent','les créances clients augmentent','les dettes fournisseurs augmentent','les clients paient plus vite','les fournisseurs exigent d\'être payés plus vite'],c:[0,1,4],e:'Plus d\'actifs d\'exploitation ou moins de dettes d\'exploitation ⇒ BFR plus élevé.'}
+];
+let runX=null;
+function startX(ids){runX={ids,n:0,pts:0};showX()}
+function showX(){
+  const i=runX.ids[runX.n],q=X[i],ord=sh(q.o.map((_,k)=>k)),sel=new Set();
+  $('#quiz').innerHTML=`<div class="sub" style="display:flex;justify-content:space-between"><span>Question ${runX.n+1} / ${runX.ids.length}</span><button class="chip" id="quit">Quitter</button></div>
+  <div class="bar"><i style="width:${runX.n/runX.ids.length*100}%"></i></div>
+  <div class="card"><span class="tag">${q.src||'Type CC'} · une ou plusieurs réponses</span><div class="q">${q.q}</div>
+  ${ord.map(k=>`<button class="ch" data-k="${k}">${q.o[k]}</button>`).join('')}
+  <button class="big" id="val">Valider</button><div id="after"></div></div>`;
+  $('#quit').onclick=home;
+  document.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{const k=+b.dataset.k;sel.has(k)?sel.delete(k):sel.add(k);b.classList.toggle('sel')});
+  $('#val').onclick=()=>{
+    let g=0,w=0;sel.forEach(k=>q.c.includes(k)?g++:w++);const p=Math.max(0,(g-w)/q.c.length);runX.pts+=p;
+    document.querySelectorAll('.ch').forEach(b=>{b.disabled=true;const k=+b.dataset.k;if(q.c.includes(k))b.classList.add('good');else if(sel.has(k))b.classList.add('bad')});
+    $('#val').remove();
+    $('#after').innerHTML=`<div class="exp"><b>${p===1?'Tous les points.':p>0?'Points partiels : '+Math.round(p*100)+' %.':'0 point.'}</b>${w?' Tu as coché '+w+' case'+(w>1?'s':'')+' fausse'+(w>1?'s':'')+' : chacune annule une bonne réponse.':''} ${q.e}</div><button class="big" id="nx">${runX.n+1<runX.ids.length?'Question suivante':'Voir mon score'}</button>`;
+    $('#nx').onclick=()=>{runX.n++;runX.n<runX.ids.length?showX():endX()};
+    $('#nx').scrollIntoView({behavior:'smooth',block:'nearest'});
+  };
+  window.scrollTo(0,0);
+}
+function endX(){
+  const t=runX.ids.length,p=runX.pts;
+  $('#quiz').innerHTML=`<div class="card"><span class="tag">Résultat</span><div class="score">${f(p,1)} / ${t}</div><p style="text-align:center">Soit <b>${f(p/t*5,1)} / 5</b> au barème du CC.</p>
+  <button class="big" id="again">Recommencer</button><button class="big alt" id="back">Retour</button></div>`;
+  $('#again').onclick=()=>startX(sh(runX.ids));$('#back').onclick=home;
+}
+
+const views=['methode','annales','drill','quiz','fiche'];
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
-  ['quiz','fiche','cas'].forEach(v=>$('#'+v).hidden=v!==b.dataset.v);
+  views.forEach(v=>$('#'+v).hidden=v!==b.dataset.v);
   if(b.dataset.v==='quiz')home();
+  if(b.dataset.v==='annales'&&!$('#anc'))annales();
+  if(b.dataset.v==='drill'&&!$('#dc'))drill();
   window.scrollTo(0,0);
 });
 home();

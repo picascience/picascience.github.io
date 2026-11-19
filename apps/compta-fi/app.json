@@ -1,9 +1,12 @@
 {
   "name": "Compta Fi",
   "emoji": "📊",
-  "colors": ["#042f2e", "#14b8a6"],
+  "colors": [
+    "#042f2e",
+    "#14b8a6"
+  ],
   "category": "Dauphine",
   "added": "2026-11-13",
-  "description": "QCM, fiche express et cas chiffrés de comptabilité financière (L1 Dauphine)",
+  "description": "Spécial CC : méthode des 3 tableaux, annales 2019-2025 corrigées, cas infinis, QCM type examen",
   "icon": "icon.svg"
 }

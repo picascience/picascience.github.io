@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-18T21:49:57.899Z",
+  "generated": "2026-11-19T10:18:51.890Z",
   "apps": [
     {
       "name": "Bottle Flip",
@@ -193,7 +193,7 @@
       ],
       "category": "Dauphine",
       "added": "2026-11-13",
-      "description": "QCM, fiche express et cas chiffrés de comptabilité financière (L1 Dauphine)",
+      "description": "Spécial CC : méthode des 3 tableaux, annales 2019-2025 corrigées, cas infinis, QCM type examen",
       "icon": "apps/compta-fi/icon.svg",
       "id": "compta-fi"
     },
