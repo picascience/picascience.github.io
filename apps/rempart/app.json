@@ -1,0 +1,9 @@
+{
+  "name": "Rempart",
+  "emoji": "🏰",
+  "colors": ["#1a0a2e", "#b04ac8"],
+  "category": "Jeux",
+  "added": "2026-11-19",
+  "description": "Pinball + défense de château en pixel art : 10 vagues, cartes d'amélioration, structures à poser",
+  "icon": "icon.svg"
+}

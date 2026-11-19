@@ -1,7 +1,20 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-19T10:18:51.890Z",
+  "generated": "2026-11-19T10:42:23.537Z",
   "apps": [
+    {
+      "name": "Rempart",
+      "emoji": "🏰",
+      "colors": [
+        "#1a0a2e",
+        "#b04ac8"
+      ],
+      "category": "Jeux",
+      "added": "2026-11-19",
+      "description": "Pinball + défense de château en pixel art : 10 vagues, cartes d'amélioration, structures à poser",
+      "icon": "apps/rempart/icon.svg",
+      "id": "rempart"
+    },
     {
       "name": "Bottle Flip",
       "emoji": "🍾",
