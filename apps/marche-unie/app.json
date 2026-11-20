@@ -1,0 +1,9 @@
+{
+  "name": "Marche Unie",
+  "emoji": "🔷",
+  "colors": ["#0a1638", "#3b7bff"],
+  "category": "Jeux",
+  "added": "2026-11-20",
+  "description": "Auto-battler de formes inspiré de We March as One : peins des milliers d'unités, 25 batailles, arbre d'améliorations, 5 modes",
+  "icon": "icon.svg"
+}
