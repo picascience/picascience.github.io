@@ -68,5 +68,15 @@
     "added": "2026-11-18",
     "file": "models/ferme-porte.html",
     "thumb": "thumbs/ferme-porte.webp"
+  },
+  {
+    "id": "airfryer",
+    "number": "No. 08",
+    "title": "Airfryer",
+    "subtitle": "convection forcée · résistance & turbine",
+    "parts": 124,
+    "added": "2026-11-20",
+    "file": "models/airfryer.html",
+    "thumb": "thumbs/airfryer.webp"
   }
 ]
