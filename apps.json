@@ -1,7 +1,33 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-20T22:24:49.628Z",
+  "generated": "2026-11-21T09:21:44.742Z",
   "apps": [
+    {
+      "name": "Caravane",
+      "emoji": "⭐",
+      "colors": [
+        "#3b0f04",
+        "#f59e0b"
+      ],
+      "category": "Jeux",
+      "added": "2026-11-21",
+      "description": "Commerce sur la route des épices, de Fès à Samarcande : moudaraba, zakat, zéro riba",
+      "icon": "apps/caravane/icon.svg",
+      "id": "caravane"
+    },
+    {
+      "name": "Racines",
+      "emoji": "✨",
+      "colors": [
+        "#0f0a2e",
+        "#7c3aed"
+      ],
+      "category": "Coran",
+      "added": "2026-11-21",
+      "description": "Un ciel 3D de 89 racines du Coran : chaque verset dessine sa constellation",
+      "icon": "apps/racines/icon.svg",
+      "id": "racines"
+    },
     {
       "name": "Marche Unie",
       "emoji": "🔷",

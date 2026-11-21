@@ -1,0 +1,9 @@
+{
+  "name": "Racines",
+  "emoji": "✨",
+  "colors": ["#0f0a2e", "#7c3aed"],
+  "category": "Coran",
+  "added": "2026-11-21",
+  "description": "Un ciel 3D de 89 racines du Coran : chaque verset dessine sa constellation",
+  "icon": "icon.svg"
+}

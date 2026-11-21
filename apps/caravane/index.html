@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2a1408">
+<title>Caravane</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header id="hud">
+  <div class="stat gold"><small>Dinars</small><b id="cash">0</b></div>
+  <div class="stat"><small>Jour</small><b id="day">1</b></div>
+  <div class="stat"><small>Charge</small><b id="load">0/20</b></div>
+  <div class="stat rank"><small id="rankName">Colporteur</small><div class="bar"><i id="rankBar"></i></div></div>
+</header>
+
+<div id="mapWrap">
+  <canvas id="map"></canvas>
+  <div id="where"></div>
+  <div id="news"></div>
+</div>
+
+<section id="panel">
+  <nav id="tabs">
+    <button data-tab="souk" class="on">Souk</button>
+    <button data-tab="routes">Routes</button>
+    <button data-tab="carnet">Carnet</button>
+    <button data-tab="assoc">Associés</button>
+  </nav>
+  <div id="tabBody"></div>
+</section>
+
+<div id="modal" class="hidden"><div class="card" id="modalCard"></div></div>
+
+<script src="./game.js"></script>
+</body>
+</html>

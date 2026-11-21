@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b0f04"/><stop offset=".55" stop-color="#b45309"/><stop offset="1" stop-color="#f59e0b"/></linearGradient>
+<radialGradient id="hl" cx=".3" cy=".15" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity=".28"/></filter>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<rect width="512" height="512" fill="url(#hl)"/>
+<g filter="url(#sh)">
+<circle cx="340" cy="170" r="66" fill="#fde68a"/>
+<path d="M0 360C110 280 210 286 290 344C360 300 440 300 512 330V512H0Z" fill="#fff"/>
+<path d="M0 438C150 388 300 392 512 428V512H0Z" fill="#fde68a"/>
+<path d="M120 296C200 330 280 300 380 360" stroke="#b45309" stroke-width="16" stroke-linecap="round" stroke-dasharray="1 36" fill="none"/>
+<g transform="translate(108 230)"><rect x="-30" y="-30" width="60" height="60" fill="#fff"/><rect x="-30" y="-30" width="60" height="60" fill="#fff" transform="rotate(45)"/><circle r="14" fill="#b45309"/></g>
+</g>
+</svg>

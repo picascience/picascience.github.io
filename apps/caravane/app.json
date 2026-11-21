@@ -1,0 +1,9 @@
+{
+  "name": "Caravane",
+  "emoji": "⭐",
+  "colors": ["#3b0f04", "#f59e0b"],
+  "category": "Jeux",
+  "added": "2026-11-21",
+  "description": "Commerce sur la route des épices, de Fès à Samarcande : moudaraba, zakat, zéro riba",
+  "icon": "icon.svg"
+}
