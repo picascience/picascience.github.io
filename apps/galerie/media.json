@@ -1,5 +1,25 @@
 [
   {
+    "id": "mille-orbites",
+    "type": "image",
+    "title": "Mille orbites",
+    "date": "2026-11-22",
+    "file": "media/mille-orbites.jpg",
+    "width": 1080,
+    "height": 1920,
+    "description": "Image calculée en code par Opus : 6 000 grains de lumière lancés autour de trois astres et soumis à la gravité de Newton. Chaque traînée est une vraie trajectoire — or, cyan et violet selon l'astre de départ."
+  },
+  {
+    "id": "nuit-de-geometrie",
+    "type": "image",
+    "title": "Nuit de géométrie",
+    "date": "2026-11-22",
+    "file": "media/nuit-de-geometrie.jpg",
+    "width": 1290,
+    "height": 2796,
+    "description": "Fond d'écran iPhone 17 Pro Max calculé en code : rosace à 16 branches et pavage d'étoiles à 8 branches, lumière dorée sur nuit bleu-vert. Le haut reste dégagé pour l'heure de l'écran verrouillé."
+  },
+  {
     "id": "porte-cle-astronaute-vente",
     "type": "image",
     "title": "Affiche de vente — porte-clé",

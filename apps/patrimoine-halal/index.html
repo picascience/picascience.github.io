@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Patrimoine Halal — simulateur PEA, zakat et purification</title>
+<style>
+:root{--bg:#06110e;--card:#0d1d18;--line:#1d3a31;--txt:#e8f3ee;--mut:#8fb3a5;--gold:#f5c862;--em:#34d399;--sky:#60a5fa;--rose:#fb7185}
+*{box-sizing:border-box;margin:0}
+body{background:radial-gradient(1200px 600px at 20% -10%,#123b2e 0%,transparent 60%),var(--bg);color:var(--txt);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:calc(env(safe-area-inset-top) + 18px) calc(env(safe-area-inset-right) + 16px) calc(env(safe-area-inset-bottom) + 40px) calc(env(safe-area-inset-left) + 16px);min-height:100vh}
+.wrap{max-width:980px;margin:0 auto}
+h1{font-size:28px;letter-spacing:-.02em;display:flex;align-items:center;gap:12px}
+h1 svg{flex:none}
+.sub{color:var(--mut);margin:6px 0 20px}
+.grid{display:grid;grid-template-columns:340px 1fr;gap:16px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:linear-gradient(180deg,#10241e,var(--card));border:1px solid var(--line);border-radius:18px;padding:16px}
+.card h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin-bottom:12px}
+.f{margin-bottom:14px}
+.f label{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
+.f label b{color:var(--gold);font-variant-numeric:tabular-nums}
+.f small{display:block;color:var(--mut);font-size:12px;margin-top:4px}
+input[type=range]{width:100%;accent-color:var(--gold);height:28px}
+input[type=number]{width:100%;background:#071510;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:9px 10px;font-size:15px}
+.seg{display:flex;background:#071510;border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:none;color:var(--mut);padding:8px 6px;border-radius:9px;font:inherit;font-size:13px;cursor:pointer}
+.seg button.on{background:#1b3a30;color:var(--txt)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:520px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.k{background:#0a1914;border:1px solid var(--line);border-radius:14px;padding:12px}
+.k span{font-size:12px;color:var(--mut)}
+.k b{display:block;font-size:22px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:2px}
+.k.big{grid-column:span 3;background:linear-gradient(135deg,#1d3b2a,#0c1f18);border-color:#2f5a45}
+@media(max-width:520px){.k.big{grid-column:span 2}}
+.k.big b{font-size:34px;color:var(--gold)}
+canvas{width:100%;height:280px;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--mut);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 6px;text-align:right;border-bottom:1px solid #15302a}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--mut);font-weight:500;font-size:12px}
+tr.nisab td{color:var(--gold)}
+.tbl{max-height:320px;overflow:auto;margin-top:6px}
+.note{font-size:12.5px;color:var(--mut);margin-top:16px;line-height:1.55}
+.note b{color:var(--txt)}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;background:#2a2310;color:var(--gold);border:1px solid #4d3f17;margin-left:6px}
+.tip{position:absolute;pointer-events:none;background:#0a1914ee;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;display:none;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1><svg width="40" height="40" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#065f46"/><stop offset="1" stop-color="#f5c862"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="url(#g)"/><g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 46l12-12 8 7 16-17"/><path d="M41 24h9v9"/></g></svg>Patrimoine Halal</h1>
+<p class="sub">Simule ton PEA mois par mois, avec la <b>zakat</b> chaque année dès que tu dépasses le nisab et la <b>purification</b> des dividendes.</p>
+
+<div class="grid">
+<div class="card" id="ctl">
+<h2>Tes paramètres</h2>
+<div class="f"><label>Versement mensuel <b id="v-m"></b></label><input type="range" id="m" min="20" max="1000" step="10" value="150"></div>
+<div class="f"><label>Capital de départ <b id="v-c0"></b></label><input type="range" id="c0" min="0" max="20000" step="100" value="0"></div>
+<div class="f"><label>Durée <b id="v-y"></b></label><input type="range" id="y" min="1" max="40" step="1" value="20"></div>
+<div class="f"><label>Rendement annuel supposé <b id="v-r"></b></label><input type="range" id="r" min="0" max="12" step="0.5" value="6"><small>Hypothèse, pas une prévision : la bourse peut baisser plusieurs années de suite.</small></div>
+<div class="f"><label>Dont dividendes <b id="v-d"></b></label><input type="range" id="d" min="0" max="6" step="0.25" value="2.5"><small>Réinvestis dans le PEA (inclus dans le rendement ci-dessus).</small></div>
+<div class="f"><label>Revenus impurs des sociétés <b id="v-p"></b></label><input type="range" id="p" min="0" max="5" step="0.25" value="2"><small>Part à purifier (AAOIFI : doit rester sous 5 %). Elle se lit sur Zoya ou Musaffa pour chaque action.</small></div>
+<div class="f"><label>Base de la zakat</label>
+<div class="seg" id="zk"><button data-v="1" class="on">Valeur totale</button><button data-v="0.3">Part zakatable ~30 %</button><button data-v="0">Aucune</button></div>
+<small id="zk-h">Avis prudent : 2,5 % de la valeur de marché du portefeuille.</small></div>
+<div class="f"><label>Prix du gramme d'or (€) <span class="pill">à vérifier</span></label><input type="number" id="au" value="108" step="1" min="1"><small>Nisab = 85 g d'or ≈ <b id="v-nis"></b>. Mi-novembre 2026, l'once est passée sous 3 800 $, soit environ 105-110 €/g.</small></div>
+<div class="f"><label>Prélèvements sociaux à la sortie <b id="v-ps"></b></label><input type="range" id="ps" min="0" max="25" step="0.1" value="17.2"><small>PEA de plus de 5 ans : pas d'impôt sur le revenu, seulement les prélèvements sociaux sur les gains. Vérifie le taux en vigueur.</small></div>
+</div>
+
+<div>
+<div class="kpis" id="kpis"></div>
+<div class="card">
+<h2>Évolution</h2>
+<div style="position:relative"><canvas id="cv"></canvas><div class="tip" id="tip"></div></div>
+<div class="legend"><span><i style="background:#2b6b55"></i>Tes versements</span><span><i style="background:var(--em)"></i>Gains</span><span><i style="background:var(--gold)"></i>Zakat + purification cumulées</span><span><i style="background:transparent;border:1px dashed #f5c86299"></i>Nisab</span></div>
+</div>
+<div class="card" style="margin-top:16px">
+<h2>Année par année</h2>
+<div class="tbl"><table id="tb"></table></div>
+</div>
+</div>
+</div>
+
+<p class="note"><b>Comment c'est calculé.</b> Versement au début de chaque mois, rendement mensuel composé. À chaque date anniversaire (année hégirienne approximée à 12 mois), si le portefeuille dépasse le nisab, la zakat (2,5 % de la base choisie) est comptée comme payée <b>de ta poche</b>, sans rien retirer du PEA (un retrait avant 5 ans clôturerait le plan). La purification = dividendes de l'année × part de revenus impurs, à donner en sadaqa sans en attendre de récompense. Les avis des savants divergent sur la base de la zakat des actions : demande à une personne de science de confiance. Ceci n'est pas un conseil financier ; je ne suis pas conseiller en investissement.</p>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const eur=v=>v.toLocaleString('fr-FR',{maximumFractionDigits:0})+' €';
+let zkBase=1;
+document.querySelectorAll('#zk button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#zk button').forEach(x=>x.classList.remove('on'));b.classList.add('on');zkBase=+b.dataset.v;
+$('zk-h').textContent=zkBase==1?"Avis prudent : 2,5 % de la valeur de marché du portefeuille.":zkBase>0?"Investisseur long terme : 2,5 % de la part d'actifs zakatables des sociétés (approximée à 30 %).":"Pour comparer sans zakat.";run()});
+try{const s=JSON.parse(localStorage.getItem('patrimoine-halal:params')||'{}');for(const k in s)if($(k))$(k).value=s[k]}catch(e){}
+['m','c0','y','r','d','p','au','ps'].forEach(id=>$(id).addEventListener('input',run));
+let data=[],nisab=0;
+function run(){
+ const m=+$('m').value,c0=+$('c0').value,Y=+$('y').value,r=+$('r').value/100,dy=+$('d').value/100,p=+$('p').value/100,au=+$('au').value||0,ps=+$('ps').value/100;
+ try{localStorage.setItem('patrimoine-halal:params',JSON.stringify({m,c0,y:Y,r:r*100,d:dy*100,p:p*100,au,ps:ps*100}))}catch(e){}
+ $('v-m').textContent=eur(m);$('v-c0').textContent=eur(c0);$('v-y').textContent=Y+(Y>1?' ans':' an');$('v-r').textContent=(r*100).toFixed(1).replace('.',',')+' %';
+ $('v-d').textContent=(dy*100).toFixed(2).replace('.',',')+' %';$('v-p').textContent=(p*100).toFixed(2).replace('.',',')+' %';$('v-ps').textContent=(ps*100).toFixed(1).replace('.',',')+' %';
+ nisab=85*au;$('v-nis').textContent=eur(nisab);
+ const rm=Math.pow(1+r,1/12)-1;let v=c0,inv=c0,zk=0,pur=0,divY=0,firstN=null;data=[{t:0,v,inv,char:0}];const rows=[];
+ for(let mo=1;mo<=Y*12;mo++){v+=m;inv+=m;divY+=v*dy/12;v*=1+rm;
+  if(mo%12==0){const yr=mo/12;let z=0;if(v>=nisab&&zkBase>0){z=v*zkBase*0.025;if(firstN===null)firstN=yr}
+   const pu=divY*p;zk+=z;pur+=pu;rows.push({yr,v,inv,z,pu,n:v>=nisab});divY=0}
+  data.push({t:mo,v,inv,char:zk+pur})}
+ const gain=v-inv,net=v-Math.max(0,gain)*ps;
+ $('kpis').innerHTML=`<div class="k big"><span>Valeur du PEA dans ${Y} ans</span><b>${eur(v)}</b><span>Net après prélèvements sociaux : ${eur(net)}</span></div>
+ <div class="k"><span>Tu auras versé</span><b>${eur(inv)}</b></div><div class="k"><span>Gains</span><b style="color:var(--em)">${eur(gain)}</b></div>
+ <div class="k"><span>Multiplicateur</span><b>×${(v/Math.max(inv,1)).toFixed(2).replace('.',',')}</b></div>
+ <div class="k"><span>Zakat totale</span><b style="color:var(--gold)">${eur(zk)}</b></div><div class="k"><span>Purification totale</span><b style="color:var(--gold)">${eur(pur)}</b></div>
+ <div class="k"><span>Nisab atteint</span><b>${firstN?('année '+firstN):'pas encore'}</b></div>`;
+ $('tb').innerHTML='<tr><th>Année</th><th>Versé</th><th>Valeur</th><th>Zakat</th><th>Purif.</th></tr>'+rows.map(o=>`<tr class="${o.yr===firstN?'nisab':''}"><td>${o.yr}${o.yr===firstN?' ★':''}</td><td>${eur(o.inv)}</td><td>${eur(o.v)}</td><td>${o.z?eur(o.z):'—'}</td><td>${eur(o.pu)}</td></tr>`).join('');
+ draw();
+}
+const cv=$('cv'),ctx=cv.getContext('2d');let geo;
+function draw(){
+ const dpr=devicePixelRatio||1,W=cv.clientWidth,H=cv.clientHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+ const L=56,R=10,T=10,B=26,n=data.length-1,maxV=Math.max(data[n].v,nisab*1.05)*1.05;
+ const X=t=>L+(W-L-R)*t/n,Yp=v=>T+(H-T-B)*(1-v/maxV);geo={X,Yp,L,R,W,n};
+ ctx.font='11px -apple-system,sans-serif';ctx.fillStyle='#8fb3a5';ctx.strokeStyle='#15302a';ctx.lineWidth=1;
+ for(let i=0;i<=4;i++){const v=maxV*i/4,y=Yp(v);ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(W-R,y);ctx.stroke();ctx.textAlign='right';ctx.fillText(v>=1000?Math.round(v/1000)+' k€':Math.round(v)+' €',L-6,y+4)}
+ const yrs=n/12,step=yrs>20?5:yrs>8?2:1;ctx.textAlign='center';for(let y=0;y<=yrs;y+=step)ctx.fillText(y+' a',X(y*12),H-8);
+ const area=(f,col)=>{ctx.beginPath();ctx.moveTo(X(0),Yp(0));data.forEach((d,i)=>ctx.lineTo(X(i),Yp(f(d))));ctx.lineTo(X(n),Yp(0));ctx.closePath();ctx.fillStyle=col;ctx.fill()};
+ const g=ctx.createLinearGradient(0,T,0,H-B);g.addColorStop(0,'#34d399cc');g.addColorStop(1,'#34d39922');area(d=>d.v,g);area(d=>d.inv,'#2b6b55');
+ ctx.beginPath();data.forEach((d,i)=>i?ctx.lineTo(X(i),Yp(d.v)):ctx.moveTo(X(i),Yp(d.v)));ctx.strokeStyle='#6ee7b7';ctx.lineWidth=2;ctx.stroke();
+ ctx.beginPath();data.forEach((d,i)=>i?ctx.lineTo(X(i),Yp(d.char)):ctx.moveTo(X(i),Yp(d.char)));ctx.strokeStyle='#f5c862';ctx.lineWidth=2.2;ctx.stroke();
+ if(nisab<maxV){ctx.setLineDash([5,5]);ctx.strokeStyle='#f5c86299';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(L,Yp(nisab));ctx.lineTo(W-R,Yp(nisab));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#f5c862';ctx.textAlign='left';ctx.fillText('nisab',L+4,Yp(nisab)-5)}
+}
+function tipAt(e){if(!geo)return;const r=cv.getBoundingClientRect(),x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;let i=Math.round((x-geo.L)/(geo.W-geo.L-geo.R)*geo.n);i=Math.max(0,Math.min(geo.n,i));const d=data[i],t=$('tip');
+ t.style.display='block';t.innerHTML=`<b>${Math.floor(i/12)} a ${i%12} m</b><br>Valeur ${eur(d.v)}<br>Versé ${eur(d.inv)}<br><span style="color:#f5c862">Donné ${eur(d.char)}</span>`;
+ t.style.left=Math.min(Math.max(geo.X(i)-60,0),r.width-140)+'px';t.style.top='6px'}
+cv.addEventListener('mousemove',tipAt);cv.addEventListener('touchmove',e=>{tipAt(e)},{passive:true});cv.addEventListener('touchstart',tipAt,{passive:true});
+cv.addEventListener('mouseleave',()=>$('tip').style.display='none');cv.addEventListener('touchend',()=>setTimeout(()=>$('tip').style.display='none',1500));
+addEventListener('resize',draw);run();
+</script>
+</body>
+</html>

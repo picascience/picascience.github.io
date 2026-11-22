@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#04141a">
+<title>Qibla</title>
+<style>
+:root{
+  --bg0:#030e13; --bg1:#06202a; --bg2:#0a2f35;
+  --card:rgba(14,52,58,.42); --card2:rgba(20,70,76,.35);
+  --line:rgba(226,197,122,.16); --line2:rgba(255,255,255,.07);
+  --gold:#e2c57a; --gold2:#f6dfa0; --gold3:#b8913d;
+  --txt:#eef5f2; --mut:#8fb0ab; --mut2:#5f817d;
+  --teal:#2dd4bf;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg0)}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+  color:var(--txt);-webkit-user-select:none;user-select:none;touch-action:manipulation;
+  -webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(120% 70% at 50% -10%, #0f3d40 0%, rgba(15,61,64,0) 60%),
+    radial-gradient(90% 60% at 100% 110%, #0a2a3a 0%, rgba(10,42,58,0) 60%),
+    linear-gradient(180deg,var(--bg1),var(--bg0) 70%);
+}
+#pattern{position:fixed;inset:0;pointer-events:none;opacity:.07;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23e2c57a' stroke-width='1'%3E%3Cpath d='M60 18l12.7 29.3L102 60 72.7 72.7 60 102 47.3 72.7 18 60l29.3-12.7z'/%3E%3Cpath d='M30.3 30.3L60 42.6l29.7-12.3L77.4 60l12.3 29.7L60 77.4 30.3 89.7 42.6 60z'/%3E%3Ccircle cx='60' cy='60' r='9'/%3E%3Cpath d='M0 0l18 18M120 0l-18 18M0 120l18-18M120 120l-18-18'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:120px 120px;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,.6) 100%);
+  mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,.6) 100%);
+}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:calc(var(--sat) + 10px)}
+.views{flex:1;position:relative;overflow:hidden}
+.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  padding:4px 18px 24px;opacity:0;transform:translateY(10px) scale(.99);pointer-events:none;
+  transition:opacity .35s ease,transform .45s cubic-bezier(.2,.8,.2,1);scrollbar-width:none}
+.view::-webkit-scrollbar{display:none}
+.view.on{opacity:1;transform:none;pointer-events:auto}
+
+/* header */
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 2px 14px}
+.loc{display:flex;align-items:center;gap:8px;padding:8px 12px 8px 10px;border-radius:999px;
+  background:rgba(255,255,255,.05);border:1px solid var(--line2);cursor:pointer;min-width:0;
+  transition:transform .15s,background .2s}
+.loc:active{transform:scale(.96);background:rgba(255,255,255,.09)}
+.loc svg{flex:none}
+.loc span{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.dates{text-align:right;line-height:1.25}
+.dates .g{font-size:12.5px;color:var(--mut);text-transform:capitalize}
+.dates .h{font-size:13px;color:var(--gold);font-weight:600}
+
+/* hero */
+.hero{position:relative;border-radius:28px;padding:22px 22px 18px;overflow:hidden;
+  background:linear-gradient(155deg,rgba(28,86,86,.55),rgba(8,34,42,.6));
+  border:1px solid var(--line);box-shadow:0 20px 50px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06)}
+.hero:before{content:"";position:absolute;right:-60px;top:-60px;width:230px;height:230px;opacity:.13;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-100 -100 200 200'%3E%3Cg fill='none' stroke='%23f6dfa0' stroke-width='2'%3E%3Crect x='-60' y='-60' width='120' height='120'/%3E%3Crect x='-60' y='-60' width='120' height='120' transform='rotate(45)'/%3E%3Ccircle r='40'/%3E%3Crect x='-36' y='-36' width='72' height='72'/%3E%3Crect x='-36' y='-36' width='72' height='72' transform='rotate(45)'/%3E%3Ccircle r='92'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+  animation:spin 120s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero .lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.hero .nm{display:flex;align-items:baseline;gap:12px;margin-top:6px}
+.hero .nm b{font-size:40px;font-weight:700;letter-spacing:-.02em}
+.hero .nm i{font-style:normal;font-size:24px;color:var(--gold2);font-family:"Geeza Pro","Noto Naskh Arabic","Amiri",serif;opacity:.9}
+.hero .tm{font-size:17px;color:var(--mut);margin-top:2px}
+.hero .tm strong{color:var(--txt);font-weight:600}
+.cd{display:flex;gap:6px;margin-top:16px;align-items:flex-end}
+.cd .u{display:flex;flex-direction:column;align-items:center;min-width:64px;padding:10px 8px 8px;border-radius:16px;
+  background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.06)}
+.cd .u b{font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
+.cd .u small{font-size:10.5px;color:var(--mut);margin-top:5px;letter-spacing:.06em;text-transform:uppercase}
+.cd .sep{font-size:26px;color:var(--gold3);padding-bottom:20px}
+.prog{height:5px;border-radius:9px;background:rgba(255,255,255,.08);margin-top:18px;overflow:hidden}
+.prog i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--gold3),var(--gold2));
+  box-shadow:0 0 12px rgba(246,223,160,.6);transition:width 1s linear}
+.prog-l{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut2);margin-top:7px}
+
+/* sun curve */
+.sky{margin-top:14px;border-radius:24px;padding:12px 6px 6px;background:var(--card);border:1px solid var(--line2);position:relative}
+.sky svg{display:block;width:100%;height:auto}
+.sky .cap{position:absolute;left:16px;top:12px;font-size:11.5px;color:var(--mut);letter-spacing:.04em}
+
+/* list */
+.sec{font-size:12px;color:var(--mut);letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin:22px 4px 10px;display:flex;justify-content:space-between}
+.sec em{font-style:normal;letter-spacing:0;text-transform:none;color:var(--mut2);font-weight:500}
+.list{border-radius:24px;background:var(--card);border:1px solid var(--line2);overflow:hidden}
+.row{display:flex;align-items:center;gap:14px;padding:14px 18px;position:relative;transition:background .3s}
+.row+.row{border-top:1px solid var(--line2)}
+.row .ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.05);flex:none}
+.row .n{flex:1;min-width:0}
+.row .n b{display:block;font-size:16.5px;font-weight:600}
+.row .n small{font-size:12px;color:var(--mut2);font-family:"Geeza Pro","Noto Naskh Arabic",serif}
+.row .t{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.row.past{opacity:.45}
+.row.minor .n b{font-weight:500;color:var(--mut)}
+.row.minor .t{color:var(--mut);font-weight:500;font-size:18px}
+.row.cur{background:linear-gradient(90deg,rgba(226,197,122,.17),rgba(226,197,122,.03));opacity:1}
+.row.cur:before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:3px;background:var(--gold2);box-shadow:0 0 10px var(--gold)}
+.row.cur .t{color:var(--gold2)}
+.row.cur .ic{background:rgba(226,197,122,.18)}
+.row .tag{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#13262a;background:var(--gold2);padding:3px 7px;border-radius:6px;margin-left:8px;vertical-align:2px}
+.row.next .tag{background:rgba(45,212,191,.16);color:#7ee8d9}
+.meta{font-size:12px;color:var(--mut2);text-align:center;margin:16px 0 4px;line-height:1.5}
+
+/* qibla view */
+.qhead{text-align:center;margin:6px 0 8px}
+.qhead .big{font-size:56px;font-weight:200;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.qhead .big sup{font-size:26px;color:var(--gold);font-weight:300;vertical-align:top;position:relative;top:6px}
+.qhead .sub{font-size:13.5px;color:var(--mut);margin-top:6px}
+.dialwrap{position:relative;width:min(88vw,370px);aspect-ratio:1;margin:14px auto 0}
+.dialwrap .halo{position:absolute;inset:-6%;border-radius:50%;opacity:0;transition:opacity .4s;
+  background:radial-gradient(circle,rgba(246,223,160,0) 52%,rgba(246,223,160,.38) 62%,rgba(246,223,160,0) 72%);filter:blur(4px)}
+.dialwrap.aligned .halo{opacity:1;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.03);opacity:.7}}
+#dial{width:100%;height:100%;display:block;touch-action:none}
+.status{margin:18px auto 0;text-align:center;min-height:52px}
+.status .msg{font-size:15px;font-weight:600;transition:color .3s}
+.status .hint{font-size:12.5px;color:var(--mut2);margin-top:4px}
+.dialwrap.aligned + .status .msg{color:var(--gold2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:0;cursor:pointer;font:inherit;
+  font-size:16px;font-weight:600;color:#1a1405;padding:15px 24px;border-radius:18px;
+  background:linear-gradient(180deg,#f8e3a8,#d6b25e);box-shadow:0 10px 30px -10px rgba(226,197,122,.7),inset 0 1px 0 rgba(255,255,255,.6);
+  transition:transform .15s}
+.btn:active{transform:scale(.96)}
+.btn.ghost{background:rgba(255,255,255,.06);color:var(--txt);box-shadow:none;border:1px solid var(--line2);font-weight:500;font-size:14.5px;padding:12px 18px}
+.btns{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:14px}
+.qinfo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.qinfo div{border-radius:18px;background:var(--card);border:1px solid var(--line2);padding:12px 14px}
+.qinfo small{display:block;font-size:11px;color:var(--mut2);letter-spacing:.08em;text-transform:uppercase}
+.qinfo b{display:block;font-size:17px;font-weight:600;margin-top:3px;font-variant-numeric:tabular-nums}
+
+/* table view */
+.seg{display:flex;background:rgba(255,255,255,.06);border-radius:13px;padding:3px;position:relative;border:1px solid var(--line2)}
+.seg button{flex:1;border:0;background:none;color:var(--mut);font:inherit;font-size:14px;font-weight:600;padding:8px 0;border-radius:10px;position:relative;z-index:1;transition:color .25s;cursor:pointer}
+.seg button.on{color:#1a1405}
+.seg .knob{position:absolute;top:3px;bottom:3px;left:3px;border-radius:10px;background:linear-gradient(180deg,#f3dca0,#d4b261);transition:transform .35s cubic-bezier(.2,.8,.2,1);z-index:0}
+.mnav{display:flex;align-items:center;justify-content:space-between;margin:16px 2px 10px}
+.mnav b{font-size:20px;font-weight:700;text-transform:capitalize;text-align:center}
+.mnav small{display:block;font-size:12px;color:var(--gold);font-weight:500;text-align:center;margin-top:2px}
+.rb{width:40px;height:40px;border-radius:13px;border:1px solid var(--line2);background:rgba(255,255,255,.05);display:grid;place-items:center;cursor:pointer;color:var(--txt);transition:transform .15s}
+.rb:active{transform:scale(.9)}
+.tbl{border-radius:20px;background:var(--card);border:1px solid var(--line2)}
+.tbl thead th:first-child{border-top-left-radius:19px}.tbl thead th:last-child{border-top-right-radius:19px}
+.tbl table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.tbl th{position:sticky;top:-4px;box-shadow:0 1px 0 var(--line2);background:#0b2a30;font-size:10.5px;color:var(--gold);font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:10px 2px;z-index:2}
+.tbl td{font-size:13.5px;text-align:center;padding:10px 2px;border-top:1px solid var(--line2)}
+.tbl td:first-child{text-align:left;padding-left:12px;white-space:nowrap}
+.tbl td:first-child b{font-size:14px;font-weight:600}
+.tbl td:first-child small{display:block;font-size:10.5px;color:var(--mut2);text-transform:capitalize}
+.tbl td.sh{color:var(--mut2)}
+.tbl tr.we td:first-child small{color:var(--gold3)}
+.tbl tr.today td{background:rgba(226,197,122,.13)}
+.tbl tr.today td:first-child{box-shadow:inset 3px 0 0 var(--gold2)}
+.tbl .scr{max-height:none}
+
+/* settings */
+.st h3{font-size:12px;color:var(--mut);letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin:22px 4px 10px}
+.st h3:first-of-type{margin-top:10px}
+.grp{border-radius:20px;background:var(--card);border:1px solid var(--line2);overflow:hidden}
+.opt{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .2s}
+.opt+.opt{border-top:1px solid var(--line2)}
+.opt:active{background:rgba(255,255,255,.05)}
+.opt .l{flex:1;min-width:0}
+.opt .l b{display:block;font-size:15.5px;font-weight:500}
+.opt .l small{display:block;font-size:12px;color:var(--mut2);margin-top:2px}
+.opt .ck{width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);display:grid;place-items:center;flex:none;transition:all .25s}
+.opt.on .ck{background:var(--gold2);border-color:var(--gold2)}
+.opt.on .ck:after{content:"";width:9px;height:5px;border:2.5px solid #1a1405;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.cities{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.city{padding:12px 13px;border-radius:16px;background:var(--card);border:1px solid var(--line2);cursor:pointer;transition:all .2s}
+.city:active{transform:scale(.96)}
+.city b{display:block;font-size:14.5px;font-weight:600}
+.city small{font-size:11.5px;color:var(--mut2)}
+.city.on{border-color:rgba(246,223,160,.6);background:linear-gradient(160deg,rgba(226,197,122,.2),rgba(226,197,122,.05))}
+.city.on small{color:var(--gold)}
+.gps{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;cursor:pointer;margin-bottom:10px;
+  background:linear-gradient(160deg,rgba(45,212,191,.16),rgba(45,212,191,.04));border:1px solid rgba(45,212,191,.25)}
+.gps:active{transform:scale(.98)}
+.gps b{font-size:15px;display:block}
+.gps small{font-size:12px;color:var(--mut)}
+.gps.on{border-color:rgba(246,223,160,.6)}
+.man{display:flex;gap:8px;margin-top:10px}
+.man input{flex:1;min-width:0;background:rgba(0,0,0,.25);border:1px solid var(--line2);border-radius:14px;color:var(--txt);
+  font:inherit;font-size:16px;padding:12px;outline:none;-webkit-user-select:text;user-select:text;font-variant-numeric:tabular-nums}
+.man input:focus{border-color:rgba(246,223,160,.5)}
+.man button{border:0;border-radius:14px;padding:0 16px;font:inherit;font-weight:600;font-size:15px;background:var(--gold2);color:#1a1405;cursor:pointer}
+.err{color:#fca5a5;font-size:12.5px;margin:8px 4px 0;min-height:16px}
+.about{font-size:12px;color:var(--mut2);line-height:1.6;margin:22px 6px 6px;text-align:center}
+
+/* tab bar */
+.tabs{flex:none;display:flex;justify-content:space-around;margin:0 14px calc(var(--sab) + 32px);padding:6px;
+  border-radius:24px;background:rgba(8,30,36,.78);border:1px solid var(--line2);
+  -webkit-backdrop-filter:blur(20px) saturate(1.4);backdrop-filter:blur(20px) saturate(1.4);box-shadow:0 10px 30px -10px rgba(0,0,0,.8);position:relative}
+.tabs button{flex:1;border:0;background:none;color:var(--mut2);font:inherit;font-size:10.5px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 5px;border-radius:18px;cursor:pointer;transition:color .25s;position:relative;z-index:1}
+.tabs button svg{transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.tabs button.on{color:var(--gold2)}
+.tabs button.on svg{transform:translateY(-1px) scale(1.08)}
+.tabs .pill{position:absolute;top:6px;bottom:6px;left:6px;border-radius:18px;background:rgba(226,197,122,.12);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+
+.toast{position:fixed;left:50%;bottom:calc(var(--sab) + 110px);transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:rgba(20,50,54,.95);border:1px solid var(--line);color:var(--txt);font-size:13.5px;padding:10px 16px;border-radius:14px;
+  transition:all .35s cubic-bezier(.2,.8,.2,1);white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:50}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.fade-num{display:inline-block}
+.fade-num.tick{animation:tick .35s ease}
+@keyframes tick{from{transform:translateY(-4px);opacity:.4}}
+</style>
+</head>
+<body>
+<div id="pattern"></div>
+<div id="app">
+  <div class="views">
+    <!-- PRIERES -->
+    <section class="view on" id="v-pr">
+      <div class="hdr">
+        <div class="loc" data-go="st">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e2c57a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+          <span id="locName">—</span>
+        </div>
+        <div class="dates"><div class="g" id="dGreg"></div><div class="h" id="dHij"></div></div>
+      </div>
+      <div class="hero">
+        <div class="lbl" id="nxLbl">Prochaine prière</div>
+        <div class="nm"><b id="nxName">—</b><i id="nxAr"></i></div>
+        <div class="tm" id="nxTime"></div>
+        <div class="cd">
+          <div class="u"><b id="cdH">00</b><small>heures</small></div><span class="sep">:</span>
+          <div class="u"><b id="cdM">00</b><small>min</small></div><span class="sep">:</span>
+          <div class="u"><b id="cdS">00</b><small>sec</small></div>
+        </div>
+        <div class="prog"><i id="prog" style="width:0"></i></div>
+        <div class="prog-l"><span id="pgA"></span><span id="pgB"></span></div>
+      </div>
+      <div class="sky"><span class="cap">Course du soleil aujourd'hui</span><svg id="sky" viewBox="0 0 380 142"></svg></div>
+      <div class="sec">Aujourd'hui <em id="methodLbl"></em></div>
+      <div class="list" id="list"></div>
+      <div class="meta" id="meta"></div>
+    </section>
+
+    <!-- QIBLA -->
+    <section class="view" id="v-qb">
+      <div class="qhead">
+        <div class="big"><span id="qDeg">0</span><sup>°</sup></div>
+        <div class="sub" id="qSub">Direction de la Kaaba depuis le Nord</div>
+      </div>
+      <div class="dialwrap" id="dialwrap">
+        <div class="halo"></div>
+        <svg id="dial" viewBox="-200 -200 400 400"></svg>
+      </div>
+      <div class="status">
+        <div class="msg" id="qMsg">Boussole inactive</div>
+        <div class="hint" id="qHint">Activez la boussole et tenez le téléphone à plat</div>
+      </div>
+      <div class="btns" id="qBtns">
+        <button class="btn" id="btnCompass">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1405" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z" fill="#1a1405"/></svg>
+          Activer la boussole
+        </button>
+        <button class="btn ghost" id="btnDemo">Mode démo</button>
+      </div>
+      <div class="qinfo">
+        <div><small>Distance</small><b id="qDist">—</b></div>
+        <div><small>Cap actuel</small><b id="qHead">—</b></div>
+      </div>
+      <div class="meta">Azimut calculé sur le grand cercle vers la Kaaba (21,4225° N, 39,8262° E).<br>Éloignez-vous des objets métalliques pour plus de précision.</div>
+    </section>
+
+    <!-- CALENDRIER -->
+    <section class="view" id="v-ca">
+      <div class="seg" id="seg"><div class="knob" id="knob"></div><button data-m="w" class="on">Semaine</button><button data-m="m">Mois</button></div>
+      <div class="mnav">
+        <button class="rb" id="prv"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <div><b id="calT"></b><small id="calH"></small></div>
+        <button class="rb" id="nxt"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+      <div class="tbl"><table><thead><tr><th style="text-align:left;padding-left:12px">Jour</th><th>Fajr</th><th>Chour.</th><th>Dhuhr</th><th>Asr</th><th>Magh.</th><th>Isha</th></tr></thead><tbody id="tb"></tbody></table></div>
+      <div class="meta" id="calMeta"></div>
+    </section>
+
+    <!-- REGLAGES -->
+    <section class="view st" id="v-st">
+      <h3>Position</h3>
+      <div class="gps" id="gps">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7ee8d9" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7.5"/></svg>
+        <div style="flex:1"><b>Utiliser ma position</b><small id="gpsSub">Géolocalisation de l'appareil</small></div>
+      </div>
+      <div class="cities" id="cities"></div>
+      <div class="man"><input id="iLat" inputmode="decimal" placeholder="Latitude"><input id="iLng" inputmode="decimal" placeholder="Longitude"><button id="iOk">OK</button></div>
+      <div class="err" id="iErr"></div>
+      <h3>Méthode de calcul</h3>
+      <div class="grp" id="methods"></div>
+      <h3>Asr (école juridique)</h3>
+      <div class="grp" id="madhabs"></div>
+      <div class="about">Horaires calculés entièrement sur l'appareil (algorithme astronomique : déclinaison solaire et équation du temps). Les mosquées peuvent appliquer quelques minutes de précaution : en cas de doute, référez-vous à votre mosquée.</div>
+    </section>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <div class="pill" id="pill"></div>
+    <button data-v="pr" class="on"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>Prières</button>
+    <button data-v="qb"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Qibla</button>
+    <button data-v="ca"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Horaires</button>
+    <button data-v="st"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.2"/><circle cx="10" cy="17" r="2.2"/></svg>Réglages</button>
+  </nav>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ============ Utilitaires ============ */
+const $ = s => document.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+const DEG = Math.PI/180;
+const dsin=d=>Math.sin(d*DEG), dcos=d=>Math.cos(d*DEG), dtan=d=>Math.tan(d*DEG);
+const darcsin=x=>Math.asin(x)/DEG, darccos=x=>Math.acos(x)/DEG, darctan2=(y,x)=>Math.atan2(y,x)/DEG, darccot=x=>Math.atan(1/x)/DEG;
+const fix=(a,b)=>{a=a-b*Math.floor(a/b);return a<0?a+b:a};
+const fixAngle=a=>fix(a,360), fixHour=a=>fix(a,24);
+const timeDiff=(a,b)=>fixHour(b-a);
+const pad=n=>String(n).padStart(2,"0");
+const store={get(k,d){try{const v=localStorage.getItem("qibla:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem("qibla:"+k,JSON.stringify(v))}catch(e){}}};
+
+/* ============ Données ============ */
+const KAABA={lat:21.4225,lng:39.8262};
+const DEVICE_TZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||"Europe/Paris"}catch(e){return "Europe/Paris"}})();
+const CITIES=[
+  {id:"epinay",n:"Épinay-sur-Seine",lat:48.9553,lng:2.3092,tz:"Europe/Paris"},
+  {id:"paris",n:"Paris",lat:48.8566,lng:2.3522,tz:"Europe/Paris"},
+  {id:"stdenis",n:"Saint-Denis",lat:48.9362,lng:2.3574,tz:"Europe/Paris"},
+  {id:"lyon",n:"Lyon",lat:45.7640,lng:4.8357,tz:"Europe/Paris"},
+  {id:"marseille",n:"Marseille",lat:43.2965,lng:5.3698,tz:"Europe/Paris"},
+  {id:"lille",n:"Lille",lat:50.6292,lng:3.0573,tz:"Europe/Paris"},
+  {id:"tunis",n:"Tunis",lat:36.8065,lng:10.1815,tz:"Africa/Tunis"},
+  {id:"alger",n:"Alger",lat:36.7538,lng:3.0588,tz:"Africa/Algiers"},
+  {id:"casa",n:"Casablanca",lat:33.5731,lng:-7.5898,tz:"Africa/Casablanca"},
+  {id:"makkah",n:"La Mecque",lat:21.3891,lng:39.8579,tz:"Asia/Riyadh"},
+  {id:"madinah",n:"Médine",lat:24.4672,lng:39.6111,tz:"Asia/Riyadh"},
+  {id:"istanbul",n:"Istanbul",lat:41.0082,lng:28.9784,tz:"Europe/Istanbul"},
+];
+const METHODS={
+  uoif:{n:"UOIF / Musulmans de France",d:"Fajr 12° · Isha 12°",fajr:12,isha:12},
+  gmp:{n:"Grande Mosquée de Paris",d:"Fajr 18° · Isha 17°",fajr:18,isha:17},
+  mwl:{n:"Ligue Islamique Mondiale",d:"Fajr 18° · Isha 17°",fajr:18,isha:17},
+  umm:{n:"Umm al-Qura (La Mecque)",d:"Fajr 18,5° · Isha 90 min après Maghrib",fajr:18.5,ishaMin:90},
+};
+const MADHAB={shafii:{n:"Standard (Shafi'i, Maliki, Hanbali)",d:"Ombre = 1 × hauteur de l'objet",f:1},hanafi:{n:"Hanafi",d:"Ombre = 2 × hauteur de l'objet",f:2}};
+const PR=[
+  {k:"fajr",n:"Fajr",ar:"الفجر"},{k:"sunrise",n:"Chourouq",ar:"الشروق",minor:true},{k:"dhuhr",n:"Dhuhr",ar:"الظهر"},
+  {k:"asr",n:"Asr",ar:"العصر"},{k:"maghrib",n:"Maghrib",ar:"المغرب"},{k:"isha",n:"Isha",ar:"العشاء"}];
+
+/* ============ État ============ */
+let S={method:store.get("method","uoif"),madhab:store.get("madhab","shafii"),loc:store.get("loc",null)};
+if(!S.loc||typeof S.loc.lat!=="number"){const c=CITIES[0];S.loc={type:"city",id:c.id,n:c.n,lat:c.lat,lng:c.lng,tz:c.tz}}
+if(!METHODS[S.method])S.method="uoif"; if(!MADHAB[S.madhab])S.madhab="shafii";
+const save=()=>{store.set("method",S.method);store.set("madhab",S.madhab);store.set("loc",S.loc)};
+
+/* ============ Fuseaux ============ */
+const dtfCache={};
+function partsIn(tz,ms){
+  let f=dtfCache[tz];
+  if(!f){try{f=new Intl.DateTimeFormat("en-US",{timeZone:tz,hourCycle:"h23",year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",second:"numeric"})}catch(e){f=new Intl.DateTimeFormat("en-US",{hourCycle:"h23",year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",second:"numeric"})}dtfCache[tz]=f}
+  const o={};for(const p of f.formatToParts(new Date(ms)))o[p.type]=+p.value;
+  if(o.hour===24)o.hour=0; return o;
+}
+function tzOffsetH(tz,ms){const p=partsIn(tz,ms);const asUTC=Date.UTC(p.year,p.month-1,p.day,p.hour,p.minute,p.second);return Math.round((asUTC-Math.floor(ms/1000)*1000)/60000)/60}
+function todayIn(tz,ms){const p=partsIn(tz,ms);return {y:p.year,m:p.month,d:p.day}}
+
+/* ============ Astronomie (algorithme type PrayTimes.org) ============ */
+function julian(y,m,d){if(m<=2){y-=1;m+=12}const A=Math.floor(y/100),B=2-A+Math.floor(A/4);return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+B-1524.5}
+function sunPosition(jd){
+  const D=jd-2451545.0, g=fixAngle(357.529+0.98560028*D), q=fixAngle(280.459+0.98564736*D);
+  const L=fixAngle(q+1.915*dsin(g)+0.020*dsin(2*g)), e=23.439-0.00000036*D;
+  const RA=darctan2(dcos(e)*dsin(L),dcos(L))/15;
+  return {decl:darcsin(dsin(e)*dsin(L)), eqt:q/15-fixHour(RA)};
+}
+function computeDay(y,m,d,lat,lng,tz,method,madhab){
+  const M=METHODS[method], fac=MADHAB[madhab].f;
+  const jDate=julian(y,m,d)-lng/(15*24);
+  const midDay=t=>fixHour(12-sunPosition(jDate+t).eqt);
+  const sunAngleTime=(angle,t,ccw)=>{
+    const decl=sunPosition(jDate+t).decl, noon=midDay(t);
+    const T=darccos((-dsin(angle)-dsin(decl)*dsin(lat))/(dcos(decl)*dcos(lat)))/15;
+    return noon+(ccw?-T:T);
+  };
+  const asrTime=(f,t)=>{const decl=sunPosition(jDate+t).decl;return sunAngleTime(-darccot(f+dtan(Math.abs(lat-decl))),t)};
+  let T={fajr:5,sunrise:6,dhuhr:12,asr:13,sunset:18,isha:18};
+  for(let i=0;i<2;i++){
+    const p={};for(const k in T)p[k]=T[k]/24;
+    T={fajr:sunAngleTime(M.fajr,p.fajr,true),sunrise:sunAngleTime(0.833,p.sunrise,true),dhuhr:midDay(p.dhuhr),
+       asr:asrTime(fac,p.asr),sunset:sunAngleTime(0.833,p.sunset),isha:M.isha!=null?sunAngleTime(M.isha,p.isha):18};
+  }
+  const off=tzOffsetH(tz,Date.UTC(y,m-1,d,12));
+  for(const k in T)T[k]+=off-lng/15;
+  T.maghrib=T.sunset;
+  // Hautes latitudes : règle « angle-based » (portion = angle/60 de la nuit)
+  const night=timeDiff(T.sunset,T.sunrise);
+  const adj=(time,base,angle,ccw)=>{const portion=angle/60*night;const diff=ccw?timeDiff(time,base):timeDiff(base,time);return (isNaN(time)||diff>portion)?base+(ccw?-portion:portion):time};
+  T.fajr=adj(T.fajr,T.sunrise,M.fajr,true);
+  if(M.isha!=null)T.isha=adj(T.isha,T.sunset,M.isha,false); else T.isha=T.maghrib+M.ishaMin/60;
+  // instants absolus (ms UTC)
+  const base=Date.UTC(y,m-1,d), out={y,m,d,off,h:{},ms:{}};
+  for(const p of PR){let h=Math.round(T[p.k]*60)/60;out.h[p.k]=h;out.ms[p.k]=base+(h-off)*3600000}
+  out.decl=sunPosition(jDate+0.5).decl; out.noonRaw=T.dhuhr;
+  return out;
+}
+function fmtH(h){if(isNaN(h))return "--:--";let mins=Math.round(fixHour(h)*60)%1440;return pad(Math.floor(mins/60))+":"+pad(mins%60)}
+
+/* ============ Qibla ============ */
+function qibla(lat,lng){
+  const p1=lat*DEG,p2=KAABA.lat*DEG,dl=(KAABA.lng-lng)*DEG;
+  const b=Math.atan2(Math.sin(dl),Math.cos(p1)*Math.tan(p2)-Math.sin(p1)*Math.cos(dl))/DEG;
+  const a=Math.sin((p2-p1)/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  return {az:fixAngle(b),km:6371.0088*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))};
+}
+
+/* ============ Dates ============ */
+const fmtGreg=new Intl.DateTimeFormat("fr-FR",{weekday:"long",day:"numeric",month:"long",timeZone:"UTC"});
+let fmtHij;try{fmtHij=new Intl.DateTimeFormat("fr-u-ca-islamic-umalqura",{day:"numeric",month:"long",year:"numeric",timeZone:"UTC"})}catch(e){fmtHij=null}
+const hijri=(y,m,d)=>{if(!fmtHij)return "";try{return fmtHij.format(new Date(Date.UTC(y,m-1,d,12))).replace(/\s*(AH|ap\. ?l'H\.|AP)\s*$/i," AH")}catch(e){return ""}};
+const hijriMonth=(y,m,d)=>{try{const f=new Intl.DateTimeFormat("fr-u-ca-islamic-umalqura",{month:"long",year:"numeric",timeZone:"UTC"});return f.format(new Date(Date.UTC(y,m-1,d,12)))}catch(e){return ""}};
+
+/* ============ Toast ============ */
+let tT;function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");clearTimeout(tT);tT=setTimeout(()=>el.classList.remove("on"),2200)}
+
+/* ============ Navigation ============ */
+const VIEWS=["pr","qb","ca","st"];let curView="pr";
+function go(v){
+  curView=v;
+  document.querySelectorAll(".view").forEach(el=>el.classList.toggle("on",el.id==="v-"+v));
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  placePill();
+  if(v==="ca")renderCal();
+  if(v==="qb")drawDialStatic();
+}
+function placePill(){const bs=[...document.querySelectorAll("#tabs button")];const i=VIEWS.indexOf(curView);const b=bs[i];const pill=$("#pill");pill.style.width=b.offsetWidth+"px";pill.style.transform="translateX("+(b.offsetLeft-6)+"px)"}
+document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.v)));
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+addEventListener("resize",()=>{placePill();placeKnob()});
+
+/* ============ Écran Prières ============ */
+const ICONS={
+  fajr:'<path d="M3 17h18M7 17a5 5 0 0 1 10 0M12 7V5M5.6 10.6 4.2 9.2M18.4 10.6l1.4-1.4" stroke="#9cc7e6"/>',
+  sunrise:'<path d="M3 18h18M7 18a5 5 0 0 1 10 0M12 9V4M9.5 6.5 12 4l2.5 2.5" stroke="#fbbf77"/>',
+  dhuhr:'<circle cx="12" cy="12" r="4" stroke="#fde68a"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4" stroke="#fde68a"/>',
+  asr:'<circle cx="10" cy="10" r="3.6" stroke="#f6c97a"/><path d="M10 3v1.6M3 10h1.6M5 5l1.1 1.1M15 5l-1.1 1.1M4 20h16M7 16.5h10" stroke="#f6c97a"/>',
+  maghrib:'<path d="M3 15h18M7 15a5 5 0 0 1 10 0M5 19h14M12 6v3M14.5 8.5 12 11 9.5 8.5" stroke="#f59e7a"/>',
+  isha:'<path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5z" stroke="#c4b5fd"/><path d="M17 4l.6 1.4L19 6l-1.4.6L17 8l-.6-1.4L15 6l1.4-.6z" stroke="#c4b5fd"/>'};
+function icon(k){return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+ICONS[k]+'</svg>'}
+
+let DAY=null, DAYKEY="", lastNextKey="";
+function dayKey(t){return t.y+"-"+t.m+"-"+t.d+"|"+S.method+S.madhab+S.loc.lat+","+S.loc.lng+S.loc.tz}
+function addDays(t,n){const dt=new Date(Date.UTC(t.y,t.m-1,t.d+n));return {y:dt.getUTCFullYear(),m:dt.getUTCMonth()+1,d:dt.getUTCDate()}}
+const comp=t=>computeDay(t.y,t.m,t.d,S.loc.lat,S.loc.lng,S.loc.tz,S.method,S.madhab);
+
+function buildDay(force){
+  const now=Date.now(), t=todayIn(S.loc.tz,now), key=dayKey(t);
+  if(!force&&key===DAYKEY)return;
+  DAYKEY=key;
+  DAY={today:comp(t),yest:comp(addDays(t,-1)),tom:comp(addDays(t,1)),t};
+  $("#locName").textContent=S.loc.n;
+  $("#dGreg").textContent=fmtGreg.format(new Date(Date.UTC(t.y,t.m-1,t.d,12)));
+  $("#dHij").textContent=hijri(t.y,t.m,t.d);
+  $("#methodLbl").textContent=METHODS[S.method].n.split(" (")[0].split(" / ")[0]+" · "+(S.madhab==="hanafi"?"Asr Hanafi":"Asr standard");
+  const q=qibla(S.loc.lat,S.loc.lng);
+  $("#meta").innerHTML=S.loc.lat.toFixed(4)+"°, "+S.loc.lng.toFixed(4)+"° · Qibla "+q.az.toFixed(1)+"° · "+S.loc.tz.replace("_"," ");
+  $("#list").innerHTML=PR.map(p=>'<div class="row'+(p.minor?" minor":"")+'" data-k="'+p.k+'"><div class="ic">'+icon(p.k)+'</div><div class="n"><b>'+p.n+'<span class="tag" style="display:none"></span></b><small>'+p.ar+'</small></div><div class="t">'+fmtH(DAY.today.h[p.k])+'</div></div>').join("");
+  drawSky();
+  lastNextKey="";
+}
+
+function state(now){
+  // liste chronologique d'événements (veille Isha -> demain Fajr)
+  const ev=[{k:"isha",ms:DAY.yest.ms.isha,day:-1}];
+  for(const p of PR)ev.push({k:p.k,ms:DAY.today.ms[p.k],day:0});
+  ev.push({k:"fajr",ms:DAY.tom.ms.fajr,day:1});
+  let next=null,prev=null;
+  for(let i=0;i<ev.length;i++){if(ev[i].ms>now){next=ev[i];prev=ev[i-1];break}}
+  // prière en cours : dernière prière obligatoire passée (Chourouq clôt le temps de Fajr)
+  let cur=null;
+  for(const e of ev){if(e.ms<=now)cur=e}
+  if(cur&&cur.k==="sunrise")cur=null;
+  // la prochaine « prière » : sauter Chourouq pour le grand affichage ? on l'affiche, mais libellé adapté
+  return {next,prev,cur};
+}
+
+function tick(){
+  const now=Date.now();
+  buildDay(false);
+  const st=state(now);
+  if(!st.next){buildDay(true);return}
+  const p=PR.find(x=>x.k===st.next.k);
+  const nk=st.next.k+st.next.day;
+  if(nk!==lastNextKey){
+    lastNextKey=nk;
+    $("#nxLbl").textContent=st.next.k==="sunrise"?"Lever du soleil · fin de Fajr":"Prochaine prière";
+    $("#nxName").textContent=p.n; $("#nxAr").textContent=p.ar;
+    const h=st.next.day===1?DAY.tom.h.fajr:DAY.today.h[st.next.k];
+    $("#nxTime").innerHTML=(st.next.day===1?"Demain à ":"Aujourd'hui à ")+"<strong>"+fmtH(h)+"</strong>";
+    const pp=PR.find(x=>x.k===st.prev.k);
+    $("#pgA").textContent=pp.n+" "+fmtH(st.prev.day===-1?DAY.yest.h.isha:DAY.today.h[st.prev.k]);
+    $("#pgB").textContent=p.n+" "+fmtH(h);
+    document.querySelectorAll("#list .row").forEach(r=>{
+      const k=r.dataset.k, tag=r.querySelector(".tag");
+      const isCur=st.cur&&st.cur.day===0&&st.cur.k===k || (st.cur&&st.cur.day===-1&&k==="isha"&&false);
+      const isNext=st.next.day===0&&st.next.k===k;
+      r.classList.toggle("cur",!!isCur); r.classList.toggle("next",isNext&&!isCur);
+      r.classList.toggle("past",!isCur&&st.next.day===0&&DAY.today.ms[k]<now || (st.next.day===1&&!isCur));
+      if(isCur){tag.style.display="";tag.textContent="En cours"}else if(isNext){tag.style.display="";tag.textContent="Suivante"}else tag.style.display="none";
+    });
+  }
+  let s=Math.max(0,Math.ceil((st.next.ms-now)/1000));
+  const H=Math.floor(s/3600),M=Math.floor(s%3600/60),Sx=s%60;
+  setNum("#cdH",pad(H));setNum("#cdM",pad(M));setNum("#cdS",pad(Sx));
+  const span=st.next.ms-st.prev.ms; $("#prog").style.width=Math.min(100,Math.max(0,(now-st.prev.ms)/span*100)).toFixed(2)+"%";
+  updateSkyNow(now);
+}
+function setNum(sel,v){const el=$(sel);if(el.textContent!==v){el.textContent=v;}}
+
+/* --- Courbe du soleil --- */
+let skyNow=null;
+function solarAlt(hLocal){ // hLocal: heure locale ; approximation avec la déclinaison du jour
+  const D=DAY.today, lat=S.loc.lat;
+  const H=(hLocal-D.noonRaw)*15;
+  return darcsin(dsin(lat)*dsin(D.decl)+dcos(lat)*dcos(D.decl)*dcos(H));
+}
+function drawSky(){
+  const svg=$("#sky"),W=380,Hh=128,top=26,hor=84,amp=56;
+  const maxAlt=Math.max(10,90-Math.abs(S.loc.lat-DAY.today.decl));
+  const sc=Math.min(amp/maxAlt, 2.2), X=h=>8+h/24*(W-16), Y=a=>hor-Math.max(-24,a)*sc*(a<0?0.55:1);
+  let d="";for(let i=0;i<=192;i++){const h=i/8;d+=(i?"L":"M")+X(h).toFixed(1)+" "+Y(solarAlt(h)).toFixed(1)}
+  let html='<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6dfa0" stop-opacity=".35"/><stop offset="1" stop-color="#f6dfa0" stop-opacity="0"/></linearGradient>'+
+    '<clipPath id="above"><rect x="0" y="0" width="'+W+'" height="'+hor+'"/></clipPath>'+
+    '<radialGradient id="sunG"><stop offset="0" stop-color="#fff7d6"/><stop offset=".45" stop-color="#f6dfa0"/><stop offset="1" stop-color="#f6dfa0" stop-opacity="0"/></radialGradient></defs>';
+  html+='<path d="'+d+'L'+X(24)+' '+hor+'L'+X(0)+' '+hor+'Z" fill="url(#sg)" clip-path="url(#above)"/>';
+  html+='<line x1="8" x2="'+(W-8)+'" y1="'+hor+'" y2="'+hor+'" stroke="rgba(255,255,255,.18)" stroke-dasharray="2 4"/>';
+  html+='<path d="'+d+'" fill="none" stroke="rgba(246,223,160,.25)" stroke-width="1.5"/>';
+  html+='<path d="'+d+'" fill="none" stroke="#f6dfa0" stroke-width="2.2" clip-path="url(#above)"/>';
+  let lastX=-99,row=0;
+  for(const p of PR){const h=DAY.today.h[p.k];if(isNaN(h))continue;const x=X(h),y=Y(solarAlt(h));
+    row=(x-lastX<40&&row===0)?1:0; lastX=x; const ty=row?Hh+9:Hh-3;
+    html+='<line x1="'+x+'" x2="'+x+'" y1="'+(y)+'" y2="'+(ty-10)+'" stroke="rgba(255,255,255,.09)"/><circle cx="'+x+'" cy="'+y+'" r="3" fill="#0b2a30" stroke="'+(p.minor?"#8fb0ab":"#f6dfa0")+'" stroke-width="1.6"/>'+
+      '<text x="'+x+'" y="'+ty+'" fill="'+(p.minor?"#5f817d":"#8fb0ab")+'" font-size="9.5" text-anchor="middle" font-weight="600">'+(p.minor?"Chourouq":p.n)+'</text>';}
+  html+='<g id="sunNow"><circle r="13" fill="url(#sunG)"/><circle r="4.5" fill="#fff7d6"/></g>';
+  svg.innerHTML=html; skyNow={X,Y};
+}
+function updateSkyNow(now){
+  if(!skyNow)return;const p=partsIn(S.loc.tz,now);const h=p.hour+p.minute/60+p.second/3600;
+  const g=document.getElementById("sunNow");if(!g)return;const a=solarAlt(h);
+  g.setAttribute("transform","translate("+skyNow.X(h).toFixed(1)+" "+skyNow.Y(a).toFixed(1)+")");
+  g.style.opacity=a<-0.8?.45:1;
+}
+
+/* ============ Boussole ============ */
+const dial=$("#dial");
+let QB=qibla(S.loc.lat,S.loc.lng);
+let heading=0, target=0, sensor=false, demo=false, gotReading=false, aligned=false, dragging=false;
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+let rotor,needle,kaabaEl;
+function buildDial(){
+  dial.innerHTML="";
+  const defs=el("defs",{},dial);
+  defs.innerHTML='<radialGradient id="face" cx=".5" cy=".42" r=".6"><stop offset="0" stop-color="#14444a"/><stop offset=".7" stop-color="#0a252c"/><stop offset="1" stop-color="#061a20"/></radialGradient>'+
+   '<linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8e3a8"/><stop offset=".5" stop-color="#9a7832"/><stop offset="1" stop-color="#f1d690"/></linearGradient>'+
+   '<linearGradient id="ndl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2c4"/><stop offset="1" stop-color="#c79c45"/></linearGradient>'+
+   '<filter id="gl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
+   '<filter id="ds"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity=".5"/></filter>';
+  el("circle",{r:196,fill:"url(#rim)",opacity:.85,filter:"url(#ds)"},dial);
+  el("circle",{r:192,fill:"url(#face)"},dial);
+  rotor=el("g",{},dial);
+  // motif central étoile 8 branches
+  const star=el("g",{opacity:.22,stroke:"#e2c57a","stroke-width":1.2,fill:"none"},rotor);
+  for(const r of [118,74]){el("rect",{x:-r/1.414,y:-r/1.414,width:r*1.414,height:r*1.414},star);el("rect",{x:-r/1.414,y:-r/1.414,width:r*1.414,height:r*1.414,transform:"rotate(45)"},star)}
+  el("circle",{r:118},star);el("circle",{r:150,opacity:.6},star);el("circle",{r:52},star);
+  // graduations
+  const ticks=el("g",{},rotor);
+  for(let a=0;a<360;a+=2){
+    const major=a%30===0, mid=a%10===0;
+    const r1=180, r2=major?162:mid?168:173;
+    el("line",{x1:0,y1:-r1,x2:0,y2:-r2,stroke:major?"#f6dfa0":mid?"rgba(238,245,242,.7)":"rgba(238,245,242,.3)","stroke-width":major?2.6:mid?1.6:1,"stroke-linecap":"round",transform:"rotate("+a+")"},ticks);
+  }
+  const card={0:"N",90:"E",180:"S",270:"O"};
+  for(let a=0;a<360;a+=30){
+    if(card[a]!=null){
+      const t=el("text",{x:0,y:-136,"text-anchor":"middle","dominant-baseline":"middle","font-size":a===0?26:21,"font-weight":700,fill:a===0?"#f6dfa0":"#eef5f2",transform:"rotate("+a+")"},rotor);t.textContent=card[a];
+    }else{
+      const t=el("text",{x:0,y:-146,"text-anchor":"middle","dominant-baseline":"middle","font-size":11.5,"font-weight":500,fill:"rgba(238,245,242,.55)",transform:"rotate("+a+")"},rotor);t.textContent=a;
+    }
+  }
+  el("path",{d:"M0 -192 L7 -181 L-7 -181Z",fill:"#f6dfa0"},rotor);
+  // arc Qibla + aiguille + Kaaba
+  needle=el("g",{},rotor);
+  const arcR=180;
+  el("path",{d:"M"+(arcR*dsin(-3))+" "+(-arcR*dcos(-3))+" A"+arcR+" "+arcR+" 0 0 1 "+(arcR*dsin(3))+" "+(-arcR*dcos(3)),stroke:"#f6dfa0","stroke-width":8,fill:"none",opacity:.55,"stroke-linecap":"round"},needle);
+  el("path",{d:"M0 -112 L9 -16 L0 -6 L-9 -16Z",fill:"url(#ndl)",filter:"url(#gl)"},needle);
+  el("path",{d:"M0 -112 L0 -6 L-9 -16Z",fill:"#fff",opacity:.25},needle);
+  el("path",{d:"M0 22 L6 14 L0 64 L-6 14Z",fill:"rgba(238,245,242,.18)"},needle);
+  // Kaaba (cube géométrique simple, vue isométrique)
+  const kb=el("g",{transform:"translate(0 -118)"},needle);
+  kb.setAttribute("id","kaaba");kaabaEl=kb;
+  el("circle",{r:24,fill:"#061a20",stroke:"#f6dfa0","stroke-width":1.5,opacity:.95},kb);
+  el("path",{d:"M0 -13 L13 -6.5 L0 0 L-13 -6.5Z",fill:"#2a2f33"},kb);
+  el("path",{d:"M-13 -6.5 L0 0 L0 14 L-13 7.5Z",fill:"#111417"},kb);
+  el("path",{d:"M13 -6.5 L0 0 L0 14 L13 7.5Z",fill:"#1c2125"},kb);
+  el("path",{d:"M-13 -2.5 L0 4 L13 -2.5 M-13 -0.5 L0 6 L13 -0.5",stroke:"#e2c57a","stroke-width":1.6,fill:"none"},kb);
+  el("path",{d:"M5 9.5 L5 4.5 L8.5 2.8 L8.5 7.8Z",fill:"#e2c57a",opacity:.9},kb);
+  // centre
+  el("circle",{r:13,fill:"#0b2a30",stroke:"url(#rim)","stroke-width":3},dial);
+  el("circle",{r:4,fill:"#f6dfa0"},dial);
+  // repère fixe du téléphone (haut)
+  el("path",{d:"M0 -200 L-10 -214 L10 -214Z",fill:"#eef5f2",transform:"translate(0 22)"},dial);
+  el("line",{x1:0,y1:-178,x2:0,y2:-160,stroke:"#eef5f2","stroke-width":3,"stroke-linecap":"round"},dial);
+}
+function setQiblaDial(){QB=qibla(S.loc.lat,S.loc.lng);needle.setAttribute("transform","rotate("+QB.az.toFixed(2)+")");
+  $("#qDeg").textContent=QB.az.toFixed(1).replace(".",",");
+  $("#qDist").textContent=Math.round(QB.km).toLocaleString("fr-FR")+" km";
+  $("#qSub").textContent="Direction de la Kaaba depuis le Nord · "+S.loc.n;
+}
+function drawDialStatic(){rotor.setAttribute("transform","rotate("+(-heading).toFixed(2)+")");kaabaEl.setAttribute("transform","translate(0 -118) rotate("+(heading-QB.az).toFixed(2)+")")}
+const angDiff=(a,b)=>((a-b+540)%360)-180;
+
+let lastFrame=0, demoT=0;
+function loop(ts){
+  const dt=Math.min(64,ts-(lastFrame||ts));lastFrame=ts;
+  if(demo&&!dragging){demoT+=dt/1000;const a=Math.sin(demoT*0.45)*(38+30*Math.cos(demoT*0.11));target=fixAngle(QB.az+(Math.abs(a)<6?a*0.3:a))}
+  if(sensor||demo){
+    const k=1-Math.pow(0.0025,dt/1000*1.4); // lissage exponentiel
+    heading=fixAngle(heading+angDiff(target,heading)*Math.min(1,k*(dragging?3:1)));
+    if(curView==="qb"){
+      rotor.setAttribute("transform","rotate("+(-heading).toFixed(2)+")");
+      kaabaEl.setAttribute("transform","translate(0 -118) rotate("+(heading-QB.az).toFixed(2)+")");
+      $("#qHead").textContent=Math.round(heading)+"° "+compassName(heading);
+    }
+    const diff=angDiff(QB.az,heading), al=Math.abs(diff)<=3;
+    if(al!==aligned){aligned=al;$("#dialwrap").classList.toggle("aligned",al);
+      if(al&&navigator.vibrate){try{navigator.vibrate([18,40,18])}catch(e){}}}
+    if(curView==="qb"){
+      if(al){$("#qMsg").textContent="Vous êtes face à la Qibla";$("#qHint").textContent="Alignement à ±3°";}
+      else{$("#qMsg").textContent="Tournez "+(diff>0?"vers la droite":"vers la gauche")+" de "+Math.round(Math.abs(diff))+"°";
+        $("#qHint").textContent=demo?"Mode démo · faites glisser le cadran pour le tourner":"Tenez le téléphone à plat, écran vers le ciel";}
+    }
+  }
+  requestAnimationFrame(loop);
+}
+const compassName=h=>["N","NE","E","SE","S","SO","O","NO"][Math.round(h/45)%8];
+
+function onOrient(e){
+  let h=null;
+  if(typeof e.webkitCompassHeading==="number"&&!isNaN(e.webkitCompassHeading))h=e.webkitCompassHeading;
+  else if(e.absolute&&typeof e.alpha==="number")h=360-e.alpha;
+  else if(e.type==="deviceorientationabsolute"&&typeof e.alpha==="number")h=360-e.alpha;
+  if(h==null)return;
+  const so=(screen.orientation&&screen.orientation.angle)||0;
+  target=fixAngle(h+so); if(!gotReading){heading=target;gotReading=true;onSensorOk()}
+}
+function onSensorOk(){sensor=true;demo=false;$("#qBtns").style.display="none";toast("Boussole activée")}
+async function enableCompass(){
+  try{
+    if(typeof DeviceOrientationEvent!=="undefined"&&typeof DeviceOrientationEvent.requestPermission==="function"){
+      const r=await DeviceOrientationEvent.requestPermission();
+      if(r!=="granted"){noSensor("Autorisation refusée");return}
+    }
+  }catch(err){noSensor("Autorisation indisponible");return}
+  if("ondeviceorientationabsolute" in window)addEventListener("deviceorientationabsolute",onOrient);
+  addEventListener("deviceorientation",onOrient);
+  $("#qMsg").textContent="Recherche du capteur…";$("#qHint").textContent="Faites un 8 avec le téléphone pour calibrer";
+  setTimeout(()=>{if(!gotReading)noSensor("Aucun capteur détecté")},1800);
+}
+function noSensor(why){
+  toast(why+" · mode démo");startDemo();
+}
+function startDemo(){demo=true;demoT=0;$("#btnDemo").textContent="Mode démo actif";}
+$("#btnCompass").addEventListener("click",enableCompass);
+$("#btnDemo").addEventListener("click",()=>{if(!demo){startDemo();toast("Mode démo : faites glisser le cadran")}else{demo=false;$("#btnDemo").textContent="Mode démo";heading=0;drawDialStatic();aligned=false;$("#dialwrap").classList.remove("aligned");$("#qMsg").textContent="Boussole inactive";$("#qHint").textContent="Activez la boussole et tenez le téléphone à plat";$("#qHead").textContent="—"}});
+// glisser pour tourner le cadran (démo / sans capteur)
+let dragA=0,dragH=0;
+const angAt=e=>{const r=dial.getBoundingClientRect();return Math.atan2(e.clientX-(r.left+r.width/2),-(e.clientY-(r.top+r.height/2)))/DEG};
+dial.addEventListener("pointerdown",e=>{if(sensor)return;if(!demo)startDemo();dragging=true;dragA=angAt(e);dragH=target;dial.setPointerCapture(e.pointerId)});
+dial.addEventListener("pointermove",e=>{if(!dragging)return;target=fixAngle(dragH-(angAt(e)-dragA))});
+const endDrag=()=>{if(dragging){dragging=false;demoT=Math.PI*1.2/0.55+(Math.random()*.1)}};
+dial.addEventListener("pointerup",endDrag);dial.addEventListener("pointercancel",endDrag);
+
+/* ============ Calendrier ============ */
+let calMode="w", calOff=0;
+function placeKnob(){const bs=document.querySelectorAll("#seg button");const b=bs[calMode==="w"?0:1];const k=$("#knob");k.style.width=b.offsetWidth+"px";k.style.transform="translateX("+(b.offsetLeft-3)+"px)"}
+document.querySelectorAll("#seg button").forEach(b=>b.addEventListener("click",()=>{calMode=b.dataset.m;calOff=0;document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x===b));placeKnob();renderCal()}));
+$("#prv").addEventListener("click",()=>{calOff--;renderCal()});
+$("#nxt").addEventListener("click",()=>{calOff++;renderCal()});
+const fmtWd=new Intl.DateTimeFormat("fr-FR",{weekday:"short",timeZone:"UTC"});
+const fmtMo=new Intl.DateTimeFormat("fr-FR",{month:"long",year:"numeric",timeZone:"UTC"});
+const fmtShort=new Intl.DateTimeFormat("fr-FR",{day:"numeric",month:"short",timeZone:"UTC"});
+function renderCal(){
+  const t=todayIn(S.loc.tz,Date.now());let days=[];
+  if(calMode==="w"){
+    const dow=(new Date(Date.UTC(t.y,t.m-1,t.d)).getUTCDay()+6)%7;
+    const start=addDays(t,-dow+calOff*7);for(let i=0;i<7;i++)days.push(addDays(start,i));
+    const a=days[0],b=days[6];
+    $("#calT").textContent=fmtShort.format(new Date(Date.UTC(a.y,a.m-1,a.d)))+" – "+fmtShort.format(new Date(Date.UTC(b.y,b.m-1,b.d)));
+    $("#calH").textContent=hijriRange(a,b);
+  }else{
+    const dt=new Date(Date.UTC(t.y,t.m-1+calOff,1));const y=dt.getUTCFullYear(),m=dt.getUTCMonth()+1;
+    const n=new Date(Date.UTC(y,m,0)).getUTCDate();for(let i=1;i<=n;i++)days.push({y,m,d:i});
+    $("#calT").textContent=fmtMo.format(dt);$("#calH").textContent=hijriRange(days[0],days[n-1]);
+  }
+  const tk=t.y+"-"+t.m+"-"+t.d;
+  $("#tb").innerHTML=days.map(dd=>{const r=comp(dd);const dt=new Date(Date.UTC(dd.y,dd.m-1,dd.d));const wd=dt.getUTCDay();
+    const hd=fmtHij?shortHijri(dd):"";
+    return '<tr class="'+((dd.y+"-"+dd.m+"-"+dd.d)===tk?"today ":"")+(wd===5?"we":"")+'"><td><b>'+dd.d+' '+fmtWd.format(dt).replace(".","")+'</b><small>'+hd+'</small></td>'+
+      PR.map(p=>'<td class="'+(p.minor?"sh":"")+'">'+fmtH(r.h[p.k])+'</td>').join("")+'</tr>'}).join("");
+  $("#calMeta").textContent=METHODS[S.method].n+" · "+MADHAB[S.madhab].n.split(" (")[0]+" · "+S.loc.n;
+  const sc=$("#v-ca");if(calMode==="m"&&calOff===0){const tr=$("#tb tr.today");if(tr)requestAnimationFrame(()=>{sc.scrollTop=Math.max(0,tr.offsetTop-60)})}else sc.scrollTop=0;
+}
+function shortHijri(dd){try{return new Intl.DateTimeFormat("fr-u-ca-islamic-umalqura",{day:"numeric",month:"short",timeZone:"UTC"}).format(new Date(Date.UTC(dd.y,dd.m-1,dd.d,12)))}catch(e){return ""}}
+function hijriRange(a,b){const A=hijriMonth(a.y,a.m,a.d),B=hijriMonth(b.y,b.m,b.d);return A===B?A:(A.replace(/\s\d+.*$/,"")+" – "+B)}
+
+/* ============ Réglages ============ */
+function renderSettings(){
+  $("#cities").innerHTML=CITIES.map(c=>{const q=qibla(c.lat,c.lng);return '<div class="city'+(S.loc.type==="city"&&S.loc.id===c.id?" on":"")+'" data-id="'+c.id+'"><b>'+c.n+'</b><small>Qibla '+q.az.toFixed(0)+'° · '+Math.round(q.km).toLocaleString("fr-FR")+' km</small></div>'}).join("");
+  document.querySelectorAll(".city").forEach(d=>d.addEventListener("click",()=>{const c=CITIES.find(x=>x.id===d.dataset.id);setLoc({type:"city",id:c.id,n:c.n,lat:c.lat,lng:c.lng,tz:c.tz});toast(c.n+" sélectionnée")}));
+  $("#methods").innerHTML=Object.entries(METHODS).map(([k,m])=>'<div class="opt'+(S.method===k?" on":"")+'" data-k="'+k+'"><div class="l"><b>'+m.n+'</b><small>'+m.d+(k==="uoif"?" · par défaut":"")+'</small></div><div class="ck"></div></div>').join("");
+  document.querySelectorAll("#methods .opt").forEach(o=>o.addEventListener("click",()=>{S.method=o.dataset.k;save();renderSettings();buildDay(true);tick()}));
+  $("#madhabs").innerHTML=Object.entries(MADHAB).map(([k,m])=>'<div class="opt'+(S.madhab===k?" on":"")+'" data-k="'+k+'"><div class="l"><b>'+m.n+'</b><small>'+m.d+'</small></div><div class="ck"></div></div>').join("");
+  document.querySelectorAll("#madhabs .opt").forEach(o=>o.addEventListener("click",()=>{S.madhab=o.dataset.k;save();renderSettings();buildDay(true);tick()}));
+  $("#gps").classList.toggle("on",S.loc.type==="gps");
+  $("#gpsSub").textContent=S.loc.type==="gps"?"Position actuelle · "+S.loc.lat.toFixed(3)+", "+S.loc.lng.toFixed(3):"Géolocalisation de l'appareil";
+  if(S.loc.type==="manual"){$("#iLat").value=S.loc.lat;$("#iLng").value=S.loc.lng}
+}
+function setLoc(l){S.loc=l;save();renderSettings();buildDay(true);setQiblaDial();drawDialStatic();tick();}
+$("#iOk").addEventListener("click",()=>{
+  const la=parseFloat($("#iLat").value.replace(",",".")),lo=parseFloat($("#iLng").value.replace(",","."));
+  if(!(la>=-90&&la<=90)||!(lo>=-180&&lo<=180)||isNaN(la)||isNaN(lo)){$("#iErr").textContent="Coordonnées invalides (lat −90…90, long −180…180)";return}
+  $("#iErr").textContent="";setLoc({type:"manual",n:la.toFixed(3)+", "+lo.toFixed(3),lat:la,lng:lo,tz:DEVICE_TZ});toast("Position enregistrée");document.activeElement.blur();
+});
+function locate(silent){
+  if(!navigator.geolocation){if(!silent)$("#iErr").textContent="Géolocalisation indisponible";return}
+  $("#gpsSub").textContent="Localisation en cours…";
+  navigator.geolocation.getCurrentPosition(p=>{
+    const la=+p.coords.latitude.toFixed(4),lo=+p.coords.longitude.toFixed(4);
+    // nom : ville prédéfinie la plus proche si < 8 km
+    let best=null,bd=1e9;for(const c of CITIES){const d=Math.hypot(c.lat-la,(c.lng-lo)*dcos(la))*111;if(d<bd){bd=d;best=c}}
+    const n=bd<8?best.n+" (GPS)":"Ma position";
+    setLoc({type:"gps",n,lat:la,lng:lo,tz:DEVICE_TZ});$("#iErr").textContent="";if(!silent)toast("Position mise à jour");
+  },err=>{renderSettings();if(!silent){$("#iErr").textContent="Position refusée ou indisponible : choisissez une ville ci-dessous";}},{enableHighAccuracy:false,timeout:10000,maximumAge:600000});
+}
+$("#gps").addEventListener("click",()=>locate(false));
+
+/* ============ Init ============ */
+buildDial();
+renderSettings();
+buildDay(true);
+setQiblaDial();
+drawDialStatic();
+tick();
+setInterval(tick,1000);
+requestAnimationFrame(loop);
+requestAnimationFrame(()=>{placePill();placeKnob()});
+if(S.loc.type==="gps"||!store.get("asked",false)){store.set("asked",true);locate(true)}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){buildDay(false);tick()}});
+document.addEventListener("gesturestart",e=>e.preventDefault());
+window.__qibla={computeDay,qibla,fmtH};
+</script>
+</body>
+</html>

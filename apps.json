@@ -1,7 +1,85 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-21T09:21:44.742Z",
+  "generated": "2026-11-22T14:46:20.252Z",
   "apps": [
+    {
+      "name": "Adhkar",
+      "emoji": "📿",
+      "colors": [
+        "#03140e",
+        "#18a070"
+      ],
+      "category": "Coran",
+      "added": "2026-11-22",
+      "description": "Invocations authentiques du matin et du soir, compteur au toucher, série et tasbih libre",
+      "icon": "apps/adhkar/icon.svg",
+      "id": "adhkar"
+    },
+    {
+      "name": "Fractale",
+      "emoji": "🌀",
+      "colors": [
+        "#0b0730",
+        "#8b5cf6"
+      ],
+      "category": "Labo",
+      "added": "2026-11-22",
+      "description": "Explorateur de fractales temps réel en WebGL : zoom profond, Julia, visite guidée",
+      "icon": "apps/fractale/icon.svg",
+      "id": "fractale"
+    },
+    {
+      "name": "Micro Lab",
+      "emoji": "📈",
+      "colors": [
+        "#1a0838",
+        "#8b5cf6"
+      ],
+      "category": "Dauphine",
+      "added": "2026-11-22",
+      "description": "Labo interactif de micro (chap. 2) : préférences, TMS, optimum, demande, Slutsky/Hicks + exercices type partiel",
+      "icon": "apps/micro-lab/icon.svg",
+      "id": "micro-lab"
+    },
+    {
+      "name": "Orbite",
+      "emoji": "🪐",
+      "colors": [
+        "#030a1f",
+        "#38bdf8"
+      ],
+      "category": "Jeux",
+      "added": "2026-11-22",
+      "description": "Puzzle de fronde gravitationnelle : 40 niveaux, planètes, trous noirs et portails",
+      "icon": "apps/orbite/icon.svg",
+      "id": "orbite"
+    },
+    {
+      "name": "Patrimoine",
+      "emoji": "📈",
+      "colors": [
+        "#052e1f",
+        "#f5c862"
+      ],
+      "category": "Outils",
+      "added": "2026-11-22",
+      "description": "Simulateur PEA halal : zakat dès le nisab et purification des dividendes",
+      "icon": "apps/patrimoine-halal/icon.svg",
+      "id": "patrimoine-halal"
+    },
+    {
+      "name": "Qibla",
+      "emoji": "🧭",
+      "colors": [
+        "#03161b",
+        "#14b8a6"
+      ],
+      "category": "Coran",
+      "added": "2026-11-22",
+      "description": "Boussole de la Qibla et horaires de prière calculés en local",
+      "icon": "apps/qibla/icon.svg",
+      "id": "qibla"
+    },
     {
       "name": "Caravane",
       "emoji": "⭐",

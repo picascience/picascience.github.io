@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#04140f">
+<title>Adhkar</title>
+<style>
+@font-face{font-family:"Amiri";src:url("fonts/amiri-arabic-400-normal.woff2") format("woff2");font-display:swap}
+:root{
+  --ar:'Geeza Pro','Noto Naskh Arabic','Amiri',serif;
+  --qr:'Amiri','Geeza Pro','Noto Naskh Arabic',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;
+  --ease:cubic-bezier(.22,.8,.24,1);
+  --arsize:30px;
+  --tabh:64px;
+  --bottom:calc(30px + env(safe-area-inset-bottom));
+}
+[data-theme=dark]{
+  --bg:#03120d;--bg2:#062219;--card:#0a2a20;--card2:#0d3327;--line:rgba(233,207,140,.13);
+  --tx:#f4eedc;--tx2:rgba(244,238,220,.66);--tx3:rgba(244,238,220,.38);
+  --green:#1d8a62;--green2:#2fb383;--gold:#e3c06e;--gold2:#f5dc9b;--goldbg:rgba(227,192,110,.12);
+  --pat:.055;--shadow:0 18px 50px rgba(0,0,0,.45);--glass:rgba(6,30,23,.72);
+  --h0:rgba(255,255,255,.05);--h1:#16503c;--h2:#1f8a62;--h3:#e3c06e;
+}
+[data-theme=light]{
+  --bg:#f5efe0;--bg2:#ece3cc;--card:#fffaf0;--card2:#fbf3e1;--line:rgba(13,74,55,.12);
+  --tx:#0b2f24;--tx2:rgba(11,47,36,.68);--tx3:rgba(11,47,36,.4);
+  --green:#0f5e45;--green2:#16825f;--gold:#a87c22;--gold2:#8a6414;--goldbg:rgba(168,124,34,.1);
+  --pat:.07;--shadow:0 16px 40px rgba(60,45,10,.12);--glass:rgba(250,244,230,.8);
+  --h0:rgba(11,47,36,.07);--h1:#b9d6c4;--h2:#2f8f68;--h3:#c49a3c;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:var(--sans);
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;overscroll-behavior:none}
+body{transition:background .5s,color .5s}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.pattern{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:var(--pat);color:var(--gold);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23e3c06e' stroke-width='1.2'%3E%3Cpath d='M60 18l12.7 17.3L94 30l-5.3 21.3L106 60l-17.3 8.7L94 90l-21.3-5.3L60 102l-12.7-17.3L26 90l5.3-21.3L14 60l17.3-8.7L26 30l21.3 5.3z'/%3E%3Ccircle cx='60' cy='60' r='16'/%3E%3Cpath d='M0 0l14 14M120 0l-14 14M0 120l14-14M120 120l-14-14M60 0v18M60 120v-18M0 60h14M120 60h-14'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:120px 120px;mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.5) 55%,transparent 100%);-webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.5) 55%,transparent 100%)}
+.glow{position:fixed;inset:-20% -30% auto;height:70%;pointer-events:none;z-index:0;
+  background:radial-gradient(60% 55% at 50% 0%,rgba(29,138,98,.28),transparent 70%)}
+[data-theme=light] .glow{background:radial-gradient(60% 55% at 50% 0%,rgba(196,154,60,.2),transparent 70%)}
+#app{position:relative;z-index:1;height:100%}
+.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  padding:calc(env(safe-area-inset-top) + 18px) 18px calc(var(--bottom) + var(--tabh) + 24px);
+  opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .35s var(--ease),transform .45s var(--ease)}
+.view.on{opacity:1;pointer-events:auto;transform:none}
+.view::-webkit-scrollbar{display:none}
+
+/* ===== Tab bar ===== */
+.tabs{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:var(--bottom);height:var(--tabh);
+  width:min(330px,calc(100% - 40px));display:flex;padding:6px;border-radius:24px;background:var(--glass);
+  backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);border:1px solid var(--line);box-shadow:var(--shadow)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:18px;
+  font-size:10.5px;font-weight:600;letter-spacing:.02em;color:var(--tx3);transition:color .25s,background .25s}
+.tab svg{width:22px;height:22px}
+.tab.on{color:var(--gold);background:var(--goldbg)}
+
+/* ===== Home ===== */
+.top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.date{font-size:13px;color:var(--tx2);font-weight:500;letter-spacing:.01em}
+.h1{font-size:30px;font-weight:750;letter-spacing:-.02em;margin-top:2px;display:flex;align-items:center;gap:10px}
+.h1 svg{width:28px;height:28px;color:var(--gold)}
+.seg{display:flex;position:relative;background:var(--h0);border-radius:13px;padding:3px;border:1px solid var(--line)}
+.seg button{position:relative;z-index:1;padding:7px 13px;font-size:13px;font-weight:600;color:var(--tx2);border-radius:10px;transition:color .25s}
+.seg button.on{color:var(--tx)}
+.seg .pill{position:absolute;top:3px;bottom:3px;border-radius:10px;background:var(--card2);box-shadow:0 2px 8px rgba(0,0,0,.18);transition:left .35s var(--ease),width .35s var(--ease)}
+.hint{font-size:12px;color:var(--tx3);margin:-6px 0 14px}
+.hero{position:relative;border-radius:28px;padding:22px;overflow:hidden;
+  background:linear-gradient(150deg,#0e4434 0%,#082a20 55%,#06201a 100%);color:#f4eedc;box-shadow:var(--shadow);border:1px solid rgba(227,192,110,.18)}
+[data-theme=light] .hero{background:linear-gradient(150deg,#13644a 0%,#0d4a37 60%,#0a3d2d 100%)}
+.hero::before{content:"";position:absolute;inset:0;opacity:.09;background-image:inherit}
+.hero .star{position:absolute;right:-50px;top:-50px;width:210px;height:210px;opacity:.13;color:#e3c06e}
+.hero-row{display:flex;align-items:center;gap:20px;position:relative}
+.ring{position:relative;flex:none}
+.ring svg{display:block;transform:rotate(-90deg)}
+.ring .tr{stroke:rgba(255,255,255,.1)}
+.ring .pr{stroke:url(#gGold);transition:stroke-dashoffset .7s var(--ease)}
+.ring .ct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .big{font-size:30px;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.ring .small{font-size:11px;opacity:.6;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.hero h2{font-size:20px;font-weight:700;letter-spacing:-.01em}
+.hero p{font-size:13.5px;line-height:1.45;opacity:.72;margin-top:4px}
+.cta{margin-top:18px;width:100%;height:54px;border-radius:17px;font-weight:700;font-size:16px;letter-spacing:.01em;position:relative;
+  background:linear-gradient(180deg,#f2d690,#d9b25c);color:#1d1606;box-shadow:0 8px 24px rgba(217,178,92,.35),inset 0 1px 0 rgba(255,255,255,.5);
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s}
+.cta:active{transform:scale(.97)}
+.cta svg{width:18px;height:18px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 12px;position:relative;overflow:hidden}
+.stat b{display:block;font-size:26px;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat span{font-size:11.5px;color:var(--tx2);font-weight:500}
+.stat svg{position:absolute;right:10px;top:12px;width:18px;height:18px;color:var(--gold);opacity:.9}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:16px;margin-bottom:14px}
+.card-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.card-h h3{font-size:16px;font-weight:700}
+.card-h small{font-size:12px;color:var(--tx3)}
+.heat{display:grid;grid-template-columns:18px repeat(12,1fr);gap:4px}
+.heat .dl{font-size:9.5px;color:var(--tx3);display:flex;align-items:center;font-weight:600}
+.heat i{aspect-ratio:1;border-radius:5px;background:var(--h0);display:block;transition:background .4s}
+.heat i.l1{background:var(--h1)}.heat i.l2{background:var(--h2)}.heat i.l3{background:var(--h3);box-shadow:0 0 10px rgba(227,192,110,.35)}
+.heat i.fut{opacity:.25}
+.heat i.today{outline:1.5px solid var(--gold);outline-offset:1.5px}
+.legend{display:flex;align-items:center;gap:5px;justify-content:flex-end;margin-top:10px;font-size:10.5px;color:var(--tx3)}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.list{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:12px;padding:11px 2px;border-top:1px solid var(--line);text-align:left;width:100%}
+.row:first-child{border-top:0}
+.row .mini{flex:none;width:34px;height:34px;position:relative}
+.row .mini svg{transform:rotate(-90deg)}
+.mini .tr{stroke:var(--h0)}.mini .pr{stroke:url(#gGold);transition:stroke-dashoffset .5s var(--ease)}
+.row .mini .ck{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:11px;font-weight:700}
+.row .mini .ck svg{transform:none;width:15px;height:15px}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .t span{display:block;font-size:12px;color:var(--tx3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .x{font-size:12.5px;font-weight:700;color:var(--gold);background:var(--goldbg);padding:4px 9px;border-radius:9px;font-variant-numeric:tabular-nums}
+.row.done .t b{color:var(--tx2)}
+
+/* ===== Reader ===== */
+.reader{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .5s var(--ease);visibility:hidden}
+.reader.on{transform:none;visibility:visible}
+.reader .pattern{position:absolute}
+.r-top{position:relative;z-index:3;padding:calc(env(safe-area-inset-top) + 10px) 14px 6px}
+.bars{display:flex;gap:3px;margin-bottom:10px;padding:0 2px}
+.bars i{flex:1;height:3px;border-radius:3px;background:var(--h0);overflow:hidden;position:relative}
+.bars i b{position:absolute;inset:0;background:var(--gold);transform-origin:left;transform:scaleX(0);transition:transform .35s var(--ease)}
+.r-nav{display:flex;align-items:center;justify-content:space-between}
+.ibtn{width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--h0);border:1px solid var(--line);color:var(--tx);transition:transform .15s}
+.ibtn:active{transform:scale(.92)}
+.ibtn svg{width:19px;height:19px}
+.r-title{font-size:13px;font-weight:600;color:var(--tx2);text-align:center;font-variant-numeric:tabular-nums}
+.r-title b{color:var(--gold);font-weight:700}
+.stage{position:relative;flex:1;overflow:hidden;z-index:2}
+.track{position:absolute;inset:0;display:flex;will-change:transform}
+.slide{flex:none;width:100%;height:100%;padding:4px 14px 0}
+.dk{position:relative;height:100%;border-radius:28px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden;transition:border-color .5s,box-shadow .5s}
+.dk.done{border-color:rgba(227,192,110,.5);box-shadow:var(--shadow),0 0 0 1px rgba(227,192,110,.25) inset}
+.dk-sc{height:100%;overflow-y:auto;overflow-x:hidden;padding:22px 20px 40px;touch-action:pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.dk-sc::-webkit-scrollbar{display:none}
+.dk .lab{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--gold)}
+.dk .lab span:last-child{background:var(--goldbg);padding:4px 9px;border-radius:8px;letter-spacing:.03em}
+.dk h2{font-size:21px;font-weight:700;letter-spacing:-.01em;margin-top:10px}
+.dk .sub{font-size:13px;color:var(--tx3);margin-top:2px}
+.pre{margin-top:14px;font-size:12.5px;color:var(--tx2);font-style:italic}
+.part{margin-top:22px}
+.part h4{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);font-weight:700;display:flex;align-items:center;gap:8px}
+.part h4::after{content:"";flex:1;height:1px;background:var(--line)}
+.ar{direction:rtl;text-align:center;font-family:var(--ar);font-size:var(--arsize);line-height:2;color:var(--tx);margin:12px 0 0;word-spacing:.04em;transition:font-size .2s}
+.ar.q{font-family:var(--qr);line-height:2.15;font-size:calc(var(--arsize) * 1.06)}
+.basm{direction:rtl;text-align:center;font-family:var(--qr);font-size:calc(var(--arsize) * .78);color:var(--gold);margin-top:8px}
+.orn{display:flex;justify-content:center;margin:14px 0 6px;color:var(--gold);opacity:.7}
+.orn svg{width:120px;height:14px}
+.tr{font-size:14px;line-height:1.6;color:var(--tx2);font-style:italic;margin-top:10px}
+.fr{font-size:15px;line-height:1.6;color:var(--tx);margin-top:10px}
+.virt{margin-top:22px;padding:14px 14px 14px 16px;border-radius:16px;background:var(--goldbg);position:relative;overflow:hidden}
+.virt::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
+.virt p{font-size:14px;line-height:1.5}
+.virt small{display:block;margin-top:7px;font-size:12px;color:var(--tx2);line-height:1.45}
+.virt small b{color:var(--gold);font-weight:700}
+.note{margin-top:8px;font-size:11.5px;color:var(--tx3);line-height:1.45}
+.fade{position:absolute;left:0;right:0;bottom:0;height:40px;background:linear-gradient(transparent,var(--card));pointer-events:none;border-radius:0 0 28px 28px}
+.ripple{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;border:2px solid var(--gold);pointer-events:none;animation:rip .6s var(--ease) forwards}
+@keyframes rip{from{transform:scale(1);opacity:.8}to{transform:scale(9);opacity:0}}
+.r-foot{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;padding:14px 26px calc(var(--bottom) + 2px)}
+.cnt{position:relative;width:96px;height:96px}
+.cnt svg{transform:rotate(-90deg);display:block}
+.cnt .tr2{stroke:var(--h0)}
+.cnt .pr2{stroke:url(#gGold);transition:stroke-dashoffset .35s var(--ease)}
+.cnt .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.cnt .num b{font-size:30px;font-weight:750;letter-spacing:-.03em;line-height:1}
+.cnt .num span{font-size:11px;color:var(--tx3);font-weight:600;margin-top:3px}
+.cnt.pop{animation:pop .3s var(--ease)}
+@keyframes pop{40%{transform:scale(1.08)}}
+.cnt.fin .num b{color:var(--gold)}
+.fbtn{width:52px;height:52px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:var(--h0);border:1px solid var(--line);color:var(--tx2);transition:transform .15s}
+.fbtn:active{transform:scale(.9)}
+.fbtn svg{width:22px;height:22px}
+.taphint{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(var(--bottom) + 132px);white-space:nowrap;font-size:12px;font-weight:600;color:var(--tx);z-index:3;pointer-events:none;transition:opacity .4s;
+  background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);padding:8px 14px;border-radius:12px;box-shadow:var(--shadow)}
+.sizer{position:absolute;right:14px;top:calc(env(safe-area-inset-top) + 66px);z-index:6;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--line);border-radius:18px;padding:12px 14px;width:230px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;
+  opacity:0;transform:translateY(-6px) scale(.97);pointer-events:none;transition:.25s var(--ease)}
+.sizer.on{opacity:1;transform:none;pointer-events:auto}
+.sizer .a1{font-size:13px;font-weight:600}.sizer .a2{font-size:21px;font-weight:600}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:4px;border-radius:4px;background:var(--h0);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--gold);border:3px solid var(--card);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+
+/* done overlay */
+.fin-ov{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;
+  background:radial-gradient(70% 50% at 50% 42%,rgba(29,138,98,.35),transparent 70%),var(--bg);opacity:0;pointer-events:none;transition:opacity .5s}
+.fin-ov.on{opacity:1;pointer-events:auto}
+.fin-ov .burst{width:170px;height:170px;color:var(--gold)}
+.fin-ov.on .burst .s1{animation:spin 18s linear infinite;transform-origin:85px 85px}
+.fin-ov.on .burst .s2{animation:spin 24s linear infinite reverse;transform-origin:85px 85px}
+.fin-ov.on .burst .ck{stroke-dasharray:80;stroke-dashoffset:80;animation:draw .7s .25s var(--ease) forwards}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.fin-ov h2{font-size:26px;font-weight:750;margin-top:18px;letter-spacing:-.02em}
+.fin-ov .duaa{font-family:var(--ar);font-size:26px;color:var(--gold);margin-top:10px;direction:rtl}
+.fin-ov p{color:var(--tx2);font-size:14.5px;line-height:1.5;margin-top:8px;max-width:300px}
+.fin-ov .cta{max-width:280px;margin-top:26px}
+.fin-ov .ghost{margin-top:12px;font-size:14px;color:var(--tx2);font-weight:600;padding:10px}
+
+/* ===== Tasbih ===== */
+.chips{display:flex;gap:8px;overflow-x:auto;margin:0 -18px;padding:2px 18px 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:9px 14px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--tx2);transition:.25s var(--ease);white-space:nowrap}
+.chip .a{font-family:var(--ar);font-size:16px;margin-left:6px;color:var(--tx)}
+.chip.on{background:var(--goldbg);border-color:rgba(227,192,110,.55);color:var(--gold)}
+.formula{text-align:center;margin:18px 0 4px;min-height:118px}
+.formula .ar{font-size:38px;line-height:1.7;margin:0}
+.formula .tr{margin-top:0;font-size:14px;font-style:normal;color:var(--gold);font-weight:600}
+.formula .fr{font-size:13px;color:var(--tx3);margin-top:2px}
+.tzone{position:relative;display:flex;justify-content:center;align-items:center;margin:6px auto 0;touch-action:none;cursor:pointer}
+.bead{position:relative;width:min(76vw,320px);aspect-ratio:1;border-radius:50%}
+.bead svg.rg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.bead .core{position:absolute;inset:13%;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 35% 28%,#1a5a45,#0a2d22 60%,#062018);box-shadow:0 24px 60px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -12px 30px rgba(0,0,0,.35);
+  transition:transform .12s;color:#f4eedc;overflow:hidden}
+[data-theme=light] .bead .core{background:radial-gradient(circle at 35% 28%,#1c7a59,#0f5e45 60%,#0b4634);box-shadow:0 22px 50px rgba(15,94,69,.35),inset 0 1px 0 rgba(255,255,255,.2)}
+.bead .core::before{content:"";position:absolute;inset:0;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 120 120'%3E%3Cpath fill='none' stroke='%23e3c06e' stroke-width='2' d='M60 18l12.7 17.3L94 30l-5.3 21.3L106 60l-17.3 8.7L94 90l-21.3-5.3L60 102l-12.7-17.3L26 90l5.3-21.3L14 60l17.3-8.7L26 30l21.3 5.3z'/%3E%3C/svg%3E");background-size:60px}
+.bead.press .core{transform:scale(.965)}
+.bead .n{position:relative;font-size:76px;font-weight:200;letter-spacing:-.04em;font-variant-numeric:tabular-nums;line-height:1}
+.bead .of{position:relative;font-size:14px;opacity:.6;margin-top:6px;font-weight:600;letter-spacing:.04em}
+.bead .rd{position:relative;margin-top:10px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#e3c06e;opacity:0;transition:opacity .3s}
+.bead .rd.on{opacity:1}
+.bead.goal .core{animation:goal .9s var(--ease)}
+@keyframes goal{30%{box-shadow:0 0 0 14px rgba(227,192,110,.25),0 24px 60px rgba(0,0,0,.45)}}
+.targets{display:flex;gap:8px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.tg{min-width:52px;height:38px;padding:0 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-weight:700;font-size:14px;color:var(--tx2);font-variant-numeric:tabular-nums;transition:.2s}
+.tg.on{background:var(--gold);color:#1d1606;border-color:var(--gold)}
+.custom{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:12px;height:0;overflow:hidden;opacity:0;transition:.3s var(--ease)}
+.custom.on{height:44px;opacity:1}
+.custom b{min-width:54px;text-align:center;font-size:20px;font-variant-numeric:tabular-nums}
+.tfoot{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding:14px 16px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
+.tfoot div b{display:block;font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.tfoot div span{font-size:11.5px;color:var(--tx3)}
+.hold{position:relative;overflow:hidden;height:40px;padding:0 14px;border-radius:12px;background:var(--h0);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--tx2);display:flex;align-items:center;gap:6px}
+.hold svg{width:16px;height:16px;position:relative}
+.hold span{position:relative}
+.hold::before{content:"";position:absolute;inset:0;background:rgba(227,92,80,.25);transform:scaleX(0);transform-origin:left}
+.hold.ing::before{transform:scaleX(1);transition:transform .7s linear}
+
+/* ===== Settings ===== */
+.sec{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);font-weight:700;margin:22px 4px 8px}
+.grp{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.it{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-top:1px solid var(--line);min-height:54px}
+.it:first-child{border-top:0}
+.it .l{font-size:15px;font-weight:500}
+.it .l small{display:block;font-size:12px;color:var(--tx3);font-weight:400;margin-top:2px}
+.sw{flex:none;width:51px;height:31px;border-radius:31px;background:var(--h0);position:relative;transition:background .25s;border:1px solid var(--line)}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:25px;height:25px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.3);transition:transform .3s var(--ease)}
+.sw.on{background:var(--green2)}
+.sw.on::after{transform:translateX(20px)}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:32px;height:32px;border-radius:10px;background:var(--h0);border:1px solid var(--line);font-size:18px;font-weight:600;color:var(--tx2)}
+.step b{min-width:54px;text-align:center;font-variant-numeric:tabular-nums;font-size:15px}
+.about{font-size:12.5px;line-height:1.6;color:var(--tx3);padding:14px 6px}
+.toast{position:fixed;left:50%;bottom:calc(var(--bottom) + var(--tabh) + 16px);transform:translate(-50%,20px);z-index:60;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--line);padding:10px 16px;border-radius:14px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:.35s var(--ease);white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body data-theme="dark">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6e0a3"/><stop offset="1" stop-color="#c9973a"/></linearGradient>
+    <symbol id="i-star" viewBox="0 0 120 120"><path fill="none" stroke="currentColor" stroke-width="3" d="M60 8l15.3 23L102 23.9l-7 26.8L116 60l-21 9.3 7 26.8-26.7-7.1L60 112 44.7 89 18 96.1l7-26.8L4 60l21-9.3-7-26.8L44.7 31z"/><circle cx="60" cy="60" r="24" fill="none" stroke="currentColor" stroke-width="3"/><path fill="none" stroke="currentColor" stroke-width="3" d="M60 30l8.5 21.5L90 60l-21.5 8.5L60 90l-8.5-21.5L30 60l21.5-8.5z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></g></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/><path fill="currentColor" d="M17.5 3.5l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z"/></symbol>
+    <symbol id="i-beads" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="10.05" cy="15.49" r="1.55"/><circle cx="6.90" cy="13.20" r="1.55"/><circle cx="5.70" cy="9.50" r="1.55"/><circle cx="6.90" cy="5.80" r="1.55"/><circle cx="10.05" cy="3.51" r="1.55"/><circle cx="13.95" cy="3.51" r="1.55"/><circle cx="17.10" cy="5.80" r="1.55"/><circle cx="18.30" cy="9.50" r="1.55"/><circle cx="17.10" cy="13.20" r="1.55"/><circle cx="13.95" cy="15.49" r="1.55"/></g><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 16v2.2M12 18.2l-1.6 3.3M12 18.2l1.6 3.3"/></g></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></g></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.2 1.8 1 2.8 2 3.2-.6-3 .2-6 1-8.7z"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M9 20h6"/></g></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="5.5" width="16" height="14" rx="3"/><path d="M4 10h16M9 3.5v4M15 3.5v4"/></g></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-aa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l4.5-11L12 18M4.6 14h5.8M14 18l3-7 3 7M15 16h4"/></g></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7L5 11l4 4"/><path d="M5 11h9a5 5 0 0 1 0 10h-2"/></g></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.5v13a1 1 0 0 0 1.5.9l10-6.5a1 1 0 0 0 0-1.7l-10-6.6A1 1 0 0 0 8 5.5z"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5"/></g></symbol>
+    <symbol id="i-orn" viewBox="0 0 120 14"><g fill="none" stroke="currentColor" stroke-width="1.2"><path d="M0 7h46M74 7h46"/><path d="M60 1l6 6-6 6-6-6z"/><circle cx="50" cy="7" r="2"/><circle cx="70" cy="7" r="2"/></g></symbol>
+  </defs>
+</svg>
+<div class="glow"></div>
+<div class="pattern"></div>
+
+<div id="app">
+  <!-- HOME -->
+  <section class="view on" id="v-home">
+    <div class="top">
+      <div>
+        <div class="date" id="date"></div>
+        <div class="h1" id="h1"></div>
+      </div>
+      <div class="seg" id="seg"><div class="pill"></div><button data-s="m">Matin</button><button data-s="s">Soir</button></div>
+    </div>
+    <div class="hint" id="hint"></div>
+    <div class="hero">
+      <svg class="star"><use href="#i-star"/></svg>
+      <div class="hero-row">
+        <div class="ring" id="heroRing"></div>
+        <div>
+          <h2 id="heroT"></h2>
+          <p id="heroP"></p>
+        </div>
+      </div>
+      <button class="cta" id="start"></button>
+    </div>
+    <div class="stats">
+      <div class="stat"><svg><use href="#i-flame"/></svg><b id="stStreak">0</b><span>Série (jours)</span></div>
+      <div class="stat"><svg><use href="#i-trophy"/></svg><b id="stBest">0</b><span>Record</span></div>
+      <div class="stat"><svg><use href="#i-cal"/></svg><b id="stDays">0</b><span>Jours / 12 sem.</span></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>Régularité</h3><small>12 dernières semaines</small></div>
+      <div class="heat" id="heat"></div>
+      <div class="legend">Moins <i style="background:var(--h0)"></i><i style="background:var(--h1)"></i><i style="background:var(--h2)"></i><i style="background:var(--h3)"></i> Matin + soir</div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3 id="listT">Les adhkar</h3><small id="listS"></small></div>
+      <div class="list" id="list"></div>
+    </div>
+  </section>
+
+  <!-- TASBIH -->
+  <section class="view" id="v-tasbih">
+    <div class="top" style="margin-bottom:12px"><div><div class="date">Compteur libre</div><div class="h1">Tasbih</div></div></div>
+    <div class="chips" id="fchips"></div>
+    <div class="formula" id="formula"></div>
+    <div class="tzone" id="tzone">
+      <div class="bead" id="bead">
+        <svg class="rg" viewBox="0 0 200 200" id="beadSvg"></svg>
+        <div class="core"><div class="n" id="tN">0</div><div class="of" id="tOf"></div><div class="rd" id="tRd"></div></div>
+      </div>
+    </div>
+    <div class="targets" id="targets"></div>
+    <div class="custom" id="custom"><button class="ibtn" data-d="-1">−</button><b id="customV">33</b><button class="ibtn" data-d="1">+</button></div>
+    <div class="tfoot">
+      <div><b id="tToday">0</b><span>Aujourd'hui</span></div>
+      <div><b id="tTotal">0</b><span>Total cumulé</span></div>
+      <button class="hold" id="tReset"><svg><use href="#i-reset"/></svg><span>Remise à 0</span></button>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="v-set">
+    <div class="top"><div><div class="date">Personnaliser</div><div class="h1">Réglages</div></div></div>
+    <div class="sec">Horaires (approximatifs)</div>
+    <div class="grp">
+      <div class="it"><div class="l">Matin à partir de<small>≈ après Fajr</small></div><div class="step" data-k="mStart"><button data-d="-15">−</button><b></b><button data-d="15">+</button></div></div>
+      <div class="it"><div class="l">Matin jusqu'à<small>≈ milieu de journée</small></div><div class="step" data-k="mEnd"><button data-d="-15">−</button><b></b><button data-d="15">+</button></div></div>
+      <div class="it"><div class="l">Soir à partir de<small>≈ après Asr</small></div><div class="step" data-k="sStart"><button data-d="-15">−</button><b></b><button data-d="15">+</button></div></div>
+    </div>
+    <div class="sec">Lecture</div>
+    <div class="grp">
+      <div class="it"><div class="l">Taille de l'arabe</div><div class="step" data-k="size"><button data-d="-2">−</button><b></b><button data-d="2">+</button></div></div>
+      <div class="it"><div class="l">Translittération</div><button class="sw" data-k="showTr"></button></div>
+      <div class="it"><div class="l">Traduction française</div><button class="sw" data-k="showFr"></button></div>
+      <div class="it"><div class="l">Vertu et source</div><button class="sw" data-k="showV"></button></div>
+      <div class="it"><div class="l">Tahlîl ×100<small>« Lâ ilâha illallâh wahdah… » 100 fois au lieu de 10</small></div><button class="sw" data-k="long"></button></div>
+      <div class="it"><div class="l">Vibration au comptage<small>Si l'appareil le permet</small></div><button class="sw" data-k="vib"></button></div>
+    </div>
+    <div class="sec">Apparence</div>
+    <div class="grp"><div class="it"><div class="l">Thème</div><div class="seg" id="themeSeg"><div class="pill"></div><button data-t="auto">Auto</button><button data-t="dark">Nuit</button><button data-t="light">Jour</button></div></div></div>
+    <div class="sec">Données</div>
+    <div class="grp"><div class="it"><div class="l">Remettre à zéro la séance en cours<small>Maintenir le bouton appuyé</small></div><button class="hold" id="resetSess"><svg><use href="#i-reset"/></svg><span>Maintenir</span></button></div></div>
+    <p class="about">Textes tirés de <b>Hisn al-Muslim</b> (Sa'îd al-Qahtânî) et des recueils cités sur chaque carte. Versets en écriture uthmânie (lecture Hafs), traduction de M. Hamidullah. Les horaires sont une simple approximation : vérifie les heures de prière de ta ville. Tout reste sur ton téléphone.</p>
+  </section>
+</div>
+
+<nav class="tabs" id="tabs">
+  <button class="tab on" data-v="home"><svg><use href="#i-sun" id="tabIco"/></svg>Adhkar</button>
+  <button class="tab" data-v="tasbih"><svg><use href="#i-beads"/></svg>Tasbih</button>
+  <button class="tab" data-v="set"><svg><use href="#i-gear"/></svg>Réglages</button>
+</nav>
+
+<!-- READER -->
+<div class="reader" id="reader">
+  <div class="pattern"></div>
+  <div class="r-top">
+    <div class="bars" id="bars"></div>
+    <div class="r-nav">
+      <button class="ibtn" id="rClose" aria-label="Fermer"><svg><use href="#i-x"/></svg></button>
+      <div class="r-title" id="rTitle"></div>
+      <button class="ibtn" id="rSize" aria-label="Taille du texte"><svg><use href="#i-aa"/></svg></button>
+    </div>
+  </div>
+  <div class="sizer" id="sizer"><span class="a1">ع</span><input type="range" min="22" max="46" step="1" id="sizeR"><span class="a2">ع</span></div>
+  <div class="stage" id="stage"><div class="track" id="track"></div></div>
+  <div class="taphint" id="taphint">Touche la carte pour compter · glisse pour naviguer</div>
+  <div class="r-foot">
+    <button class="fbtn" id="rUndo" aria-label="Annuler"><svg><use href="#i-undo"/></svg></button>
+    <div class="cnt" id="cnt"></div>
+    <button class="fbtn" id="rNext" aria-label="Suivant"><svg><use href="#i-next"/></svg></button>
+  </div>
+  <div class="fin-ov" id="fin">
+    <svg class="burst" viewBox="0 0 170 170"><g class="s1"><use href="#i-star" x="5" y="5" width="160" height="160" opacity=".55"/></g><g class="s2"><circle cx="85" cy="85" r="46" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 6"/></g><circle cx="85" cy="85" r="36" style="fill:var(--card)"/><circle cx="85" cy="85" r="36" fill="rgba(227,192,110,.14)" stroke="currentColor" stroke-width="2"/><path class="ck" d="M70 86l10 10 20-22" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h2 id="finT">Adhkar terminés</h2>
+    <div class="duaa">تَقَبَّلَ اللَّهُ مِنَّا وَمِنْكُمْ</div>
+    <p id="finP"></p>
+    <button class="cta" id="finHome">Retour à l'accueil</button>
+    <button class="ghost" id="finRead">Relire les adhkar</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const Q={"basmala": "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ", "kursi": {"basm": false, "ar": "ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَ ٱلۡحَيُّ ٱلۡقَيُّومُۚ لَا تَأۡخُذُهُۥ سِنَةٞ وَلَا نَوۡمٞۚ لَّهُۥ مَا فِي ٱلسَّمَٰوَٰتِ وَمَا فِي ٱلۡأَرۡضِۗ مَن ذَا ٱلَّذِي يَشۡفَعُ عِندَهُۥٓ إِلَّا بِإِذۡنِهِۦۚ يَعۡلَمُ مَا بَيۡنَ أَيۡدِيهِمۡ وَمَا خَلۡفَهُمۡۖ وَلَا يُحِيطُونَ بِشَيۡءٖ مِّنۡ عِلۡمِهِۦٓ إِلَّا بِمَا شَآءَۚ وَسِعَ كُرۡسِيُّهُ ٱلسَّمَٰوَٰتِ وَٱلۡأَرۡضَۖ وَلَا يَـُٔودُهُۥ حِفۡظُهُمَاۚ وَهُوَ ٱلۡعَلِيُّ ٱلۡعَظِيمُ ۝٢٥٥", "fr": "Allah! Point de divinité à part Lui, le Vivant, Celui qui subsiste par lui-même «Al-Qayyûm». Ni somnolence ni sommeil ne Le saisissent. A Lui appartient tout ce qui est dans les cieux et sur la terre. Qui peut intercéder auprès de Lui sans Sa permission? Il connaît leur passé et leur futur. Et, de Sa science, ils n'embrassent que ce qu'Il veut. Son Trône «Kursiy», déborde les cieux et la terre, dont la garde ne Lui coûte aucune peine. Et Il est le Très Haut, le Très Grand."}, "ikhlas": {"basm": true, "ar": "قُلۡ هُوَ ٱللَّهُ أَحَدٌ ۝١ ٱللَّهُ ٱلصَّمَدُ ۝٢ لَمۡ يَلِدۡ وَلَمۡ يُولَدۡ ۝٣ وَلَمۡ يَكُن لَّهُۥ كُفُوًا أَحَدُۢ ۝٤", "fr": "Dis: «Il est Allah, Unique. Allah, Le Seul à être imploré pour ce que nous désirons. Il n'a jamais engendré, n'a pas été engendré non plus. Et nul n'est égal à Lui»"}, "falaq": {"basm": true, "ar": "قُلۡ أَعُوذُ بِرَبِّ ٱلۡفَلَقِ ۝١ مِن شَرِّ مَا خَلَقَ ۝٢ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۝٣ وَمِن شَرِّ ٱلنَّفَّـٰثَٰتِ فِي ٱلۡعُقَدِ ۝٤ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ۝٥", "fr": "Dis: «Je cherche protection auprès du Seigneur de l'aube naissante. contre le mal des êtres qu'Il a créés. contre le mal de l'obscurité quand elle s'approfondit. contre le mal de celles qui soufflent [les sorcières] sur les nœuds. et contre le mal de l'envieux quand il envie»"}, "nas": {"basm": true, "ar": "قُلۡ أَعُوذُ بِرَبِّ ٱلنَّاسِ ۝١ مَلِكِ ٱلنَّاسِ ۝٢ إِلَٰهِ ٱلنَّاسِ ۝٣ مِن شَرِّ ٱلۡوَسۡوَاسِ ٱلۡخَنَّاسِ ۝٤ ٱلَّذِي يُوَسۡوِسُ فِي صُدُورِ ٱلنَّاسِ ۝٥ مِنَ ٱلۡجِنَّةِ وَٱلنَّاسِ ۝٦", "fr": "Dis: «Je cherche protection auprès du Seigneur des hommes. Le Souverain des hommes. Dieu des hommes. contre le mal du mauvais conseiller, furtif. qui souffle le mal dans les poitrines des hommes. qu'il (le conseiller) soit un djinn, ou un être humain»"}, "baqara": {"basm": false, "ar": "ءَامَنَ ٱلرَّسُولُ بِمَآ أُنزِلَ إِلَيۡهِ مِن رَّبِّهِۦ وَٱلۡمُؤۡمِنُونَۚ كُلٌّ ءَامَنَ بِٱللَّهِ وَمَلَـٰٓئِكَتِهِۦ وَكُتُبِهِۦ وَرُسُلِهِۦ لَا نُفَرِّقُ بَيۡنَ أَحَدٖ مِّن رُّسُلِهِۦۚ وَقَالُواْ سَمِعۡنَا وَأَطَعۡنَاۖ غُفۡرَانَكَ رَبَّنَا وَإِلَيۡكَ ٱلۡمَصِيرُ ۝٢٨٥ لَا يُكَلِّفُ ٱللَّهُ نَفۡسًا إِلَّا وُسۡعَهَاۚ لَهَا مَا كَسَبَتۡ وَعَلَيۡهَا مَا ٱكۡتَسَبَتۡۗ رَبَّنَا لَا تُؤَاخِذۡنَآ إِن نَّسِينَآ أَوۡ أَخۡطَأۡنَاۚ رَبَّنَا وَلَا تَحۡمِلۡ عَلَيۡنَآ إِصۡرٗا كَمَا حَمَلۡتَهُۥ عَلَى ٱلَّذِينَ مِن قَبۡلِنَاۚ رَبَّنَا وَلَا تُحَمِّلۡنَا مَا لَا طَاقَةَ لَنَا بِهِۦۖ وَٱعۡفُ عَنَّا وَٱغۡفِرۡ لَنَا وَٱرۡحَمۡنَآۚ أَنتَ مَوۡلَىٰنَا فَٱنصُرۡنَا عَلَى ٱلۡقَوۡمِ ٱلۡكَٰفِرِينَ ۝٢٨٦", "fr": "Le Messager a cru en ce qu'on a fait descendre vers lui venant de son Seigneur, et aussi les croyants: tous ont cru en Allah, en Ses anges, à Ses livres et en Ses messagers; (en disant): «Nous ne faisons aucune distinction entre Ses messagers». Et ils ont dit: «Nous avons entendu et obéi. Seigneur, nous implorons Ton pardon. C'est à Toi que sera le retour» Allah n'impose à aucune âme une charge supérieure à sa capacité. Elle sera récompensée du bien qu'elle aura fait, punie du mal qu'elle aura fait. Seigneur, ne nous châtie pas s'il nous arrive d'oublier ou de commettre une erreur. Seigneur! Ne nous charge pas d'un fardeau lourd comme Tu as chargé ceux qui vécurent avant nous. Seigneur! Ne nous impose pas ce que nous ne pouvons supporter, efface nos fautes, pardonne-nous et fais nous miséricorde. Tu es Notre Maître, accorde-nous donc la victoire sur les peuples infidèles."}};
+</script>
+<script>
+"use strict";
+/* ================= DATA ================= */
+const QUL_FR={
+  ikhlas:"Dis : « Il est Allah, Unique. Allah, Le Seul à être imploré pour ce que nous désirons. Il n'a jamais engendré, n'a pas été engendré non plus. Et nul n'est égal à Lui. »",
+  falaq:"Dis : « Je cherche protection auprès du Seigneur de l'aube naissante, contre le mal des êtres qu'Il a créés, contre le mal de l'obscurité quand elle s'approfondit, contre le mal de celles qui soufflent sur les nœuds, et contre le mal de l'envieux quand il envie. »",
+  nas:"Dis : « Je cherche protection auprès du Seigneur des hommes, le Souverain des hommes, Dieu des hommes, contre le mal du mauvais conseiller, furtif, qui souffle le mal dans les poitrines des hommes, qu'il soit un djinn ou un être humain. »"
+};
+// Chaque champ peut être une chaîne, ou {m:…, s:…} pour les variantes matin/soir.
+const D=[
+ {id:"kursi",when:"ms",n:1,quran:1,title:"Âyat al-Kursî",sub:"Le verset du Trône · al-Baqara 2:255",
+  pre:"On commence par : « A'ûdhu billâhi mina-sh-shaytâni-r-rajîm ».",
+  parts:[{ar:Q.kursi.ar,
+   tr:"Allâhu lâ ilâha illâ Huwa-l-Hayyu-l-Qayyûm. Lâ ta'khudhuhu sinatun wa lâ nawm. Lahu mâ fi-s-samâwâti wa mâ fi-l-ard. Man dha-lladhî yashfa'u 'indahu illâ bi-idhnih. Ya'lamu mâ bayna aydîhim wa mâ khalfahum, wa lâ yuhîtûna bi-shay'in min 'ilmihi illâ bimâ shâ'. Wasi'a kursiyyuhu-s-samâwâti wa-l-ard, wa lâ ya'ûduhu hifzuhumâ, wa Huwa-l-'Aliyyu-l-'Azîm.",
+   fr:Q.kursi.fr}],
+  virtue:{m:"Celui qui la récite le matin est protégé des djinns jusqu'au soir.",s:"Celui qui la récite le soir est protégé des djinns jusqu'au matin."},
+  src:"an-Nasâ'î (‘Amal al-yawm wa-l-layla), al-Hâkim — authentifié par al-Albânî (Sahîh at-Targhîb)."},
+ {id:"qul",when:"ms",n:3,quran:1,title:"Les trois « Qul »",sub:"al-Ikhlâs, al-Falaq, an-Nâs · à réciter 3 fois",
+  parts:[
+   {h:"Sourate al-Ikhlâs (112)",basm:1,ar:Q.ikhlas.ar,tr:"Qul huwa-llâhu ahad. Allâhu-s-samad. Lam yalid wa lam yûlad. Wa lam yakun lahu kufuwan ahad.",fr:QUL_FR.ikhlas},
+   {h:"Sourate al-Falaq (113)",basm:1,ar:Q.falaq.ar,tr:"Qul a'ûdhu bi-rabbi-l-falaq. Min sharri mâ khalaq. Wa min sharri ghâsiqin idhâ waqab. Wa min sharri-n-naffâthâti fi-l-'uqad. Wa min sharri hâsidin idhâ hasad.",fr:QUL_FR.falaq},
+   {h:"Sourate an-Nâs (114)",basm:1,ar:Q.nas.ar,tr:"Qul a'ûdhu bi-rabbi-n-nâs. Maliki-n-nâs. Ilâhi-n-nâs. Min sharri-l-waswâsi-l-khannâs. Alladhî yuwaswisu fî sudûri-n-nâs. Mina-l-jinnati wa-n-nâs.",fr:QUL_FR.nas}],
+  virtue:"Récitées trois fois le matin et le soir, elles te suffiront contre toute chose.",
+  src:"Abû Dâwûd, at-Tirmidhî — hasan selon al-Albânî."},
+ {id:"baqara",when:"s",n:1,quran:1,title:"Fin de sourate al-Baqara",sub:"Les deux derniers versets · 2:285-286",
+  parts:[{ar:Q.baqara.ar,
+   tr:"Âmana-r-rasûlu bimâ unzila ilayhi min rabbihî wa-l-mu'minûn. Kullun âmana billâhi wa malâ'ikatihî wa kutubihî wa rusulih, lâ nufarriqu bayna ahadin min rusulih. Wa qâlû sami'nâ wa ata'nâ, ghufrânaka rabbanâ wa ilayka-l-masîr. Lâ yukallifu-llâhu nafsan illâ wus'ahâ, lahâ mâ kasabat wa 'alayhâ ma-ktasabat. Rabbanâ lâ tu'âkhidhnâ in nasînâ aw akhta'nâ. Rabbanâ wa lâ tahmil 'alaynâ isran kamâ hamaltahû 'ala-lladhîna min qablinâ. Rabbanâ wa lâ tuhammilnâ mâ lâ tâqata lanâ bih. Wa-'fu 'annâ wa-ghfir lanâ wa-rhamnâ, anta mawlânâ fa-nsurnâ 'ala-l-qawmi-l-kâfirîn.",
+   fr:Q.baqara.fr}],
+  virtue:"Celui qui récite les deux derniers versets de sourate al-Baqara la nuit, ils lui suffiront.",
+  src:"al-Bukhârî, Muslim."},
+ {id:"mulk",when:"ms",n:1,title:{m:"Asbahnâ wa asbaha al-mulku lillâh",s:"Amsaynâ wa amsâ al-mulku lillâh"},sub:"La royauté appartient à Allah",
+  parts:[{ar:{m:"أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَٰذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَٰذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
+                s:"أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَٰذِهِ اللَّيْلَةِ وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَٰذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ"},
+   tr:{m:"Asbahnâ wa asbaha-l-mulku lillâh, wa-l-hamdu lillâh, lâ ilâha illa-llâhu wahdahu lâ sharîka lah, lahu-l-mulku wa lahu-l-hamdu wa huwa 'alâ kulli shay'in qadîr. Rabbi as'aluka khayra mâ fî hâdha-l-yawmi wa khayra mâ ba'dah, wa a'ûdhu bika min sharri mâ fî hâdha-l-yawmi wa sharri mâ ba'dah. Rabbi a'ûdhu bika mina-l-kasali wa sû'i-l-kibar. Rabbi a'ûdhu bika min 'adhâbin fi-n-nâri wa 'adhâbin fi-l-qabr.",
+       s:"Amsaynâ wa amsa-l-mulku lillâh, wa-l-hamdu lillâh, lâ ilâha illa-llâhu wahdahu lâ sharîka lah, lahu-l-mulku wa lahu-l-hamdu wa huwa 'alâ kulli shay'in qadîr. Rabbi as'aluka khayra mâ fî hâdhihi-l-laylati wa khayra mâ ba'dahâ, wa a'ûdhu bika min sharri mâ fî hâdhihi-l-laylati wa sharri mâ ba'dahâ. Rabbi a'ûdhu bika mina-l-kasali wa sû'i-l-kibar. Rabbi a'ûdhu bika min 'adhâbin fi-n-nâri wa 'adhâbin fi-l-qabr."},
+   fr:{m:"Nous voici au matin, et la royauté appartient à Allah. Louange à Allah. Nulle divinité n'est digne d'adoration en dehors d'Allah, Seul, sans associé ; à Lui la royauté, à Lui la louange, et Il est capable de toute chose. Seigneur, je Te demande le bien de ce jour et le bien de ce qui le suit, et je cherche refuge auprès de Toi contre le mal de ce jour et le mal de ce qui le suit. Seigneur, je cherche refuge auprès de Toi contre la paresse et les maux de la vieillesse. Seigneur, je cherche refuge auprès de Toi contre un châtiment dans le Feu et un châtiment dans la tombe.",
+       s:"Nous voici au soir, et la royauté appartient à Allah. Louange à Allah. Nulle divinité n'est digne d'adoration en dehors d'Allah, Seul, sans associé ; à Lui la royauté, à Lui la louange, et Il est capable de toute chose. Seigneur, je Te demande le bien de cette nuit et le bien de ce qui la suit, et je cherche refuge auprès de Toi contre le mal de cette nuit et le mal de ce qui la suit. Seigneur, je cherche refuge auprès de Toi contre la paresse et les maux de la vieillesse. Seigneur, je cherche refuge auprès de Toi contre un châtiment dans le Feu et un châtiment dans la tombe."}}],
+  virtue:"Le Prophète ﷺ la disait chaque matin et chaque soir.",src:"Muslim."},
+ {id:"bika",when:"ms",n:1,title:{m:"Allâhumma bika asbahnâ",s:"Allâhumma bika amsaynâ"},sub:"Par Toi nous vivons et mourons",
+  parts:[{ar:{m:"اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ",
+               s:"اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ"},
+   tr:{m:"Allâhumma bika asbahnâ, wa bika amsaynâ, wa bika nahyâ, wa bika namûtu, wa ilayka-n-nushûr.",s:"Allâhumma bika amsaynâ, wa bika asbahnâ, wa bika nahyâ, wa bika namûtu, wa ilayka-l-masîr."},
+   fr:{m:"Ô Allah, c'est par Toi que nous atteignons le matin et par Toi que nous atteignons le soir, par Toi nous vivons et par Toi nous mourons, et vers Toi est la résurrection.",
+       s:"Ô Allah, c'est par Toi que nous atteignons le soir et par Toi que nous atteignons le matin, par Toi nous vivons et par Toi nous mourons, et vers Toi est le retour."}}],
+  virtue:"Le Prophète ﷺ l'enseignait à ses Compagnons pour le matin et le soir.",src:"at-Tirmidhî, Abû Dâwûd — authentifié par al-Albânî."},
+ {id:"sayyid",when:"ms",n:1,title:"Sayyid al-Istighfâr",sub:"La meilleure demande de pardon",
+  parts:[{ar:"اللَّهُمَّ أَنْتَ رَبِّي، لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي، فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",
+   tr:"Allâhumma anta rabbî, lâ ilâha illâ ant, khalaqtanî wa ana 'abduk, wa ana 'alâ 'ahdika wa wa'dika ma-stata't, a'ûdhu bika min sharri mâ sana't, abû'u laka bi-ni'matika 'alayya, wa abû'u laka bi-dhanbî, fa-ghfir lî, fa-innahu lâ yaghfiru-dh-dhunûba illâ ant.",
+   fr:"Ô Allah, Tu es mon Seigneur, nulle divinité n'est digne d'adoration en dehors de Toi. Tu m'as créé et je suis Ton serviteur ; je reste fidèle à mon engagement envers Toi et à Ta promesse autant que je le peux. Je cherche refuge auprès de Toi contre le mal que j'ai commis. Je reconnais Ton bienfait envers moi et je reconnais mon péché : pardonne-moi, car nul ne pardonne les péchés en dehors de Toi."}],
+  virtue:{m:"Celui qui la dit le matin avec conviction et meurt avant le soir fait partie des gens du Paradis.",s:"Celui qui la dit le soir avec conviction et meurt avant le matin fait partie des gens du Paradis."},src:"al-Bukhârî."},
+ {id:"afw",when:"ms",n:1,title:"Al-'afwa wa-l-'âfiya",sub:"Le pardon et le salut",
+  parts:[{ar:"اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي، وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ، وَمِنْ خَلْفِي، وَعَنْ يَمِينِي، وَعَنْ شِمَالِي، وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي",
+   tr:"Allâhumma innî as'aluka-l-'afwa wa-l-'âfiyata fi-d-dunyâ wa-l-âkhirah. Allâhumma innî as'aluka-l-'afwa wa-l-'âfiyata fî dînî wa dunyâya wa ahlî wa mâlî. Allâhumma-stur 'awrâtî, wa âmin raw'âtî. Allâhumma-hfaznî min bayni yadayya, wa min khalfî, wa 'an yamînî, wa 'an shimâlî, wa min fawqî, wa a'ûdhu bi-'azamatika an ughtâla min tahtî.",
+   fr:"Ô Allah, je Te demande le pardon et le salut dans ce monde et dans l'au-delà. Ô Allah, je Te demande le pardon et le salut dans ma religion, ma vie d'ici-bas, ma famille et mes biens. Ô Allah, couvre mes défauts et apaise mes craintes. Ô Allah, protège-moi par-devant et par-derrière, à ma droite et à ma gauche, et d'en haut ; et je cherche refuge auprès de Ta grandeur contre le fait d'être saisi par surprise d'en bas."}],
+  virtue:"Le Prophète ﷺ ne délaissait jamais ces invocations, ni le matin ni le soir.",src:"Abû Dâwûd, Ibn Mâjah — authentifié par al-Albânî."},
+ {id:"ghayb",when:"ms",n:1,title:"Allâhumma 'âlima-l-ghayb",sub:"Refuge contre le mal de l'âme",
+  parts:[{ar:"اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءًا، أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ",
+   tr:"Allâhumma 'âlima-l-ghaybi wa-sh-shahâdah, fâtira-s-samâwâti wa-l-ard, rabba kulli shay'in wa malîkah, ash-hadu an lâ ilâha illâ ant, a'ûdhu bika min sharri nafsî, wa min sharri-sh-shaytâni wa shirkih, wa an aqtarifa 'alâ nafsî sû'an, aw ajurrahu ilâ muslim.",
+   fr:"Ô Allah, Connaisseur de l'invisible et du visible, Créateur des cieux et de la terre, Seigneur et Souverain de toute chose, j'atteste que nulle divinité n'est digne d'adoration en dehors de Toi. Je cherche refuge auprès de Toi contre le mal de mon âme, contre le mal de Shaytân et de son appel à l'association, et contre le fait de commettre un mal contre moi-même ou de l'attirer sur un musulman."}],
+  virtue:"Enseignée par le Prophète ﷺ à Abû Bakr, pour le matin, le soir et au coucher.",src:"Abû Dâwûd, at-Tirmidhî — authentifié par al-Albânî."},
+ {id:"bismillah",when:"ms",n:3,title:"Bismillâhi-lladhî lâ yadurru",sub:"Protection contre tout mal",
+  parts:[{ar:"بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ، وَهُوَ السَّمِيعُ الْعَلِيمُ",
+   tr:"Bismi-llâhi-lladhî lâ yadurru ma'a-smihi shay'un fi-l-ardi wa lâ fi-s-samâ', wa huwa-s-samî'u-l-'alîm.",
+   fr:"Au nom d'Allah, Celui avec le nom duquel rien ne peut nuire, ni sur la terre ni dans le ciel, et Il est Celui qui entend tout, l'Omniscient."}],
+  virtue:"Celui qui la dit trois fois le matin et trois fois le soir, rien ne lui nuira.",src:"Abû Dâwûd, at-Tirmidhî — authentifié par al-Albânî."},
+ {id:"raditu",when:"ms",n:3,title:"Radîtu billâhi rabbâ",sub:"Agréer Allah, l'islam et le Prophète ﷺ",
+  parts:[{ar:"رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا",
+   tr:"Radîtu billâhi rabbâ, wa bil-islâmi dînâ, wa bi-Muhammadin (sallâ-llâhu 'alayhi wa sallam) nabiyyâ.",
+   fr:"J'agrée Allah comme Seigneur, l'islam comme religion et Muhammad ﷺ comme Prophète."}],
+  virtue:"Allah s'est engagé à satisfaire, le Jour de la Résurrection, celui qui la dit trois fois matin et soir.",
+  src:"Abû Dâwûd, at-Tirmidhî, Ahmad — jugé hasan par Ibn Bâz.",
+  note:"La chaîne de cette version matin/soir est discutée (al-Albânî l'a jugée faible) ; la formule elle-même est authentique (Muslim)."},
+ {id:"hayy",when:"ms",n:1,title:"Yâ Hayyu yâ Qayyûm",sub:"Ne me confie pas à moi-même",
+  parts:[{ar:"يَا حَيُّ يَا قَيُّومُ، بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ",
+   tr:"Yâ Hayyu yâ Qayyûm, bi-rahmatika astaghîth, aslih lî sha'nî kullah, wa lâ takilnî ilâ nafsî tarfata 'ayn.",
+   fr:"Ô Vivant, ô Toi qui subsistes par Toi-même, c'est Ta miséricorde que j'implore : arrange toutes mes affaires et ne me confie pas à moi-même, ne serait-ce que le temps d'un clin d'œil."}],
+  virtue:"Conseillée par le Prophète ﷺ à sa fille Fâtima, à dire matin et soir.",src:"an-Nasâ'î (‘Amal al-yawm wa-l-layla), al-Hâkim — hasan selon al-Albânî."},
+ {id:"hasbi",when:"ms",n:7,title:"Hasbiya-llâhu lâ ilâha illâ huwa",sub:"Allah me suffit · 7 fois",
+  parts:[{ar:"حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ، عَلَيْهِ تَوَكَّلْتُ، وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+   tr:"Hasbiya-llâhu lâ ilâha illâ huwa, 'alayhi tawakkaltu, wa huwa rabbu-l-'arshi-l-'azîm.",
+   fr:"Allah me suffit, nulle divinité n'est digne d'adoration en dehors de Lui. En Lui je place ma confiance, et Il est le Seigneur du Trône immense."}],
+  virtue:"Celui qui la dit sept fois matin et soir, Allah lui suffira pour ce qui le préoccupe.",
+  src:"Abû Dâwûd (parole d'Abû ad-Dardâ').",
+  note:"Les mots sont ceux du Coran (at-Tawba 9:129). L'authenticité de la vertu est discutée : chaîne jugée bonne par al-Arna'ût, faible par al-Albânî."},
+ {id:"kalimat",when:"s",n:3,title:"A'ûdhu bi-kalimâti-llâhi-t-tâmmât",sub:"Refuge auprès des paroles parfaites",
+  parts:[{ar:"أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+   tr:"A'ûdhu bi-kalimâti-llâhi-t-tâmmâti min sharri mâ khalaq.",
+   fr:"Je cherche refuge auprès des paroles parfaites d'Allah contre le mal de ce qu'Il a créé."}],
+  virtue:"Celui qui la dit le soir, aucune piqûre venimeuse ne lui nuira cette nuit-là.",src:"Muslim ; « trois fois » chez at-Tirmidhî et Ahmad."},
+ {id:"khalq",when:"m",n:3,title:"Subhâna-llâhi 'adada khalqih",sub:"Quatre paroles plus lourdes que tout",
+  parts:[{ar:"سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ",
+   tr:"Subhâna-llâhi wa bi-hamdih, 'adada khalqih, wa ridâ nafsih, wa zinata 'arshih, wa midâda kalimâtih.",
+   fr:"Gloire et louange à Allah, autant que le nombre de Ses créatures, autant qu'il Lui plaît, autant que le poids de Son Trône et autant que l'encre de Ses paroles."}],
+  virtue:"Dites trois fois, ces paroles pèsent plus que tout le dhikr fait depuis l'aube (hadith de Juwayriya).",src:"Muslim."},
+ {id:"tahlil",when:"ms",n:10,nLong:100,title:"Lâ ilâha illa-llâhu wahdah",sub:"L'unicité d'Allah",
+  parts:[{ar:"لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+   tr:"Lâ ilâha illa-llâhu wahdahu lâ sharîka lah, lahu-l-mulku wa lahu-l-hamd, wa huwa 'alâ kulli shay'in qadîr.",
+   fr:"Nulle divinité n'est digne d'adoration en dehors d'Allah, Seul, sans associé. À Lui la royauté, à Lui la louange, et Il est capable de toute chose."}],
+  virtue:"Dite dix fois : comme affranchir quatre descendants d'Ismâ'îl.",
+  virtueLong:"Dite cent fois dans la journée : l'équivalent de dix affranchissements, cent bonnes actions inscrites, cent péchés effacés, et une protection contre Shaytân jusqu'au soir.",
+  src:"al-Bukhârî, Muslim."},
+ {id:"subhan",when:"ms",n:100,title:"Subhâna-llâhi wa bi-hamdih",sub:"Gloire et louange à Allah · 100 fois",
+  parts:[{ar:"سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",tr:"Subhâna-llâhi wa bi-hamdih.",fr:"Gloire et louange à Allah."}],
+  virtue:"Personne ne viendra le Jour de la Résurrection avec mieux, sauf celui qui en aura dit autant ou davantage.",src:"Muslim."}
+];
+const F=[
+ {ar:"سُبْحَانَ اللَّهِ",tr:"Subhâna-llâh",fr:"Gloire à Allah"},
+ {ar:"الْحَمْدُ لِلَّهِ",tr:"Al-hamdu lillâh",fr:"Louange à Allah"},
+ {ar:"اللَّهُ أَكْبَرُ",tr:"Allâhu akbar",fr:"Allah est le plus Grand"},
+ {ar:"أَسْتَغْفِرُ اللَّهَ",tr:"Astaghfiru-llâh",fr:"Je demande pardon à Allah"},
+ {ar:"لَا إِلَٰهَ إِلَّا اللَّهُ",tr:"Lâ ilâha illa-llâh",fr:"Nulle divinité en dehors d'Allah"},
+ {ar:"اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ",tr:"Allâhumma salli 'alâ Muhammad",fr:"Ô Allah, prie sur Muhammad ﷺ"},
+ {ar:"سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",tr:"Subhâna-llâhi wa bi-hamdih",fr:"Gloire et louange à Allah"},
+ {ar:"لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",tr:"Lâ hawla wa lâ quwwata illâ billâh",fr:"Ni force ni puissance sauf par Allah"}
+];
+
+/* ================= STORAGE ================= */
+const K=k=>"adhkar:"+k;
+const load=(k,d)=>{try{const v=localStorage.getItem(K(k));return v?Object.assign(Array.isArray(d)?[]:{},d,JSON.parse(v)):d}catch(e){return d}};
+const save=(k,v)=>{try{localStorage.setItem(K(k),JSON.stringify(v))}catch(e){}};
+const S=load("settings",{mStart:270,mEnd:720,sStart:930,size:30,showTr:true,showFr:true,showV:true,long:false,vib:true,theme:"auto"});
+let H=load("hist",{});              // {YYYY-MM-DD:{m:0..1,s:0..1}}
+let P=load("prog",{day:"",m:{},s:{}});
+let T=load("tasbih",{f:0,target:33,custom:50,count:0,total:0,day:"",today:0});
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+const pad=n=>String(n).padStart(2,"0");
+const fmtM=m=>pad(Math.floor(m/60)%24)+":"+pad(m%60);
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const dayKey=()=>ymd(new Date(Date.now()-3*3600e3)); // avant 3 h = encore la veille
+const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()};
+const V=(x,s)=>x&&typeof x==="object"&&!Array.isArray(x)?x[s]:x;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const vib=p=>{if(S.vib&&navigator.vibrate){try{navigator.vibrate(p)}catch(e){}}};
+const fmtN=n=>n.toLocaleString("fr-FR");
+let toastT;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),1800)}
+
+function autoSess(){const m=nowMin();
+  if(m>=S.mStart&&m<S.mEnd)return{s:"m",off:false};
+  if(m>=S.sStart||m<S.mStart)return{s:"s",off:false};
+  return{s:m<(S.mEnd+S.sStart)/2?"m":"s",off:true};}
+let sess=autoSess().s;
+const items=s=>D.filter(d=>d.when.includes(s));
+const target=d=>S.long&&d.nLong?d.nLong:d.n;
+function ensureDay(){const k=dayKey();if(P.day!==k){P={day:k,m:{},s:{}};save("prog",P)}}
+function sessFrac(s){const L=items(s);let a=0,b=0;L.forEach(d=>{const t=target(d);a+=Math.min(P[s][d.id]||0,t)/t;b++});return a/b}
+function doneCount(s){return items(s).filter(d=>(P[s][d.id]||0)>=target(d)).length}
+function recordHist(){ensureDay();const k=P.day;H[k]={m:+sessFrac("m").toFixed(3),s:+sessFrac("s").toFixed(3)};if(!H[k].m&&!H[k].s)delete H[k];save("hist",H)}
+const lvl=h=>!h?0:(h.m>=1&&h.s>=1)?3:(h.m>=1||h.s>=1)?2:(h.m>0||h.s>0)?1:0;
+function streaks(){
+  const ok=k=>lvl(H[k])>=2;const d=new Date(Date.now()-3*3600e3);let cur=0;
+  if(!ok(ymd(d)))d.setDate(d.getDate()-1);
+  while(ok(ymd(d))){cur++;d.setDate(d.getDate()-1)}
+  const keys=Object.keys(H).filter(ok).sort();let best=0,run=0,prev=null;
+  keys.forEach(k=>{const t=new Date(k+"T12:00:00");run=(prev&&Math.round((t-prev)/864e5)===1)?run+1:1;best=Math.max(best,run);prev=t});
+  return{cur,best:Math.max(best,cur)};
+}
+
+/* ================= THEME ================= */
+function applyTheme(){let t=S.theme;if(t==="auto"){const h=new Date().getHours();t=(h>=7&&h<19)?"light":"dark"}
+  document.body.dataset.theme=t;document.querySelector('meta[name=theme-color]').content=t==="dark"?"#03120d":"#f5efe0"}
+function setSeg(el,attr,val){const bs=[...el.querySelectorAll("button")];bs.forEach(b=>b.classList.toggle("on",b.dataset[attr]===val));
+  const on=bs.find(b=>b.dataset[attr]===val);const p=el.querySelector(".pill");if(on&&p){p.style.left=on.offsetLeft+"px";p.style.width=on.offsetWidth+"px"}}
+
+/* ================= HOME ================= */
+function ringSVG(size,sw,frac,cls){const r=(size-sw)/2,c=2*Math.PI*r;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle class="${cls?cls[0]:'tr'}" cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke-width="${sw}"/><circle class="${cls?cls[1]:'pr'}" cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-frac)}"/></svg>`}
+function renderHome(){
+  ensureDay();
+  const now=new Date();
+  $("#date").textContent=now.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"}).replace(/^./,c=>c.toUpperCase());
+  $("#h1").innerHTML=`<svg><use href="#${sess==="m"?"i-sun":"i-moon"}"/></svg>${sess==="m"?"Matin":"Soir"}`;
+  $("#tabIco").setAttribute("href",sess==="m"?"#i-sun":"#i-moon");
+  setSeg($("#seg"),"s",sess);
+  const a=autoSess();
+  $("#hint").textContent=a.s!==sess?`Hors horaire : les adhkar du ${a.s==="m"?"matin":"soir"} sont conseillés maintenant.`:
+     a.off?`Entre ${fmtM(S.mEnd)} et ${fmtM(S.sStart)} : le soir commence vers ${fmtM(S.sStart)}.`:
+     sess==="m"?`Après Fajr jusqu'à ${fmtM(S.mEnd)} environ.`:`À partir de ${fmtM(S.sStart)} environ (après Asr).`;
+  const L=items(sess),dc=doneCount(sess),fr=sessFrac(sess);
+  $("#heroRing").innerHTML=ringSVG(104,9,fr)+`<div class="ct"><div class="big">${Math.round(fr*100)}<span style="font-size:15px;opacity:.6">%</span></div><div class="small">${dc}/${L.length}</div></div>`;
+  $("#heroT").textContent=fr>=1?"Séance accomplie":fr>0?"Séance en cours":(sess==="m"?"Adhkar du matin":"Adhkar du soir");
+  $("#heroP").textContent=fr>=1?"Qu'Allah accepte de toi. Tu peux relire ou passer au tasbih.":fr>0?`Encore ${L.length-dc} dhikr${L.length-dc>1?"s":""} pour terminer.`:`${L.length} invocations authentiques · environ ${sess==="m"?"12":"13"} minutes.`;
+  $("#start").innerHTML=`<svg><use href="#i-play"/></svg>${fr>=1?"Relire":fr>0?"Reprendre":"Commencer"}`;
+  const st=streaks();$("#stStreak").textContent=st.cur;$("#stBest").textContent=st.best;
+  // heatmap
+  const today=new Date(Date.now()-3*3600e3);today.setHours(12,0,0,0);
+  const dow=(today.getDay()+6)%7;const start=new Date(today);start.setDate(start.getDate()-dow-77);
+  let html="",active=0;const dl=["L","","M","","V","","D"];
+  for(let r=0;r<7;r++){html+=`<span class="dl">${dl[r]}</span>`;
+    for(let w=0;w<12;w++){const d=new Date(start);d.setDate(d.getDate()+w*7+r);const k=ymd(d);
+      const fut=d>today,l=fut?0:lvl(H[k]);html+=`<i class="l${l}${fut?" fut":""}${k===ymd(today)?" today":""}"></i>`}}
+  for(let i=0;i<84;i++){const d=new Date(start);d.setDate(d.getDate()+i);if(d<=today&&lvl(H[ymd(d)])>0)active++}
+  $("#heat").innerHTML=html;$("#stDays").textContent=active;
+  $("#listT").textContent=sess==="m"?"Adhkar du matin":"Adhkar du soir";
+  $("#listS").textContent=`${dc} / ${L.length}`;
+  $("#list").innerHTML=L.map((d,i)=>{const t=target(d),c=Math.min(P[sess][d.id]||0,t),done=c>=t;
+    return `<button class="row${done?" done":""}" data-i="${i}"><div class="mini">${ringSVG(34,3.5,c/t)}<div class="ck">${done?'<svg><use href="#i-check"/></svg>':(i+1)}</div></div>
+    <div class="t"><b>${esc(V(d.title,sess))}</b><span>${esc(d.sub)}</span></div><span class="x">${done?"✓":c?c+"/"+t:"×"+t}</span></button>`}).join("");
+}
+
+/* ================= READER ================= */
+let RI=0,RL=[],advT=null;
+function cardHTML(d,i){
+  const parts=d.parts.map(p=>`<div class="part">${p.h?`<h4>${esc(p.h)}</h4>`:""}${p.basm?`<div class="basm">${Q.basmala}</div>`:""}
+    <div class="ar${d.quran?" q":""}" lang="ar">${esc(V(p.ar,sess))}</div>
+    ${S.showTr||S.showFr?`<div class="orn"><svg><use href="#i-orn"/></svg></div>`:""}
+    ${S.showTr?`<div class="tr">${esc(V(p.tr,sess))}</div>`:""}
+    ${S.showFr?`<div class="fr">${esc(V(p.fr,sess))}</div>`:""}</div>`).join("");
+  const virt=S.long&&d.virtueLong?d.virtueLong:V(d.virtue,sess);
+  return `<div class="slide"><div class="dk" data-i="${i}"><div class="dk-sc">
+    <div class="lab"><span>${d.quran?"Coran":"Dhikr"} · ${i+1}/${RL.length}</span><span>${target(d)>1?target(d)+" fois":"1 fois"}</span></div>
+    <h2>${esc(V(d.title,sess))}</h2><div class="sub">${esc(d.sub)}</div>
+    ${d.pre?`<div class="pre">${esc(d.pre)}</div>`:""}${parts}
+    ${S.showV?`<div class="virt"><p>${esc(virt)}</p><small><b>Source</b> · ${esc(d.src)}</small>${d.note?`<div class="note">${esc(d.note)}</div>`:""}</div>`:""}
+  </div><div class="fade"></div></div></div>`}
+function openReader(i){
+  ensureDay();RL=items(sess);RI=Math.max(0,Math.min(i||0,RL.length-1));
+  document.documentElement.style.setProperty("--arsize",S.size+"px");$("#sizeR").value=S.size;
+  $("#track").innerHTML=RL.map(cardHTML).join("");
+  $("#bars").innerHTML=RL.map(()=>"<i><b></b></i>").join("");
+  $("#fin").classList.remove("on");$("#sizer").classList.remove("on");
+  $("#reader").classList.add("on");
+  go(RI,false);
+  $("#taphint").style.opacity=localStorage.getItem(K("hinted"))?"0":"1";
+}
+function closeReader(){$("#reader").classList.remove("on");clearTimeout(advT);renderHome()}
+function go(i,anim=true){
+  clearTimeout(advT);RI=Math.max(0,Math.min(i,RL.length-1));
+  const tr=$("#track");tr.style.transition=anim?"transform .45s var(--ease)":"none";
+  tr.style.transform=`translateX(${-RI*100}%)`;updateReader();
+}
+function updateReader(pop){
+  const d=RL[RI],t=target(d),c=Math.min(P[sess][d.id]||0,t);
+  $("#rTitle").innerHTML=`<b>${RI+1}</b> / ${RL.length} · ${sess==="m"?"Matin":"Soir"}`;
+  [...$("#bars").children].forEach((el,j)=>{const dj=RL[j],tj=target(dj);el.firstChild.style.transform=`scaleX(${Math.min((P[sess][dj.id]||0)/tj,1)})`});
+  const cn=$("#cnt");cn.innerHTML=ringSVG(96,7,c/t,["tr2","pr2"])+`<div class="num"><b>${c}</b><span>sur ${t}</span></div>`;
+  cn.classList.toggle("fin",c>=t);
+  if(pop){cn.classList.remove("pop");void cn.offsetWidth;cn.classList.add("pop")}
+  document.querySelectorAll(".dk").forEach(el=>{const dj=RL[+el.dataset.i];el.classList.toggle("done",(P[sess][dj.id]||0)>=target(dj))});
+}
+function count(x,y){
+  const d=RL[RI],t=target(d),c=P[sess][d.id]||0;
+  if(!localStorage.getItem(K("hinted"))){localStorage.setItem(K("hinted"),"1");$("#taphint").style.opacity="0"}
+  if(c>=t){if(RI<RL.length-1)go(RI+1);else checkFinish(true);return}
+  P[sess][d.id]=c+1;save("prog",P);recordHist();
+  if(x!=null){const card=document.querySelectorAll(".dk")[RI];const r=card.getBoundingClientRect();const s=document.createElement("span");s.className="ripple";s.style.left=(x-r.left)+"px";s.style.top=(y-r.top)+"px";card.appendChild(s);setTimeout(()=>s.remove(),650)}
+  if(c+1>=t){vib([18,50,28]);updateReader(true);
+    advT=setTimeout(()=>{if(RI<RL.length-1)go(RI+1);else checkFinish(true)},700)}
+  else{vib(10);updateReader(true)}
+}
+function undo(){const d=RL[RI];const c=P[sess][d.id]||0;if(c>0){P[sess][d.id]=c-1;save("prog",P);recordHist();clearTimeout(advT);updateReader(true);vib(6)}}
+function checkFinish(force){
+  if(sessFrac(sess)>=1){const st=streaks();
+    $("#finT").textContent=sess==="m"?"Adhkar du matin accomplis":"Adhkar du soir accomplis";
+    $("#finP").textContent=`Série actuelle : ${st.cur} jour${st.cur>1?"s":""}. Qu'Allah te protège et t'accorde la constance.`;
+    $("#fin").classList.add("on");vib([20,60,20,60,40])}
+  else if(force){const j=RL.findIndex(d=>(P[sess][d.id]||0)<target(d));if(j>=0){go(j);toast("Il reste des adhkar à compléter")}}
+}
+// gestures on stage
+(function(){
+  const st=$("#stage");let sx=0,sy=0,t0=0,mode=null,id=null;
+  st.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return;id=e.pointerId;sx=e.clientX;sy=e.clientY;t0=Date.now();mode=null});
+  st.addEventListener("pointermove",e=>{if(e.pointerId!==id)return;const dx=e.clientX-sx,dy=e.clientY-sy;
+    if(!mode){if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.2){mode="h";clearTimeout(advT)}else if(Math.abs(dy)>10)mode="v"}
+    if(mode==="h"){let ddx=dx;if((RI===0&&dx>0)||(RI===RL.length-1&&dx<0))ddx=dx*.3;
+      const tr=$("#track");tr.style.transition="none";tr.style.transform=`translateX(calc(${-RI*100}% + ${ddx}px))`}});
+  const end=e=>{if(e.pointerId!==id)return;id=null;const dx=e.clientX-sx,dy=e.clientY-sy,dt=Date.now()-t0;
+    if(mode==="h"){const w=st.offsetWidth,v=Math.abs(dx)/dt;
+      if((dx<-w*.18||(dx<-30&&v>.5))&&RI<RL.length-1)go(RI+1);else if((dx>w*.18||(dx>30&&v>.5))&&RI>0)go(RI-1);else go(RI)}
+    else if(!mode&&e.type==="pointerup"&&Math.abs(dx)<10&&Math.abs(dy)<10&&dt<700){count(e.clientX,e.clientY)}
+    mode=null};
+  st.addEventListener("pointerup",end);st.addEventListener("pointercancel",e=>{if(mode==="h"){mode=null;id=null;go(RI)}else{id=null;mode=null}});
+})();
+$("#rClose").onclick=closeReader;
+$("#rUndo").onclick=undo;
+$("#rNext").onclick=()=>{if(RI<RL.length-1)go(RI+1);else checkFinish(true)};
+$("#rSize").onclick=e=>{e.stopPropagation();$("#sizer").classList.toggle("on")};
+$("#sizeR").oninput=e=>{S.size=+e.target.value;save("settings",S);document.documentElement.style.setProperty("--arsize",S.size+"px")};
+$("#reader").addEventListener("pointerdown",e=>{if(!e.target.closest("#sizer,#rSize"))$("#sizer").classList.remove("on")});
+$("#finHome").onclick=closeReader;
+$("#finRead").onclick=()=>{$("#fin").classList.remove("on");go(0)};
+document.addEventListener("keydown",e=>{if(!$("#reader").classList.contains("on"))return;
+  if(e.key===" "||e.key==="Enter"){e.preventDefault();count()}else if(e.key==="ArrowRight")go(RI+1);else if(e.key==="ArrowLeft")go(RI-1);else if(e.key==="Escape")closeReader()});
+
+/* ================= TASBIH ================= */
+function tEnsure(){const k=dayKey();if(T.day!==k){T.day=k;T.today=0;save("tasbih",T)}}
+function tTarget(){return T.target==="c"?T.custom:T.target}
+function renderTasbih(){
+  tEnsure();
+  $("#fchips").innerHTML=F.map((f,i)=>`<button class="chip${i===T.f?" on":""}" data-i="${i}">${esc(f.tr)}</button>`).join("");
+  const f=F[T.f];$("#formula").innerHTML=`<div class="ar" lang="ar">${f.ar}</div><div class="tr">${esc(f.tr)}</div><div class="fr">${esc(f.fr)}</div>`;
+  const tg=[33,99,100,0,"c"];
+  $("#targets").innerHTML=tg.map(v=>`<button class="tg${T.target===v?" on":""}" data-v="${v}">${v===0?"∞":v==="c"?"Perso":v}</button>`).join("");
+  $("#custom").classList.toggle("on",T.target==="c");$("#customV").textContent=T.custom;
+  tDraw();
+}
+function tDraw(goal){
+  const tg=tTarget(),c=T.count;
+  const inRound=tg?(c%tg===0&&c>0?tg:c%tg):c,round=tg?Math.floor((c-1)/tg)+1:0;
+  const r=94,C=2*Math.PI*r,frac=tg?inRound/tg:(c%100)/100;
+  let ticks="";
+  if(tg&&tg<=40){for(let i=0;i<tg;i++){const a=i/tg*2*Math.PI,on=i<inRound;
+      ticks+=`<circle cx="${100+r*Math.cos(a)}" cy="${100+r*Math.sin(a)}" r="${on?3.6:2.4}" ${on?'fill="url(#gGold)"':'style="fill:var(--h0);stroke:var(--line)"'}/>`}}
+  else ticks=`<circle cx="100" cy="100" r="${r}" fill="none" style="stroke:var(--h0)" stroke-width="5"/><circle cx="100" cy="100" r="${r}" fill="none" stroke="url(#gGold)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" style="transition:stroke-dashoffset .25s"/>`;
+  $("#beadSvg").innerHTML=ticks;
+  $("#tN").textContent=tg?inRound:c;
+  $("#tOf").textContent=tg?"sur "+tg:"compteur libre";
+  const rd=$("#tRd");rd.textContent=tg&&c>0?(inRound===tg?"Objectif atteint":"Tour "+round):"";rd.classList.toggle("on",!!(tg&&c>0&&(round>1||inRound===tg)));
+  $("#tToday").textContent=fmtN(T.today);$("#tTotal").textContent=fmtN(T.total);
+  if(goal){const b=$("#bead");b.classList.remove("goal");void b.offsetWidth;b.classList.add("goal")}
+}
+function tInc(){tEnsure();T.count++;T.total++;T.today++;save("tasbih",T);const tg=tTarget();const g=tg&&T.count%tg===0;
+  vib(g?[25,60,25,60,25]:9);tDraw(g)}
+(function(){const z=$("#tzone"),b=$("#bead");
+  z.addEventListener("pointerdown",e=>{e.preventDefault();b.classList.add("press");tInc()});
+  const up=()=>b.classList.remove("press");z.addEventListener("pointerup",up);z.addEventListener("pointerleave",up);z.addEventListener("pointercancel",up);
+})();
+$("#fchips").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;const i=+c.dataset.i;if(i!==T.f){T.f=i;T.count=0;save("tasbih",T);renderTasbih()}
+  c.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"})};
+$("#targets").onclick=e=>{const c=e.target.closest(".tg");if(!c)return;const v=c.dataset.v==="c"?"c":+c.dataset.v;T.target=v;T.count=0;save("tasbih",T);renderTasbih()};
+$("#custom").onclick=e=>{const b=e.target.closest("button");if(!b)return;T.custom=Math.max(1,Math.min(1000,T.custom+(+b.dataset.d)*(T.custom>=100?10:1)));T.count=0;save("tasbih",T);renderTasbih()};
+function holdBtn(el,fn){let t;const st=e=>{e.preventDefault();el.classList.add("ing");t=setTimeout(()=>{el.classList.remove("ing");fn();vib(30)},700)};
+  const cn=e=>{if(el.classList.contains("ing")&&e.type==="pointerup")toast("Maintiens appuyé pour confirmer");clearTimeout(t);el.classList.remove("ing")};
+  el.addEventListener("pointerdown",st);["pointerup","pointerleave","pointercancel"].forEach(ev=>el.addEventListener(ev,cn))}
+holdBtn($("#tReset"),()=>{T.count=0;save("tasbih",T);tDraw();toast("Compteur remis à zéro")});
+holdBtn($("#resetSess"),()=>{ensureDay();P[sess]={};save("prog",P);recordHist();renderHome();toast(`Séance du ${sess==="m"?"matin":"soir"} remise à zéro`)});
+
+/* ================= SETTINGS ================= */
+function renderSet(){
+  document.querySelectorAll(".step").forEach(el=>{const k=el.dataset.k;el.querySelector("b").textContent=k==="size"?S.size+" px":fmtM(S[k])});
+  document.querySelectorAll(".sw").forEach(el=>el.classList.toggle("on",!!S[el.dataset.k]));
+  setSeg($("#themeSeg"),"t",S.theme);
+}
+document.querySelectorAll(".step").forEach(el=>el.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const k=el.dataset.k,d=+b.dataset.d;
+  if(k==="size")S.size=Math.max(22,Math.min(46,S.size+d));else S[k]=(S[k]+d+1440)%1440;
+  if(S.mEnd<=S.mStart)S.mEnd=S.mStart+15;if(S.sStart<=S.mEnd)S.sStart=S.mEnd+15;
+  save("settings",S);renderSet()}));
+document.querySelectorAll(".sw").forEach(el=>el.addEventListener("click",()=>{S[el.dataset.k]=!S[el.dataset.k];save("settings",S);renderSet();if(el.dataset.k==="long"){recordHist()}}));
+$("#themeSeg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S.theme=b.dataset.t;save("settings",S);applyTheme();renderSet()});
+
+/* ================= NAV ================= */
+let view="home";
+function show(v){view=v;document.querySelectorAll(".view").forEach(el=>el.classList.toggle("on",el.id==="v-"+v));
+  document.querySelectorAll(".tab").forEach(el=>el.classList.toggle("on",el.dataset.v===v));
+  if(v==="home")renderHome();if(v==="tasbih")renderTasbih();if(v==="set")renderSet()}
+$("#tabs").onclick=e=>{const b=e.target.closest(".tab");if(b)show(b.dataset.v)};
+$("#seg").onclick=e=>{const b=e.target.closest("button");if(!b)return;sess=b.dataset.s;renderHome()};
+$("#start").onclick=()=>{const L=items(sess);const j=L.findIndex(d=>(P[sess][d.id]||0)<target(d));openReader(j<0?0:j)};
+$("#list").onclick=e=>{const r=e.target.closest(".row");if(r)openReader(+r.dataset.i)};
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){applyTheme();if(!$("#reader").classList.contains("on")){sess=autoSess().s;show(view)}}});
+setInterval(()=>applyTheme(),60000);
+
+applyTheme();renderHome();
+requestAnimationFrame(()=>setSeg($("#seg"),"s",sess));
+</script>
+</body>
+</html>

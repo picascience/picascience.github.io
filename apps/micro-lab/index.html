@@ -1,0 +1,926 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#09090f">
+<title>Micro Lab</title>
+<style>
+:root{--bg:#09090f;--bg2:#0f0f17;--card:#13131c;--card2:#191925;--line:rgba(255,255,255,.075);--txt:#eeeef6;--mut:#9898ae;--dim:#62627a;--u:#a78bfa;--ud:#7c3aed;--bud:#fb923c;--opt:#fbbf24;--tms:#22d3ee;--es:#34d399;--er:#f472b6;--ok:#4ade80;--ko:#fb7185}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overscroll-behavior:none;-webkit-text-size-adjust:100%}
+body{overflow:hidden}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;background:radial-gradient(120% 60% at 50% -10%,rgba(124,58,237,.16),transparent 60%),var(--bg)}
+header{flex:none;padding:calc(env(safe-area-inset-top) + 12px) calc(env(safe-area-inset-right) + 20px) 8px calc(env(safe-area-inset-left) + 20px);display:flex;align-items:flex-end;justify-content:space-between}
+header .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);font-weight:700}
+header h1{margin:2px 0 0;font-size:28px;line-height:1.1;font-weight:800;letter-spacing:-.02em}
+header .pill{font-size:11.5px;font-weight:700;color:#ddd6fe;background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.3);padding:5px 10px;border-radius:999px;white-space:nowrap}
+#scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:4px calc(env(safe-area-inset-right) + 14px) calc(env(safe-area-inset-bottom) + 118px) calc(env(safe-area-inset-left) + 14px);scrollbar-width:none}
+#scroll::-webkit-scrollbar{display:none}
+.view{display:none}
+.view.on{display:block;animation:up .38s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:20px;padding:14px 16px;margin:12px 0;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.card h3{margin:0 0 8px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:800;display:flex;align-items:center;gap:8px}
+.card h3 .dot{width:8px;height:8px;border-radius:50%;background:var(--u);box-shadow:0 0 10px var(--u)}
+.card p{margin:6px 0;color:#d4d4e2}
+.small{font-size:13px;color:var(--mut)}
+.m{font-family:"New York","Iowan Old Style","Palatino Linotype",Georgia,"Times New Roman",serif;font-size:1.06em;white-space:nowrap}
+.m i{font-style:italic}
+.eq{display:block;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:8px 12px;margin:7px 0;font-family:"New York","Iowan Old Style","Palatino Linotype",Georgia,"Times New Roman",serif;font-size:15.5px;line-height:1.65;overflow-x:auto;white-space:normal;overflow-wrap:break-word;scrollbar-width:none}
+.eq::-webkit-scrollbar{display:none}
+.eq b{font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+sup{font-size:.68em;line-height:0;vertical-align:.62em}
+.cu{color:var(--u)}.cb{color:var(--bud)}.co{color:var(--opt)}.ct{color:var(--tms)}.ces{color:var(--es)}.cer{color:var(--er)}
+.cvwrap{position:relative;margin:6px 0 0}
+canvas.cv{width:100%;aspect-ratio:1/1;display:block;border-radius:22px;background:radial-gradient(90% 80% at 30% 0%,rgba(124,58,237,.10),transparent 70%),linear-gradient(180deg,#12121b,#0d0d14);border:1px solid var(--line);touch-action:none}
+canvas.strip{width:100%;height:104px;display:block;border-radius:18px;background:linear-gradient(180deg,#12121b,#0d0d14);border:1px solid var(--line);margin-top:8px}
+canvas.cv.short{aspect-ratio:1/.78}
+.hint{position:absolute;right:12px;top:10px;font-size:11.5px;color:var(--mut);background:rgba(10,10,16,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:4px 9px;border-radius:999px;border:1px solid var(--line);pointer-events:none;transition:opacity .4s}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none;margin:0 -2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--mut);padding:8px 13px;border-radius:999px;font:650 13px/1 -apple-system,BlinkMacSystemFont,sans-serif;transition:all .2s}
+.chip.on{background:rgba(167,139,250,.17);border-color:rgba(167,139,250,.55);color:#ede9fe;box-shadow:0 0 18px rgba(167,139,250,.18)}
+.chip:active{transform:scale(.95)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:3px;gap:3px;margin:8px 0}
+.seg button{border:0;background:transparent;color:var(--mut);font:700 13.5px/1 -apple-system,BlinkMacSystemFont,sans-serif;padding:10px 4px;border-radius:11px;transition:all .2s}
+.seg button.on{background:#262638;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.ufor{margin:4px 0 2px;font-size:17px;text-align:center;color:#e9e5ff}
+.sl{display:grid;grid-template-columns:58px 1fr 54px;align-items:center;gap:10px;margin:4px 0}
+.sl .lb{font-family:"New York","Iowan Old Style",Georgia,serif;font-size:16px;font-style:italic;color:#e5e5f0}
+.sl .vl{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;font-size:14px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:34px;background:transparent;margin:0;--p:50%;--c:var(--u)}
+input[type=range]:focus{outline:none}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--c) var(--p),rgba(255,255,255,.1) var(--p))}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--c) var(--p),rgba(255,255,255,.1) var(--p))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;margin-top:-10px;box-shadow:0 2px 10px rgba(0,0,0,.5),0 0 0 4px rgba(255,255,255,.06)}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#fff;border:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:9px 11px}
+.tile .t{font-size:12px;color:var(--mut);font-weight:700;letter-spacing:.02em}
+.tile .v{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px}
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 8px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;font-weight:750;font-size:12.5px;border:1px solid}
+.b-ok{color:#86efac;background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.35)}
+.b-ko{color:#f9a8d4;background:rgba(244,114,182,.1);border-color:rgba(244,114,182,.35)}
+.b-n{color:#c7d2fe;background:rgba(129,140,248,.1);border-color:rgba(129,140,248,.35)}
+.b-g{color:#fde68a;background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.35)}
+.steps{list-style:none;padding:0;margin:4px 0;counter-reset:s}
+.steps li{position:relative;padding:2px 0 8px 34px;counter-increment:s;color:#d6d6e4}
+.steps li:before{content:counter(s);position:absolute;left:0;top:2px;width:23px;height:23px;border-radius:50%;background:rgba(167,139,250,.16);border:1px solid rgba(167,139,250,.4);color:#ddd6fe;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.steps.anim li{opacity:0;animation:up .4s forwards}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:15px;padding:14px 16px;font:750 16px/1 -apple-system,BlinkMacSystemFont,sans-serif;color:#fff;background:linear-gradient(135deg,#8b5cf6,#6d28d9);box-shadow:0 8px 22px rgba(109,40,217,.35);transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:var(--card2);box-shadow:none;border:1px solid var(--line);color:#d4d4e2}
+.btn.sm{width:auto;padding:9px 14px;font-size:13.5px;border-radius:12px}
+.row{display:flex;gap:8px;align-items:center}
+.tabbar{position:fixed;left:calc(env(safe-area-inset-left) + 10px);right:calc(env(safe-area-inset-right) + 10px);bottom:calc(env(safe-area-inset-bottom) + 30px);height:66px;display:grid;grid-template-columns:repeat(5,1fr);background:rgba(22,22,34,.8);backdrop-filter:blur(22px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6);border:1px solid rgba(255,255,255,.09);border-radius:24px;box-shadow:0 14px 34px rgba(0,0,0,.55);z-index:10;padding:0 4px}
+.tabbar button{border:0;background:transparent;color:#77778f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:650 10.5px/1 -apple-system,BlinkMacSystemFont,sans-serif;position:relative;transition:color .25s}
+.tabbar svg{width:25px;height:25px;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.tabbar button.on{color:#ddd6fe}
+.tabbar button.on svg{transform:translateY(-1px) scale(1.08);filter:drop-shadow(0 0 8px rgba(167,139,250,.6))}
+.tabbar button.on:after{content:"";position:absolute;bottom:6px;width:4px;height:4px;border-radius:50%;background:var(--u);box-shadow:0 0 8px var(--u)}
+.ax{display:grid;grid-template-columns:86px 1fr;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.ax:first-of-type{border-top:0}
+.ax svg{width:86px;height:70px;background:var(--bg2);border-radius:12px;border:1px solid var(--line)}
+.ax b{display:block;font-size:15px;margin-bottom:2px}
+.ax span{font-size:13px;color:var(--mut);line-height:1.4}
+.not{display:grid;grid-template-columns:44px 1fr;gap:8px 10px;align-items:center}
+.not .s{font-family:"New York",Georgia,serif;font-size:22px;text-align:center;color:var(--u);background:rgba(167,139,250,.1);border-radius:10px;padding:2px 0}
+table.t{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+table.t th{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;text-align:right;padding:4px 6px;font-weight:700}
+table.t th:first-child,table.t td:first-child{text-align:left}
+table.t td{text-align:right;padding:7px 6px;border-top:1px solid var(--line)}
+.ans{width:100%;font:700 19px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;color:#fff;background:var(--bg2);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;-webkit-user-select:text;user-select:text;outline:none;transition:border-color .2s,box-shadow .2s}
+.ans::placeholder{font-size:15px;font-weight:500;color:#5a5a72}
+.ans:focus{border-color:rgba(167,139,250,.7);box-shadow:0 0 0 4px rgba(167,139,250,.14)}
+.ans.good{border-color:rgba(74,222,128,.7);background:rgba(74,222,128,.07)}
+.ans.bad{border-color:rgba(251,113,133,.7);background:rgba(251,113,133,.07)}
+.qlab{font-size:14px;color:#d4d4e2;margin:10px 0 6px;display:flex;justify-content:space-between;gap:8px}
+.qlab .exp{font-weight:800;font-size:13px}
+.fb{border-radius:14px;padding:11px 13px;margin:10px 0 4px;font-weight:700;display:flex;align-items:center;gap:10px}
+.fb.good{background:rgba(74,222,128,.1);color:#86efac;border:1px solid rgba(74,222,128,.3)}
+.fb.bad{background:rgba(251,113,133,.1);color:#fda4af;border:1px solid rgba(251,113,133,.3)}
+.tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#ddd6fe;background:rgba(167,139,250,.14);padding:4px 9px;border-radius:8px;margin-bottom:8px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--mut);margin:8px 2px 0}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:5px}
+.pulse{animation:pl 1.2s ease}
+@keyframes pl{0%{box-shadow:0 0 0 0 rgba(167,139,250,.5)}100%{box-shadow:0 0 0 14px rgba(167,139,250,0)}}
+details summary{list-style:none;cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+.sumrow{display:flex;justify-content:space-between;align-items:center}
+.chev{transition:transform .25s;color:var(--mut)}
+details[open] .chev{transform:rotate(90deg)}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <div><div class="k">Micro Lab · Chapitre 2</div><h1 id="title">Préférences</h1></div>
+  <div class="pill" id="hpill">L1 IASO</div>
+</header>
+<div id="scroll">
+
+<!-- ============ MODULE 1 : PREFERENCES ============ -->
+<section class="view on" id="v1">
+  <div class="card" style="padding:12px 12px 10px">
+    <div class="chips" id="u1chips"></div>
+    <div class="ufor m" id="u1for"></div>
+    <div id="u1sl"></div>
+  </div>
+  <div class="cvwrap"><canvas class="cv" id="cv1"></canvas><div class="hint" id="h1">Touche ou glisse : choisis un panier A</div></div>
+  <div class="legend"><span><i style="background:var(--u)"></i>courbes d'indifférence</span><span><i style="background:rgba(167,139,250,.35);height:9px"></i>paniers préférés à A</span><span><i style="background:var(--tms)"></i>tangente (pente = −TMS)</span></div>
+  <div class="card" id="p1"></div>
+  <div class="card">
+    <h3><span class="dot"></span>Les notations, sans stress</h3>
+    <div class="not">
+      <div class="s">≿</div><div><b>A ≿ B</b> : « A est <i>au moins aussi bien</i> que B ». C'est la relation de base.</div>
+      <div class="s">≻</div><div><b>A ≻ B</b> : « A est <i>strictement préféré</i> à B » (A ≿ B mais pas B ≿ A).</div>
+      <div class="s">∼</div><div><b>A ∼ B</b> : « A et B sont <i>indifférents</i> » (A ≿ B et B ≿ A). Ils sont sur la <span class="cu">même courbe d'indifférence</span>.</div>
+    </div>
+    <p class="small" style="margin-top:10px">Sur le graphe : la zone violette = tous les paniers ≻ A ; la courbe qui passe par A = tous les paniers ∼ A ; en dessous = les paniers que A bat.</p>
+  </div>
+  <div class="card">
+    <h3><span class="dot"></span>Les 4 axiomes</h3>
+    <div class="ax"><svg viewBox="0 0 86 70"><circle cx="24" cy="44" r="6" fill="#fff"/><circle cx="62" cy="24" r="6" fill="#fbbf24"/><path d="M32 38 L54 28" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/><path d="M50 25l6 2-4 5M36 41l-6-2 4-5" stroke="#a78bfa" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="17" y="62" fill="#9898ae" font-size="10" font-family="Georgia">A</text><text x="66" y="14" fill="#9898ae" font-size="10" font-family="Georgia">B</text></svg>
+      <div><b>Complétude</b><span>On peut <i>toujours</i> comparer deux paniers : A ≿ B, ou B ≿ A, ou les deux (∼). Le consommateur n'est jamais « sans avis ».</span></div></div>
+    <div class="ax"><svg viewBox="0 0 86 70"><circle cx="16" cy="54" r="5" fill="#fff"/><circle cx="43" cy="34" r="5" fill="#fff"/><circle cx="70" cy="14" r="5" fill="#fbbf24"/><path d="M22 50l15-11M49 30l15-11" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/><path d="M18 60 Q60 62 70 22" stroke="#22d3ee" stroke-width="2" fill="none" stroke-dasharray="3 3"/><text x="8" y="44" fill="#9898ae" font-size="9" font-family="Georgia">C</text><text x="35" y="24" fill="#9898ae" font-size="9" font-family="Georgia">B</text><text x="74" y="30" fill="#9898ae" font-size="9" font-family="Georgia">A</text></svg>
+      <div><b>Transitivité</b><span>Si A ≿ B et B ≿ C, alors A ≿ C. Conséquence clé : <b style="display:inline;font-size:13px">deux courbes d'indifférence ne se coupent jamais</b>.</span></div></div>
+    <div class="ax"><svg viewBox="0 0 86 70"><rect x="38" y="6" width="44" height="30" fill="rgba(167,139,250,.25)"/><path d="M8 64H82M8 64V4" stroke="#62627a" stroke-width="1.5"/><path d="M14 10 Q26 46 80 56" stroke="#a78bfa" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="38" cy="36" r="5" fill="#fff"/><path d="M42 32l12-12" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/><path d="M48 19h7v7" stroke="#fbbf24" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+      <div><b>Monotonie</b><span>« Plus, c'est mieux. » Ajouter du x₁ ou du x₂ augmente la satisfaction : les courbes <i>descendent</i> et plus on va loin en haut à droite, plus U est grand.</span></div></div>
+    <div class="ax"><svg viewBox="0 0 86 70"><path d="M8 64H82M8 64V4" stroke="#62627a" stroke-width="1.5"/><path d="M14 8 Q24 52 80 58" stroke="#a78bfa" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M18 20 L64 54" stroke="#22d3ee" stroke-width="2" stroke-dasharray="3 3"/><circle cx="18" cy="20" r="4" fill="#fff"/><circle cx="64" cy="54" r="4" fill="#fff"/><circle cx="41" cy="37" r="5" fill="#fbbf24"/></svg>
+      <div><b>Convexité</b><span>Les mélanges sont préférés aux extrêmes : le milieu <span class="co">●</span> de deux paniers indifférents est au-dessus de la courbe. Résultat : le <b style="display:inline;font-size:13px">TMS diminue</b> quand x₁ augmente.</span></div></div>
+  </div>
+  <div class="card">
+    <h3><span class="dot" style="background:var(--tms);box-shadow:0 0 10px var(--tms)"></span>Le TMS en une phrase</h3>
+    <p>Le <b>taux marginal de substitution</b> dit combien d'unités de x₂ tu es prêt à <i>lâcher</i> pour avoir <i>une</i> unité de x₁ en plus, sans changer ta satisfaction.</p>
+    <div class="eq">TMS = <span class="ct">−dx₂/dx₁</span> (le long de la courbe) = Um₁ / Um₂</div>
+    <p class="small">Géométriquement : c'est la pente (en valeur absolue) de la tangente à la courbe d'indifférence.</p>
+  </div>
+</section>
+
+<!-- ============ MODULE 2 : CHOIX OPTIMAL ============ -->
+<section class="view" id="v2">
+  <div class="card" style="padding:12px 12px 10px">
+    <div class="chips" id="u2chips"></div>
+    <div class="ufor m" id="u2for"></div>
+    <div id="u2sl"></div>
+  </div>
+  <div class="cvwrap"><canvas class="cv" id="cv2"></canvas><div class="hint" id="h2">Touche le graphe pour tester un panier</div></div>
+  <div class="legend"><span><i style="background:var(--bud)"></i>budget p₁x₁ + p₂x₂ = R</span><span><i style="background:var(--u)"></i>courbe d'indifférence</span><span><i style="background:var(--opt)"></i>optimum</span></div>
+  <div class="card" id="p2budget"></div>
+  <div class="card" id="p2res"></div>
+  <div class="card" id="p2probe" style="display:none"></div>
+  <div class="card" id="p2why"></div>
+</section>
+
+<!-- ============ MODULE 3 : DEMANDE ============ -->
+<section class="view" id="v3">
+  <div class="card" style="padding:12px 12px 10px">
+    <div class="chips" id="u3chips"></div>
+    <div class="ufor m" id="u3for"></div>
+    <div id="u3sl"></div>
+  </div>
+  <div class="seg" id="m3mode"><button data-v="p">Faire varier p₁</button><button data-v="R">Faire varier R</button></div>
+  <div class="cvwrap"><canvas class="cv short" id="cv3a"></canvas><div class="hint" id="h3a">Courbe prix-consommation</div></div>
+  <div class="cvwrap"><canvas class="cv short" id="cv3b" style="margin-top:8px"></canvas><div class="hint" id="h3b">Courbe de demande</div></div>
+  <div class="card" id="p3ctl"></div>
+  <div class="card" id="p3class"></div>
+  <div class="card" id="p3expl"></div>
+  <div class="card" id="p3giffen"></div>
+</section>
+
+<!-- ============ MODULE 4 : EFFETS ============ -->
+<section class="view" id="v4">
+  <div class="card" style="padding:12px 12px 10px">
+    <div class="chips" id="u4chips"></div>
+    <div class="ufor m" id="u4for"></div>
+    <div id="u4sl"></div>
+  </div>
+  <div class="seg" id="m4meth"><button data-v="slutsky">Slutsky</button><button data-v="hicks">Hicks</button></div>
+  <div class="cvwrap"><canvas class="cv" id="cv4"></canvas><div class="hint" id="h4">A → B → C</div></div>
+  <canvas class="strip" id="cv4b"></canvas>
+  <div class="legend"><span><i style="background:var(--es)"></i>effet de substitution</span><span><i style="background:var(--er)"></i>effet revenu</span><span><i style="background:#fff"></i>effet total</span><span><i style="background:var(--tms)"></i>budget compensé</span></div>
+  <div class="card" id="p4ctl"></div>
+  <div class="card" id="p4tab"></div>
+  <div class="card" id="p4steps"></div>
+</section>
+
+<!-- ============ MODULE 5 : ENTRAINEMENT ============ -->
+<section class="view" id="v5">
+  <div class="grid3" style="margin-top:8px" id="stats"></div>
+  <div class="chips" id="cats" style="margin-top:10px"></div>
+  <div class="card" id="ex"></div>
+</section>
+
+</div>
+<nav class="tabbar" id="tabs">
+  <button data-t="1" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M6 5c1 8 5 11 14 12"/><path d="M9 4c1 5 4 8 11 9" opacity=".5"/></svg>Préférences</button>
+  <button data-t="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M5 6l14 13"/><circle cx="12" cy="12.5" r="2.6" fill="currentColor"/></svg>Optimum</button>
+  <button data-t="3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="M6 5c2 9 6 12 14 13"/><circle cx="9.5" cy="12.5" r="1.6" fill="currentColor"/></svg>Demande</button>
+  <button data-t="4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h9M10 5l3 3-3 3"/><path d="M11 16h9M17 13l3 3-3 3"/><path d="M4 16h3" opacity=".5"/></svg>Effets</button>
+  <button data-t="5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg>Exercices</button>
+</nav>
+</div>
+
+<script>
+/*MATH-START*/
+const fr=(x,d=3)=>{
+  if(x===Infinity)return '+∞'; if(x===-Infinity)return '−∞'; if(typeof x!=='number'||!isFinite(x))return '—';
+  const k=Math.pow(10,d); let r=Math.round(x*k)/k; if(r===0)r=0;
+  let s=Math.abs(r)<1e-6&&r!==0?r.toExponential(2):String(r);
+  if(s.includes('e')&&Math.abs(r)>=1e-6)s=r.toFixed(d).replace(/0+$/,'').replace(/\.$/,'');
+  return s.replace('-','−').replace('.',',');
+};
+const MATH=(()=>{
+  const EPS=1e-12;
+  const TYPES={
+    cd:{name:'Cobb-Douglas',params:[{k:'a',lb:'a',min:.1,max:.9,step:.05,def:.5}]},
+    sub:{name:'Substituts',params:[{k:'a',lb:'a',min:.5,max:5,step:.5,def:3},{k:'b',lb:'b',min:.5,max:5,step:.5,def:1}]},
+    comp:{name:'Compléments',params:[{k:'a',lb:'a',min:.5,max:5,step:.5,def:1},{k:'b',lb:'b',min:.5,max:5,step:.5,def:2}]},
+    ql:{name:'Quasi-linéaire',params:[{k:'a',lb:'α',min:.5,max:8,step:.5,def:3}]},
+    inf:{name:'Bien inférieur',params:[]}
+  };
+  function U(t,q,x1,x2){switch(t){
+    case 'cd':return Math.pow(x1,q.a)*Math.pow(x2,1-q.a);
+    case 'sub':return q.a*x1+q.b*x2;
+    case 'comp':return Math.min(q.a*x1,q.b*x2);
+    case 'ql':return q.a*Math.log(x1)+x2;
+    case 'inf':return Math.log(x1)+(x2+1)*(x2+1)/2;}}
+  // utilités marginales [Um1, Um2]
+  function UM(t,q,x1,x2){switch(t){
+    case 'cd':return [q.a*Math.pow(x1,q.a-1)*Math.pow(x2,1-q.a),(1-q.a)*Math.pow(x1,q.a)*Math.pow(x2,-q.a)];
+    case 'sub':return [q.a,q.b];
+    case 'comp':{const d=q.a*x1-q.b*x2; if(d<0)return [q.a,0]; if(d>0)return [0,q.b]; return [NaN,NaN];}
+    case 'ql':return [q.a/x1,1];
+    case 'inf':return [1/x1,x2+1];}}
+  function TMS(t,q,x1,x2){switch(t){
+    case 'cd':return q.a*x2/((1-q.a)*x1);
+    case 'sub':return q.a/q.b;
+    case 'comp':{const d=q.a*x1-q.b*x2; if(d<0)return Infinity; if(d>0)return 0; return NaN;}
+    case 'ql':return q.a/x1;
+    case 'inf':return 1/(x1*(x2+1));}}
+  // x2 sur la courbe U=u (NaN si hors du quadrant)
+  function x2On(t,q,u,x1){let v;switch(t){
+    case 'cd':v=Math.pow(u/Math.pow(x1,q.a),1/(1-q.a));break;
+    case 'sub':v=(u-q.a*x1)/q.b;break;
+    case 'comp':v=x1>=u/q.a?u/q.b:NaN;break;
+    case 'ql':v=u-q.a*Math.log(x1);break;
+    case 'inf':{const w=2*(u-Math.log(x1)); v=w<0?NaN:Math.sqrt(w)-1;break;}}
+    return v>=-1e-12?Math.max(0,v):NaN;}
+  function x1On(t,q,u,x2){switch(t){
+    case 'cd':return x2<=0?Infinity:Math.pow(u/Math.pow(x2,1-q.a),1/q.a);
+    case 'sub':return (u-q.b*x2)/q.a;
+    case 'comp':return u/q.a;
+    case 'ql':return Math.exp((u-x2)/q.a);
+    case 'inf':return Math.exp(u-(x2+1)*(x2+1)/2);}}
+  // points de la courbe d'indifférence dans [0,X]x[0,Y]
+  function curve(t,q,u,X,Y){
+    const Xt=X*1.3,Yt=Y*1.3;
+    if(t==='comp'){const xa=u/q.a,yb=u/q.b;return [[xa,Yt],[xa,yb],[Xt,yb]];}
+    if(!(isFinite(u)))return [];
+    let lo=x1On(t,q,u,Yt); if(!(lo>0))lo=1e-9;
+    let hiAxis=x1On(t,q,u,0); let hi=Math.min(Xt,hiAxis);
+    if(!(hi>lo))return [];
+    const pts=[],N=140;
+    for(let i=0;i<=N;i++){const x=lo+(hi-lo)*i/N;const y=x2On(t,q,u,x);if(isFinite(y))pts.push([x,Math.min(y,Yt*2)]);}
+    const ylo=isFinite(x2On(t,q,u,hi))?x2On(t,q,u,hi):0, yhi=Math.min(Yt,x2On(t,q,u,lo)||Yt);
+    for(let i=1;i<N;i++){const y=ylo+(yhi-ylo)*i/N;const x=x1On(t,q,u,y);if(x>lo&&x<hi)pts.push([x,y]);}
+    if(hiAxis<=Xt)pts.push([hiAxis,0]);
+    pts.sort((p,r)=>p[0]-r[0]);
+    return pts;}
+  // demande marshallienne
+  function demand(t,q,p1,p2,R){switch(t){
+    case 'cd':return {x1:q.a*R/p1,x2:(1-q.a)*R/p2,kind:'int'};
+    case 'sub':{const d=q.a*p2-q.b*p1;
+      if(d>EPS*(q.a*p2+q.b*p1))return {x1:R/p1,x2:0,kind:'coin1'};
+      if(d<-EPS*(q.a*p2+q.b*p1))return {x1:0,x2:R/p2,kind:'coin2'};
+      return {x1:R/(2*p1),x2:R/(2*p2),kind:'indet'};}
+    case 'comp':{const d=q.b*p1+q.a*p2;return {x1:q.b*R/d,x2:q.a*R/d,kind:'coude'};}
+    case 'ql':{const x1=q.a*p2/p1; if(R>=q.a*p2)return {x1,x2:R/p2-q.a,kind:'int'}; return {x1:R/p1,x2:0,kind:'coin1'};}
+    case 'inf':{if(R<=p2)return {x1:R/p1,x2:0,kind:'coin1'};
+      const m=R/p2+1, y=(m+Math.sqrt(m*m-4))/2; return {x1:p2/(p1*y),x2:y-1,kind:'int',y};}}}
+  // demande hicksienne (minimisation de la dépense à utilité u)
+  function hicks(t,q,p1,p2,u){switch(t){
+    case 'cd':{const a=q.a;return {x1:u*Math.pow(a*p2/((1-a)*p1),1-a),x2:u*Math.pow((1-a)*p1/(a*p2),a),kind:'int'};}
+    case 'sub':{const d=q.a*p2-q.b*p1;
+      if(d>EPS*(q.a*p2+q.b*p1))return {x1:u/q.a,x2:0,kind:'coin1'};
+      if(d<-EPS*(q.a*p2+q.b*p1))return {x1:0,x2:u/q.b,kind:'coin2'};
+      return {x1:u/(2*q.a),x2:u/(2*q.b),kind:'indet'};}
+    case 'comp':return {x1:u/q.a,x2:u/q.b,kind:'coude'};
+    case 'ql':{const x1=q.a*p2/p1,x2=u-q.a*Math.log(x1); if(x2>=0)return {x1,x2,kind:'int'}; return {x1:Math.exp(u/q.a),x2:0,kind:'coin1'};}
+    case 'inf':{const xc=Math.exp(u-.5); if(xc<=p2/p1)return {x1:xc,x2:0,kind:'coin1'};
+      const f=y=>Math.log(p2/(p1*y))+y*y/2-u; let lo=1,hi=2; while(f(hi)<0)hi*=2;
+      for(let i=0;i<200;i++){const mid=(lo+hi)/2; if(f(mid)<0)lo=mid;else hi=mid;}
+      const y=(lo+hi)/2; return {x1:p2/(p1*y),x2:y-1,kind:'int'};}}}
+  function decomp(t,q,p1,p1n,p2,R,method){
+    const A=demand(t,q,p1,p2,R), uA=U(t,q,A.x1,A.x2), C=demand(t,q,p1n,p2,R);
+    let B,Rc;
+    if(method==='hicks'){B=hicks(t,q,p1n,p2,uA);Rc=p1n*B.x1+p2*B.x2;}
+    else{Rc=R+(p1n-p1)*A.x1;B=demand(t,q,p1n,p2,Rc);}
+    return {A,B,C,Rc,uA,uB:U(t,q,B.x1,B.x2),uC:U(t,q,C.x1,C.x2),
+      ES:[B.x1-A.x1,B.x2-A.x2],ER:[C.x1-B.x1,C.x2-B.x2],ET:[C.x1-A.x1,C.x2-A.x2]};}
+  // dérivées numériques et équation de Slutsky au point courant
+  function local(t,q,p1,p2,R){
+    const x=demand(t,q,p1,p2,R), u=U(t,q,x.x1,x.x2), h=p1*1e-6, hR=R*1e-6;
+    const dxdp=(demand(t,q,p1+h,p2,R).x1-demand(t,q,p1-h,p2,R).x1)/(2*h);
+    const dhdp=(hicks(t,q,p1+h,p2,u).x1-hicks(t,q,p1-h,p2,u).x1)/(2*h);
+    const dxdR=(demand(t,q,p1,p2,R+hR).x1-demand(t,q,p1,p2,R-hR).x1)/(2*hR);
+    const dxdp2=(demand(t,q,p1,p2+p2*1e-6,R).x1-demand(t,q,p1,p2-p2*1e-6,R).x1)/(2*p2*1e-6);
+    return {x,u,dxdp,dhdp,dxdR,inc:-x.x1*dxdR,epsP:x.x1>0?dxdp*p1/x.x1:NaN,epsR:x.x1>0?dxdR*R/x.x1:NaN,eps12:x.x1>0?dxdp2*p2/x.x1:NaN};}
+
+  /* ---------- générateur d'exercices ---------- */
+  const ri=(r,a,b)=>a+Math.floor(r()*(b-a+1));
+  const X1='<i>x</i>₁',X2='<i>x</i>₂',P1='<i>p</i>₁',P2='<i>p</i>₂',RR='<i>R</i>';
+  const pw=(v,e)=>e===0?'':e===1?v:v+'<sup>'+fr(e)+'</sup>';
+  const mono=(c,e1,e2)=>{const s=[c===1?'':fr(c),pw(X1,e1),pw(X2,e2)].filter(Boolean).join(' ');return s||'1';};
+  const cdU=(a,b)=>pw(X1,a)+' '+pw(X2,b);
+  const eq=s=>'<span class="eq">'+s+'</span>';
+  const G={
+    tmsCD(r){const a=ri(r,1,4),b=ri(r,1,4),x1=ri(r,1,8),x2=ri(r,1,8),ans=a*x2/(b*x1);
+      return {cat:'tms',title:'TMS d’une Cobb-Douglas',
+        html:'Soit <span class="m">U('+X1+','+X2+') = '+cdU(a,b)+'</span>. Calcule le TMS (= Um₁/Um₂) au panier <span class="m">A = ('+x1+' ; '+x2+')</span>.',
+        asks:[{lb:'TMS en A',ans}],
+        steps:['Utilité marginale du bien 1 : '+eq('Um₁ = ∂U/∂'+X1+' = '+mono(a,a-1,b)),
+          'Utilité marginale du bien 2 : '+eq('Um₂ = ∂U/∂'+X2+' = '+mono(b,a,b-1)),
+          'On divise : les puissances se simplifient.'+eq('TMS = Um₁/Um₂ = ('+a+' '+X2+') / ('+b+' '+X1+')'),
+          'On remplace par A :'+eq('TMS = ('+a+' × '+x2+') / ('+b+' × '+x1+') = <b>'+fr(ans)+'</b>'),
+          'Lecture : en A, on est prêt à céder '+fr(ans)+' unité(s) de x₂ pour 1 unité de x₁ en plus.']};},
+    tmsSqrt(r){const a=2*ri(r,1,6),k=ri(r,1,5),x1=k*k,x2=ri(r,1,9),ans=a/(2*k);
+      return {cat:'tms',title:'TMS d’une utilité quasi-linéaire',
+        html:'Soit <span class="m">U('+X1+','+X2+') = '+a+'√'+X1+' + '+X2+'</span>. Calcule le TMS au panier <span class="m">A = ('+x1+' ; '+x2+')</span>.',
+        asks:[{lb:'TMS en A',ans}],
+        steps:['Dérivée de √x : 1/(2√x).'+eq('Um₁ = '+a+' / (2√'+X1+')  ;  Um₂ = 1'),
+          eq('TMS = Um₁/Um₂ = '+a+' / (2√'+X1+')'),
+          'En A, √'+x1+' = '+k+' :'+eq('TMS = '+a+' / (2 × '+k+') = <b>'+fr(ans)+'</b>'),
+          'Le TMS ne dépend pas de x₂ : c’est la marque des utilités quasi-linéaires (courbes « parallèles » verticalement).']};},
+    optCD(r){const a=ri(r,1,4),b=ri(r,1,4),p1=ri(r,1,6),p2=ri(r,1,6),R=(a+b)*p1*p2*ri(r,1,3),s=a+b,x1=a*R/(s*p1),x2=b*R/(s*p2);
+      return {cat:'opt',title:'Optimum Cobb-Douglas',
+        html:'<span class="m">U = '+cdU(a,b)+'</span>, prix <span class="m">'+P1+' = '+p1+'</span>, <span class="m">'+P2+' = '+p2+'</span>, revenu <span class="m">'+RR+' = '+R+'</span>. Trouve le panier optimal.',
+        asks:[{lb:'x₁*',ans:x1},{lb:'x₂*',ans:x2}],
+        steps:['Lagrangien :'+eq('ℒ = '+cdU(a,b)+' + λ('+R+' − '+p1+X1+' − '+p2+X2+')'),
+          'Les CPO ∂ℒ/∂x₁ = 0 et ∂ℒ/∂x₂ = 0 donnent, en divisant :'+eq('TMS = ('+a+' '+X2+')/('+b+' '+X1+') = '+P1+'/'+P2+' = '+p1+'/'+p2),
+          'Donc '+eq(p2+' '+X2+' = ('+b+'/'+a+') × '+p1+' '+X1+'  (dépense en 2 = '+fr(b/a)+' × dépense en 1)'),
+          'Dans la contrainte de budget :'+eq(p1+' '+X1+' × (1 + '+b+'/'+a+') = '+R+'  ⇒  '+p1+' '+X1+' = '+a+'/'+s+' × '+R+' = '+fr(a*R/s)),
+          eq(X1+'* = '+fr(a*R/s)+' / '+p1+' = <b>'+fr(x1)+'</b>'),
+          eq(X2+'* = ('+R+' − '+p1+' × '+fr(x1)+') / '+p2+' = <b>'+fr(x2)+'</b>'),
+          'Raccourci Cobb-Douglas : on dépense la part a/(a+b) = '+a+'/'+s+' du revenu dans le bien 1.']};},
+    optSub(r){let a,b,p1,p2;do{a=ri(r,1,5);b=ri(r,1,5);p1=ri(r,1,6);p2=ri(r,1,6);}while(a*p2===b*p1);
+      const R=p1*p2*ri(r,2,6),one=a*p2>b*p1,x1=one?R/p1:0,x2=one?0:R/p2;
+      return {cat:'opt',title:'Optimum : substituts parfaits',
+        html:'<span class="m">U = '+a+X1+' + '+b+X2+'</span>, <span class="m">'+P1+' = '+p1+'</span>, <span class="m">'+P2+' = '+p2+'</span>, <span class="m">'+RR+' = '+R+'</span>. Trouve le panier optimal.',
+        asks:[{lb:'x₁*',ans:x1},{lb:'x₂*',ans:x2}],
+        steps:['Courbes d’indifférence = droites : TMS constant.'+eq('TMS = a/b = '+a+'/'+b+' = '+fr(a/b)+'  ;  '+P1+'/'+P2+' = '+p1+'/'+p2+' = '+fr(p1/p2)),
+          'Autre lecture : utilité par euro dépensé.'+eq('Um₁/'+P1+' = '+a+'/'+p1+' = '+fr(a/p1)+'   vs   Um₂/'+P2+' = '+b+'/'+p2+' = '+fr(b/p2)),
+          (one?'Le bien 1 rapporte plus d’utilité par euro : on met tout le revenu dedans.':'Le bien 2 rapporte plus d’utilité par euro : on met tout le revenu dedans.')+' Pas de tangence ⇒ <b>solution en coin</b>.',
+          eq(X1+'* = <b>'+fr(x1)+'</b>  ;  '+X2+'* = <b>'+fr(x2)+'</b>')]};},
+    optComp(r){const a=ri(r,1,4),b=ri(r,1,4),p1=ri(r,1,6),p2=ri(r,1,6),D=b*p1+a*p2,R=D*ri(r,1,5),x1=b*R/D,x2=a*R/D;
+      return {cat:'opt',title:'Optimum : compléments parfaits',
+        html:'<span class="m">U = min('+a+X1+' ; '+b+X2+')</span>, <span class="m">'+P1+' = '+p1+'</span>, <span class="m">'+P2+' = '+p2+'</span>, <span class="m">'+RR+' = '+R+'</span>. Trouve le panier optimal.',
+        asks:[{lb:'x₁*',ans:x1},{lb:'x₂*',ans:x2}],
+        steps:['Au coude de la courbe en L, rien n’est gaspillé :'+eq(a+' '+X1+' = '+b+' '+X2+'  ⇒  '+X2+' = ('+a+'/'+b+') '+X1),
+          'On injecte dans le budget :'+eq(p1+' '+X1+' + '+p2+' × ('+a+'/'+b+') '+X1+' = '+R),
+          eq(X1+'* = b'+RR+' / (b'+P1+' + a'+P2+') = '+b+' × '+R+' / ('+b+'×'+p1+' + '+a+'×'+p2+') = <b>'+fr(x1)+'</b>'),
+          eq(X2+'* = ('+a+'/'+b+') × '+fr(x1)+' = <b>'+fr(x2)+'</b>'),
+          'Pas de Lagrangien : au coude la fonction n’est pas dérivable (TMS non défini).']};},
+    optQL(r){const a=ri(r,2,10),p1=ri(r,1,5),p2=ri(r,1,5),R=p2*(a+ri(r,1,8)),x1=a*p2/p1,x2=R/p2-a;
+      return {cat:'opt',title:'Optimum quasi-linéaire',
+        html:'<span class="m">U = '+a+' ln '+X1+' + '+X2+'</span>, <span class="m">'+P1+' = '+p1+'</span>, <span class="m">'+P2+' = '+p2+'</span>, <span class="m">'+RR+' = '+R+'</span>. Trouve le panier optimal.',
+        asks:[{lb:'x₁*',ans:x1},{lb:'x₂*',ans:x2}],
+        steps:['Lagrangien :'+eq('ℒ = '+a+' ln '+X1+' + '+X2+' + λ('+R+' − '+p1+X1+' − '+p2+X2+')'),
+          'CPO :'+eq(a+'/'+X1+' = '+p1+'λ  ;  1 = '+p2+'λ  ⇒  λ = 1/'+p2),
+          'Donc TMS = '+a+'/x₁ = p₁/p₂ :'+eq(X1+'* = '+a+' × '+p2+' / '+p1+' = <b>'+fr(x1)+'</b>'),
+          'Le reste du budget va au bien 2 :'+eq(X2+'* = ('+R+' − '+p1+' × '+fr(x1)+') / '+p2+' = <b>'+fr(x2)+'</b>'),
+          'On vérifie x₂* ≥ 0 (sinon solution en coin). Remarque : x₁* ne dépend pas de R !']};},
+    demComp(r){const a=ri(r,1,3),b=ri(r,1,3),p1=ri(r,1,5),p2=ri(r,1,5),p1n=p1+ri(r,1,4),R=(b*p1+a*p2)*(b*p1n+a*p2)/ri(r,1,2),
+      x1=b*R/(b*p1+a*p2),x1n=b*R/(b*p1n+a*p2);
+      return {cat:'dem',title:'Fonction de demande (compléments)',
+        html:'<span class="m">U = min('+a+X1+' ; '+b+X2+')</span>, <span class="m">'+P2+' = '+p2+'</span>, <span class="m">'+RR+' = '+fr(R)+'</span>. Établis x₁('+'p₁, p₂, R) puis calcule x₁ pour <span class="m">'+P1+' = '+p1+'</span> et la variation Δx₁ si <span class="m">'+P1+'</span> passe à '+p1n+'.',
+        asks:[{lb:'x₁ pour p₁ = '+p1,ans:x1},{lb:'Δx₁ (p₁ : '+p1+' → '+p1n+')',ans:x1n-x1}],
+        steps:['Optimum au coude : '+a+'x₁ = '+b+'x₂, puis budget :'+eq(X1+'('+P1+','+P2+','+RR+') = '+b+RR+' / ('+b+P1+' + '+a+P2+')'),
+          eq(X1+'('+p1+') = '+b+' × '+fr(R)+' / ('+b*p1+' + '+a*p2+') = <b>'+fr(x1)+'</b>'),
+          eq(X1+'('+p1n+') = '+b+' × '+fr(R)+' / ('+b*p1n+' + '+a*p2+') = '+fr(x1n)),
+          eq('Δ'+X1+' = '+fr(x1n)+' − '+fr(x1)+' = <b>'+fr(x1n-x1)+'</b>'),
+          'Bien ordinaire : la quantité baisse quand son prix monte. Ici tout est effet revenu (pas de substitution possible).']};},
+    demCD(r){const a=ri(r,1,3),b=ri(r,1,3),s=a+b,p1=ri(r,1,5),p2=ri(r,1,5),R=s*p1*p2*ri(r,1,4),p1n=p1*2,x1=a*R/(s*p1),x2=b*R/(s*p2);
+      return {cat:'dem',title:'Demandes Cobb-Douglas',
+        html:'<span class="m">U = '+cdU(a,b)+'</span>, <span class="m">'+P1+' = '+p1+'</span>, <span class="m">'+P2+' = '+p2+'</span>, <span class="m">'+RR+' = '+R+'</span>. Calcule x₁, puis x₂ <b>après</b> que p₁ a doublé (p₁ = '+p1n+').',
+        asks:[{lb:'x₁ (avant)',ans:x1},{lb:'x₂ après le doublement de p₁',ans:x2}],
+        steps:['Fonctions de demande Cobb-Douglas (part a/(a+b) du revenu en bien 1) :'+eq(X1+' = ('+a+'/'+s+') '+RR+'/'+P1+'  ;  '+X2+' = ('+b+'/'+s+') '+RR+'/'+P2),
+          eq(X1+' = '+a+'/'+s+' × '+R+'/'+p1+' = <b>'+fr(x1)+'</b>'),
+          'x₂ ne dépend pas de p₁ (élasticité-prix croisée nulle) :'+eq(X2+' = '+b+'/'+s+' × '+R+'/'+p2+' = <b>'+fr(x2)+'</b>  (inchangé)'),
+          'Après le doublement, x₁ est divisé par 2 : '+fr(x1/2)+'. Élasticité-prix de x₁ = −1.']};},
+    elasLin(r){const A=10*ri(r,5,20),B=ri(r,1,8),p=ri(r,1,Math.floor(A/B)-1),x=A-B*p,ans=-B*p/x;
+      return {cat:'elas',title:'Élasticité-prix (demande linéaire)',
+        html:'La demande est <span class="m">'+X1+' = '+A+' − '+B+P1+'</span>. Calcule l’élasticité-prix au point <span class="m">'+P1+' = '+p+'</span>.',
+        asks:[{lb:'ε (élasticité-prix)',ans}],
+        steps:['Définition :'+eq('ε = (∂'+X1+'/∂'+P1+') × '+P1+' / '+X1),
+          eq('∂'+X1+'/∂'+P1+' = −'+B+'  ;  '+X1+'('+p+') = '+A+' − '+B+'×'+p+' = '+x),
+          eq('ε = −'+B+' × '+p+' / '+x+' = <b>'+fr(ans)+'</b>'),
+          (Math.abs(ans)>1?'|ε| > 1 : demande <b>élastique</b> (1 % de hausse de prix ⇒ plus de 1 % de baisse de quantité).':Math.abs(ans)<1?'|ε| < 1 : demande <b>inélastique</b>.':'|ε| = 1 : élasticité unitaire.')]};},
+    elasCross(r){const a=ri(r,1,4),b=ri(r,1,4),p1=ri(r,1,6),p2=ri(r,1,6),R=10*ri(r,2,10),D=b*p1+a*p2,ans=-a*p2/D;
+      return {cat:'elas',title:'Élasticité-prix croisée',
+        html:'<span class="m">U = min('+a+X1+' ; '+b+X2+')</span>, <span class="m">'+P1+' = '+p1+'</span>, <span class="m">'+P2+' = '+p2+'</span>, <span class="m">'+RR+' = '+R+'</span>. Calcule l’élasticité de x₁ par rapport à p₂.',
+        asks:[{lb:'ε₁,₂',ans}],
+        steps:['Demande :'+eq(X1+' = '+b+RR+' / ('+b+P1+' + '+a+P2+')'),
+          'Dérivée par rapport à p₂ :'+eq('∂'+X1+'/∂'+P2+' = −'+a+'×'+b+RR+' / ('+b+P1+' + '+a+P2+')²'),
+          eq('ε₁,₂ = (∂'+X1+'/∂'+P2+') × '+P2+'/'+X1+' = −'+a+P2+' / ('+b+P1+' + '+a+P2+')'),
+          eq('ε₁,₂ = −'+a+'×'+p2+' / ('+b*p1+' + '+a*p2+') = <b>'+fr(ans)+'</b>'),
+          'Négative : quand p₂ monte, on achète moins de x₁ ⇒ biens <b>complémentaires</b>. (Le revenu R n’intervient pas.)']};},
+    slutCD(r){const a=ri(r,1,3),b=ri(r,1,3),s=a/(a+b);let p1=ri(r,2,8),p1n;do{p1n=ri(r,1,8);}while(p1n===p1);
+      const p2=ri(r,1,5),R=(a+b)*p1*p1n*ri(r,1,3),x1A=s*R/p1,Rc=R+(p1n-p1)*x1A,x1B=s*Rc/p1n,x1C=s*R/p1n;
+      return {cat:'eff',title:'Effets de Slutsky',
+        html:'<span class="m">U = '+cdU(a,b)+'</span>, <span class="m">'+P2+' = '+p2+'</span>, <span class="m">'+RR+' = '+R+'</span>. Le prix <span class="m">'+P1+'</span> passe de '+p1+' à '+p1n+'. Décompose la variation de x₁ <b>à la Slutsky</b>.',
+        asks:[{lb:'Effet de substitution sur x₁',ans:x1B-x1A},{lb:'Effet revenu sur x₁',ans:x1C-x1B}],
+        steps:['Demande : '+eq(X1+' = ('+a+'/'+(a+b)+') '+RR+'/'+P1),
+          'Point initial A :'+eq(X1+'ᴬ = '+fr(s)+' × '+R+'/'+p1+' = '+fr(x1A)),
+          'Revenu compensé de Slutsky (on peut encore acheter A) :'+eq("R' = R + (p₁' − p₁) "+X1+'ᴬ = '+R+' + ('+p1n+' − '+p1+') × '+fr(x1A)+' = '+fr(Rc)),
+          'Point intermédiaire B (nouveaux prix, revenu R′) :'+eq(X1+'ᴮ = '+fr(s)+' × '+fr(Rc)+'/'+p1n+' = '+fr(x1B)),
+          'Point final C (nouveaux prix, revenu R) :'+eq(X1+'ᶜ = '+fr(s)+' × '+R+'/'+p1n+' = '+fr(x1C)),
+          eq('ES = '+X1+'ᴮ − '+X1+'ᴬ = <b>'+fr(x1B-x1A)+'</b>   ;   ER = '+X1+'ᶜ − '+X1+'ᴮ = <b>'+fr(x1C-x1B)+'</b>'),
+          'Vérif : ES + ER = '+fr(x1C-x1A)+' = effet total.']};},
+    hicksCD(r){const a=1,b=1,s=.5;let p1=ri(r,2,8),p1n;do{p1n=ri(r,1,8);}while(p1n===p1);
+      const p2=ri(r,1,5),R=2*p1*p2*ri(r,1,4),x1A=s*R/p1,x2A=s*R/p2,uA=Math.sqrt(x1A*x2A),h1=uA*Math.sqrt(p2/p1n),x1C=s*R/p1n;
+      return {cat:'eff',title:'Effet de substitution de Hicks',
+        html:'<span class="m">U = '+X1+X2+'</span> (on peut prendre U = √(x₁x₂), mêmes préférences), <span class="m">'+P2+' = '+p2+'</span>, <span class="m">'+RR+' = '+R+'</span>. Le prix p₁ passe de '+p1+' à '+p1n+'. Décompose la variation de x₁ <b>à la Hicks</b>.',
+        asks:[{lb:'Effet de substitution (Hicks) sur x₁',ans:h1-x1A},{lb:'Effet revenu (Hicks) sur x₁',ans:x1C-h1}],
+        steps:['Point initial A : x₁ = R/(2p₁), x₂ = R/(2p₂)'+eq('A = ('+fr(x1A)+' ; '+fr(x2A)+')  ;  √(x₁x₂) = '+fr(uA)),
+          'Point B : même utilité que A, nouveaux prix, dépense minimale. Tangence TMS = x₂/x₁ = p₁′/p₂ ⇒ x₂ = ('+p1n+'/'+p2+') x₁.',
+          'On garde √(x₁x₂) = '+fr(uA)+' :'+eq(X1+'ᴮ = '+fr(uA)+' × √('+p2+'/'+p1n+') = '+fr(h1)),
+          'Point final C :'+eq(X1+'ᶜ = R/(2p₁′) = '+R+'/'+2*p1n+' = '+fr(x1C)),
+          eq('ES = '+fr(h1)+' − '+fr(x1A)+' = <b>'+fr(h1-x1A)+'</b>  ;  ER = '+fr(x1C)+' − '+fr(h1)+' = <b>'+fr(x1C-h1)+'</b>'),
+          'Hicks garde l’<i>utilité</i> constante (Slutsky garde le <i>pouvoir d’achat</i> constant).']};}
+  };
+  const CATS={tms:'TMS',opt:'Optimum',dem:'Demande',elas:'Élasticités',eff:'Effets'};
+  function gen(cat,r){r=r||Math.random;const keys=Object.keys(G).filter(k=>!cat||cat==='all'||G[k].length>=0&&catOf(k)===cat);return G[keys[Math.floor(r()*keys.length)]](r);}
+  const catMap={tmsCD:'tms',tmsSqrt:'tms',optCD:'opt',optSub:'opt',optComp:'opt',optQL:'opt',demComp:'dem',demCD:'dem',elasLin:'elas',elasCross:'elas',slutCD:'eff',hicksCD:'eff'};
+  function catOf(k){return catMap[k];}
+  function parseNum(s){s=String(s).trim().replace(/\s/g,'').replace(/−/g,'-').replace(/,/g,'.');if(!s)return NaN;
+    const m=s.match(/^(-?[0-9.]+)\/(-?[0-9.]+)$/);if(m)return parseFloat(m[1])/parseFloat(m[2]);
+    return /^-?[0-9]*\.?[0-9]+$/.test(s)?parseFloat(s):NaN;}
+  function isOk(v,ans){return isFinite(v)&&Math.abs(v-ans)<=Math.max(.011,.01*Math.abs(ans));}
+  return {TYPES,U,UM,TMS,x2On,x1On,curve,demand,hicks,decomp,local,G,CATS,gen,catOf,parseNum,isOk};
+})();
+/*MATH-END*/
+if(typeof module!=='undefined')module.exports={MATH,fr};
+</script>
+<script>
+(()=>{
+const $=(s,r=document)=>r.querySelector(s);
+const C={u:'#a78bfa',ud:'#7c3aed',bud:'#fb923c',opt:'#fbbf24',tms:'#22d3ee',es:'#34d399',er:'#f472b6',txt:'#eeeef6',mut:'#8e8ea6'};
+const LS={get(k,d){try{const v=localStorage.getItem('micro-lab:'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('micro-lab:'+k,JSON.stringify(v))}catch(e){}}};
+const {U,TMS,UM,curve,demand,hicks,decomp,local,TYPES}=MATH;
+const X1='<i>x</i>₁',X2='<i>x</i>₂';
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ---------------- état ---------------- */
+const DEF={type:'cd',q:{cd:{a:.5},sub:{a:3,b:1},comp:{a:1,b:2},ql:{a:3},inf:{}},
+  m1:{sel:{x1:3,x2:4}},m2:{p1:2,p2:1,R:20,probe:null},m3:{mode:'p',p1:2,p2:3,R:20},m4:{method:'slutsky',p1:4,p1n:2,p2:2,R:40},tab:1};
+const S=Object.assign(JSON.parse(JSON.stringify(DEF)),LS.get('state',{}));
+for(const k of ['q','m1','m2','m3','m4'])S[k]=Object.assign(JSON.parse(JSON.stringify(DEF[k])),S[k]||{});
+for(const t in DEF.q)S.q[t]=Object.assign({},DEF.q[t],S.q[t]||{});
+if(!TYPES[S.type])S.type='cd';
+let saveT=0;const save=()=>{clearTimeout(saveT);saveT=setTimeout(()=>LS.set('state',S),250);};
+// paramètres affichés (interpolés pour des transitions fluides)
+const DQ=JSON.parse(JSON.stringify(S.q));
+function tweenQ(dt){let mv=false;const k=1-Math.exp(-dt*11);for(const t in S.q)for(const p in S.q[t]){const d=S.q[t][p]-DQ[t][p];if(Math.abs(d)>1e-5){DQ[t][p]+=d*k;mv=true;}else DQ[t][p]=S.q[t][p];}return mv;}
+function lerpObj(cur,tgt,dt,sp=11){let mv=false;const k=1-Math.exp(-dt*sp);for(const p in tgt){if(cur[p]===undefined){cur[p]=tgt[p];continue;}const d=tgt[p]-cur[p];if(Math.abs(d)>1e-5*Math.max(1,Math.abs(tgt[p]))){cur[p]+=d*k;mv=true;}else cur[p]=tgt[p];}return mv;}
+
+/* ---------------- textes ---------------- */
+function uFormula(t,q){switch(t){
+  case 'cd':return 'U = '+X1+'<sup>'+fr(q.a,2)+'</sup> '+X2+'<sup>'+fr(1-q.a,2)+'</sup>';
+  case 'sub':return 'U = '+fr(q.a)+' '+X1+' + '+fr(q.b)+' '+X2;
+  case 'comp':return 'U = min('+fr(q.a)+' '+X1+' ; '+fr(q.b)+' '+X2+')';
+  case 'ql':return 'U = '+fr(q.a)+' ln '+X1+' + '+X2;
+  case 'inf':return 'U = ln '+X1+' + ½ ('+X2+' + 1)²';}}
+const eq=s=>'<span class="eq">'+s+'</span>';
+const f2=x=>fr(x,2), f3=x=>fr(x,3);
+const par=x=>x<0?'('+f3(x)+')':f3(x);
+
+/* ---------------- composants ---------------- */
+function setRangeFill(inp){const p=(inp.value-inp.min)/(inp.max-inp.min)*100;inp.style.setProperty('--p',p+'%');}
+function slider(lb,min,max,step,get,set,col,fmt){
+  const d=document.createElement('div');d.className='sl';
+  d.innerHTML='<div class="lb">'+lb+'</div><input type="range" min="'+min+'" max="'+max+'" step="'+step+'"><div class="vl"></div>';
+  const inp=d.querySelector('input'),vl=d.querySelector('.vl');inp.style.setProperty('--c',col||C.u);
+  const upd=()=>{vl.textContent=(fmt||f2)(+inp.value);setRangeFill(inp);};
+  inp.value=get();upd();
+  inp.addEventListener('input',()=>{set(+inp.value);upd();});
+  d.sync=()=>{inp.value=get();upd();};
+  return d;}
+const pickers=[];
+function utilPicker(n,onChange){
+  const chips=$('#u'+n+'chips'),fo=$('#u'+n+'for'),sl=$('#u'+n+'sl');
+  const P={render(){
+    chips.innerHTML='';
+    for(const t in TYPES){const b=document.createElement('button');b.className='chip'+(S.type===t?' on':'');b.textContent=TYPES[t].name;
+      b.onclick=()=>{if(S.type===t)return;S.type=t;save();pickers.forEach(p=>p.render());MODS.forEach(m=>m.onUtil&&m.onUtil());};chips.appendChild(b);}
+    fo.innerHTML=uFormula(S.type,S.q[S.type]);
+    sl.innerHTML='';
+    for(const pp of TYPES[S.type].params){
+      sl.appendChild(slider(pp.lb,pp.min,pp.max,pp.step,()=>S.q[S.type][pp.k],v=>{S.q[S.type][pp.k]=v;save();fo.innerHTML=uFormula(S.type,S.q[S.type]);MODS.forEach(m=>m.onParam&&m.onParam());},C.u));}
+    if(!TYPES[S.type].params.length){const d=document.createElement('div');d.className='small';d.style.textAlign='center';d.style.margin='4px 0';d.textContent='Exemple construit pour que x₁ soit un bien inférieur (pas de paramètre).';sl.appendChild(d);}
+  }};
+  pickers.push(P);P.render();return P;}
+
+/* ---------------- tracé ---------------- */
+function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r)));const m=r/p;return (m<1.5?1:m<3?2:m<7?5:10)*p;}
+class Plot{
+  constructor(cv,o={}){this.cv=cv;this.ctx=cv.getContext('2d');this.pad=Object.assign({l:38,r:16,t:16,b:30},o.pad||{});this.X=10;this.Y=10;this.xl=o.xl||'x₁';this.yl=o.yl||'x₂';}
+  begin(){const r=this.cv.getBoundingClientRect(),d=Math.min(window.devicePixelRatio||1,3),w=Math.max(10,Math.round(r.width)),h=Math.max(10,Math.round(r.height));
+    if(this.cv.width!==Math.round(w*d)||this.cv.height!==Math.round(h*d)){this.cv.width=Math.round(w*d);this.cv.height=Math.round(h*d);}
+    this.w=w;this.h=h;const c=this.ctx;c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);return r.width>0;}
+  px(x){return this.pad.l+x/this.X*(this.w-this.pad.l-this.pad.r)}
+  py(y){return this.h-this.pad.b-y/this.Y*(this.h-this.pad.t-this.pad.b)}
+  dx(p){return (p-this.pad.l)/(this.w-this.pad.l-this.pad.r)*this.X}
+  dy(p){return (this.h-this.pad.b-p)/(this.h-this.pad.t-this.pad.b)*this.Y}
+  clip(){const c=this.ctx;c.save();c.beginPath();c.rect(this.pad.l,this.pad.t-4,this.w-this.pad.l-this.pad.r+4,this.h-this.pad.t-this.pad.b+4);c.clip();}
+  unclip(){this.ctx.restore();}
+  axes(){const c=this.ctx,sx=niceStep(this.X/5),sy=niceStep(this.Y/5);
+    c.lineWidth=1;c.strokeStyle='rgba(255,255,255,.045)';c.beginPath();
+    for(let x=sx;x<=this.X*1.0001;x+=sx){const p=Math.round(this.px(x))+.5;c.moveTo(p,this.pad.t);c.lineTo(p,this.h-this.pad.b);}
+    for(let y=sy;y<=this.Y*1.0001;y+=sy){const p=Math.round(this.py(y))+.5;c.moveTo(this.pad.l,p);c.lineTo(this.w-this.pad.r,p);}c.stroke();
+    c.fillStyle='rgba(200,200,220,.45)';c.font='500 10.5px -apple-system,BlinkMacSystemFont,sans-serif';c.textAlign='center';c.textBaseline='top';
+    for(let x=sx;x<=this.X*1.0001;x+=sx)c.fillText(fr(x,2),this.px(x),this.h-this.pad.b+6);
+    c.textAlign='right';c.textBaseline='middle';
+    for(let y=sy;y<=this.Y*1.0001;y+=sy)c.fillText(fr(y,2),this.pad.l-6,this.py(y));
+    c.fillText('0',this.pad.l-6,this.h-this.pad.b+7);
+    c.strokeStyle='rgba(255,255,255,.4)';c.lineWidth=1.5;c.beginPath();
+    c.moveTo(this.pad.l,this.pad.t-6);c.lineTo(this.pad.l,this.h-this.pad.b);c.lineTo(this.w-this.pad.r+6,this.h-this.pad.b);c.stroke();
+    c.fillStyle='rgba(255,255,255,.4)';c.beginPath();c.moveTo(this.pad.l,this.pad.t-10);c.lineTo(this.pad.l-4,this.pad.t-2);c.lineTo(this.pad.l+4,this.pad.t-2);c.fill();
+    c.beginPath();c.moveTo(this.w-this.pad.r+10,this.h-this.pad.b);c.lineTo(this.w-this.pad.r+2,this.h-this.pad.b-4);c.lineTo(this.w-this.pad.r+2,this.h-this.pad.b+4);c.fill();
+    c.font='italic 600 14px "New York","Iowan Old Style",Georgia,serif';c.fillStyle='#d8d8e6';
+    c.textAlign='right';c.textBaseline='bottom';c.fillText(this.xl,this.w-this.pad.r+4,this.h-this.pad.b-6);
+    c.textAlign='left';c.textBaseline='top';c.fillText(this.yl,this.pad.l+8,this.pad.t-8);}
+  path(pts,frac=1){const c=this.ctx;c.beginPath();const n=Math.max(2,Math.ceil(pts.length*frac));let first=true;
+    for(let i=0;i<Math.min(n,pts.length);i++){const x=this.px(pts[i][0]),y=this.py(pts[i][1]);if(first){c.moveTo(x,y);first=false;}else c.lineTo(x,y);}}
+  stroke(pts,col,w=2,o={}){if(!pts||pts.length<2)return;const c=this.ctx;c.save();c.strokeStyle=col;c.lineWidth=w;c.lineJoin='round';c.lineCap='round';
+    if(o.dash)c.setLineDash(o.dash);if(o.alpha!==undefined)c.globalAlpha=o.alpha;if(o.glow){c.shadowColor=o.glow;c.shadowBlur=o.blur||12;}
+    this.path(pts,o.frac===undefined?1:o.frac);c.stroke();c.restore();}
+  dot(x,y,r,col,o={}){const c=this.ctx,X=this.px(x),Y=this.py(y);c.save();
+    if(o.ring){c.globalAlpha=o.ringA===undefined?.35:o.ringA;c.fillStyle=col;c.beginPath();c.arc(X,Y,o.ring,0,7);c.fill();c.globalAlpha=1;}
+    c.shadowColor=col;c.shadowBlur=o.blur===undefined?14:o.blur;c.fillStyle=col;c.beginPath();c.arc(X,Y,r,0,7);c.fill();
+    if(o.core){c.shadowBlur=0;c.fillStyle=o.core;c.beginPath();c.arc(X,Y,r*.45,0,7);c.fill();}c.restore();}
+  text(s,x,y,col,o={}){const c=this.ctx;c.save();c.font=o.font||'700 12px -apple-system,BlinkMacSystemFont,sans-serif';c.fillStyle=col;c.textAlign=o.al||'left';c.textBaseline=o.bl||'middle';
+    let X=this.px(x)+(o.dx||0),Y=this.py(y)+(o.dy||0);
+    if(o.bg){const w=c.measureText(s).width;let bx=o.al==='center'?X-w/2:o.al==='right'?X-w:X;c.fillStyle=o.bg;c.beginPath();if(c.roundRect)c.roundRect(bx-5,Y-9,w+10,18,6);else c.rect(bx-5,Y-9,w+10,18);c.fill();c.fillStyle=col;}
+    c.fillText(s,X,Y);c.restore();}
+  guides(x,y,col){const c=this.ctx;c.save();c.setLineDash([3,4]);c.strokeStyle=col;c.globalAlpha=.55;c.lineWidth=1.2;c.beginPath();
+    c.moveTo(this.px(x),this.py(y));c.lineTo(this.px(x),this.py(0));c.moveTo(this.px(x),this.py(y));c.lineTo(this.px(0),this.py(y));c.stroke();c.restore();}
+}
+function arrowPx(c,x0,y0,x1,y1,col,w=3){const a=Math.atan2(y1-y0,x1-x0),len=Math.hypot(x1-x0,y1-y0);if(len<1.5)return;const hl=Math.min(11,len*.6);
+  c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=w;c.lineCap='round';c.shadowColor=col;c.shadowBlur=8;
+  c.beginPath();c.moveTo(x0,y0);c.lineTo(x1-Math.cos(a)*hl*.7,y1-Math.sin(a)*hl*.7);c.stroke();
+  c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-hl*Math.cos(a-.5),y1-hl*Math.sin(a-.5));c.lineTo(x1-hl*Math.cos(a+.5),y1-hl*Math.sin(a+.5));c.closePath();c.fill();c.restore();}
+function lerpCol(t){const a=[91,33,182],b=[221,214,254];return 'rgb('+a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',')+')';}
+function pointer(cv,cb){let down=false;
+  const go=e=>{const r=cv.getBoundingClientRect();cb(e.clientX-r.left,e.clientY-r.top,e.type);};
+  cv.addEventListener('pointerdown',e=>{down=true;try{cv.setPointerCapture(e.pointerId)}catch(_){}go(e);});
+  cv.addEventListener('pointermove',e=>{if(down)go(e);});
+  const up=()=>{down=false;};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);}
+// remplissage « paniers préférés » (au-dessus de la courbe)
+function fillAbove(P,pts,col){if(!pts.length)return;const c=P.ctx;c.save();c.fillStyle=col;c.beginPath();
+  c.moveTo(P.px(pts[0][0]),P.py(P.Y*1.4));for(const p of pts)c.lineTo(P.px(p[0]),P.py(p[1]));
+  const L=pts[pts.length-1];c.lineTo(P.px(P.X*1.4),P.py(L[1]));c.lineTo(P.px(P.X*1.4),P.py(P.Y*1.4));c.closePath();c.fill();c.restore();}
+function pointAlong(P,pts,f){const px=pts.map(p=>[P.px(p[0]),P.py(p[1])]).filter(p=>p[0]>=P.pad.l-1&&p[0]<=P.w-P.pad.r+1&&p[1]>=P.pad.t-1&&p[1]<=P.h-P.pad.b+1);
+  if(px.length<2)return null;let L=0;const cum=[0];for(let i=1;i<px.length;i++){L+=Math.hypot(px[i][0]-px[i-1][0],px[i][1]-px[i-1][1]);cum.push(L);}
+  const target=f*L;for(let i=1;i<px.length;i++)if(cum[i]>=target){const t=(target-cum[i-1])/((cum[i]-cum[i-1])||1);return [px[i-1][0]+(px[i][0]-px[i-1][0])*t,px[i-1][1]+(px[i][1]-px[i-1][1])*t];}
+  return px[px.length-1];}
+
+/* =============== MODULE 1 : PRÉFÉRENCES =============== */
+const M1={
+  init(){this.P=new Plot($('#cv1'));this.rev=0;this.t=0;utilPicker(1);
+    pointer($('#cv1'),(x,y)=>{const P=this.P;let x1=clamp(P.dx(x),.15,P.X*.98),x2=clamp(P.dy(y),.15,P.Y*.98);
+      if(S.type==='comp'){const q=S.q.comp,d=q.a*x1-q.b*x2;if(Math.abs(d)<.06*Math.max(q.a*x1,q.b*x2))x2=q.a*x1/q.b;}
+      S.m1.sel={x1,x2};save();this.panel();$('#h1').style.opacity=0;});
+    this.panel();},
+  onUtil(){this.rev=0;this.panel();},onParam(){this.panel();},
+  draw(dt){const P=this.P;if(!P.begin())return;this.t+=dt;this.rev=Math.min(1,this.rev+dt/1.2);
+    const t=S.type,q=DQ[t],c=P.ctx;P.X=10;P.Y=10;P.axes();
+    const sel=S.m1.sel;P.clip();
+    let selPts=null;
+    if(sel){const uA=U(t,q,sel.x1,sel.x2);selPts=curve(t,q,uA,P.X,P.Y);fillAbove(P,selPts,'rgba(167,139,250,.13)');}
+    const L=[1.2,2.4,3.6,4.8,6,7.2,8.4];
+    L.forEach((s,k)=>{const u=U(t,q,s,s),pts=curve(t,q,u,P.X,P.Y),f=clamp(this.rev*1.9-k*.12,0,1);if(f<=0)return;
+      P.stroke(pts,lerpCol(k/(L.length-1)),2,{frac:f,alpha:.85});
+      const gx=sel?Math.min(9.2,sel.x1+2.4):-9,gy=sel?Math.min(9.3,sel.x2+2.4):-9;
+      if(f>.9&&!(sel&&Math.hypot(s-sel.x1,s-sel.x2)<1.3)&&Math.hypot(s-gx,s-gy)>1.2&&!(sel&&Math.hypot(s-sel.x1*.42,s-sel.x2*.42)<.9)){P.text('U='+fr(u,2),s,s,'rgba(221,214,254,.55)',{font:'600 10px -apple-system,sans-serif',dx:5,dy:-8});}});
+    if(sel&&selPts){P.stroke(selPts,C.u,3.4,{glow:C.u,blur:14});
+      const tm=TMS(t,q,sel.x1,sel.x2);
+      // tangente
+      let dir=null;if(tm===Infinity)dir=[0,1];else if(tm===0)dir=[1,0];else if(isFinite(tm)){const n=Math.hypot(1,tm);dir=[1/n,-tm/n];}
+      if(dir){const k=2.6;let p0=[sel.x1-dir[0]*k,sel.x2-dir[1]*k];if(t==='comp'){const kx=S.q.comp.b*sel.x2/S.q.comp.a,ky=S.q.comp.a*sel.x1/S.q.comp.b;p0=tm===0?[Math.max(kx,sel.x1-k),sel.x2]:[sel.x1,Math.max(ky,sel.x2-k)];}
+        P.stroke([p0,[sel.x1+dir[0]*k,sel.x2+dir[1]*k]],C.tms,2.4,{glow:C.tms,blur:8});
+        const ex=sel.x1+dir[0]*k,ey=sel.x2+dir[1]*k;P.text('TMS = '+fr(tm,2),clamp(ex,.5,8.2),clamp(ey,.4,9.6),C.tms,{bg:'rgba(10,10,16,.75)',dy:-12});}
+      // point mobile : U constant le long de la courbe
+      const ph=(Math.sin(this.t*.55)+1)/2,pa=pointAlong(P,selPts,.04+.92*ph);
+      if(pa){c.save();c.fillStyle='rgba(237,233,254,.95)';c.shadowColor=C.u;c.shadowBlur=16;c.beginPath();c.arc(pa[0],pa[1],4,0,7);c.fill();c.restore();}
+      if(sel.x1>1.6&&sel.x2>1.6)P.text('≺ A',sel.x1*.42,sel.x2*.42,'rgba(200,200,220,.5)',{font:'700 13px Georgia,serif',al:'center'});
+      P.text('≻ A',Math.min(9.2,sel.x1+2.4),Math.min(9.3,sel.x2+2.4),'#ddd6fe',{font:'700 13px Georgia,serif',al:'center'});
+      P.guides(sel.x1,sel.x2,'#fff');
+      const pul=1+.25*Math.sin(this.t*4);P.dot(sel.x1,sel.x2,6,'#fff',{ring:12*pul,ringA:.15});
+      P.text('A',sel.x1,sel.x2,'#fff',{font:'800 14px -apple-system,sans-serif',dx:9,dy:12});}
+    P.unclip();return true;},
+  panel(){const el=$('#p1'),sel=S.m1.sel,t=S.type,q=S.q[t];
+    if(!sel){el.innerHTML='<h3><span class="dot"></span>Ton panier A</h3><p class="small">Touche le graphe pour choisir un panier.</p>';return;}
+    const {x1,x2}=sel,u=U(t,q,x1,x2),tm=TMS(t,q,x1,x2),um=UM(t,q,x1,x2);let h='';
+    const A='('+f2(x1)+' ; '+f2(x2)+')';
+    switch(t){
+      case 'cd':h=eq('U(A) = '+f2(x1)+'<sup>'+f2(q.a)+'</sup> × '+f2(x2)+'<sup>'+f2(1-q.a)+'</sup> = <b class="cu">'+f3(u)+'</b>')+
+        eq('Um₁ = a·U/'+X1+' = '+f3(um[0])+'  ;  Um₂ = (1−a)·U/'+X2+' = '+f3(um[1]))+
+        eq('TMS = Um₁/Um₂ = a '+X2+' / ((1−a) '+X1+') = ('+f2(q.a)+' × '+f2(x2)+') / ('+f2(1-q.a)+' × '+f2(x1)+') = <b class="ct">'+f3(tm)+'</b>');break;
+      case 'sub':h=eq('U(A) = '+fr(q.a)+' × '+f2(x1)+' + '+fr(q.b)+' × '+f2(x2)+' = <b class="cu">'+f3(u)+'</b>')+
+        eq('Um₁ = '+fr(q.a)+'  ;  Um₂ = '+fr(q.b))+eq('TMS = a/b = '+fr(q.a)+'/'+fr(q.b)+' = <b class="ct">'+f3(tm)+'</b>')+
+        '<p class="small">TMS constant : les courbes sont des droites. On échange toujours les biens au même taux, peu importe le panier.</p>';break;
+      case 'comp':{const v1=q.a*x1,v2=q.b*x2;h=eq('U(A) = min('+fr(q.a)+'×'+f2(x1)+' ; '+fr(q.b)+'×'+f2(x2)+') = min('+f2(v1)+' ; '+f2(v2)+') = <b class="cu">'+f3(u)+'</b>');
+        if(Math.abs(v1-v2)<1e-9)h+=eq('Au coude : TMS <b class="ct">non défini</b>')+'<p class="small">La courbe en L n’est pas dérivable au coude. Ici rien n’est gaspillé : a x₁ = b x₂.</p>';
+        else if(v1<v2)h+=eq('Branche verticale : Um₁ = '+fr(q.a)+', Um₂ = 0 ⇒ TMS = <b class="ct">+∞</b>')+'<p class="small">Tu as du x₂ « en trop » : en ajouter ne sert à rien. Tu donnerais n’importe quelle quantité de x₂ (inutile) pour un peu de x₁.</p>';
+        else h+=eq('Branche horizontale : Um₁ = 0, Um₂ = '+fr(q.b)+' ⇒ TMS = <b class="ct">0</b>')+'<p class="small">Tu as du x₁ en trop : tu ne céderais rien de x₂ pour plus de x₁.</p>';break;}
+      case 'ql':h=eq('U(A) = '+fr(q.a)+' × ln '+f2(x1)+' + '+f2(x2)+' = <b class="cu">'+f3(u)+'</b>')+
+        eq('Um₁ = α/'+X1+' = '+f3(um[0])+'  ;  Um₂ = 1')+eq('TMS = α/'+X1+' = '+fr(q.a)+'/'+f2(x1)+' = <b class="ct">'+f3(tm)+'</b>')+
+        '<p class="small">Le TMS ne dépend que de x₁ : toutes les courbes sont la même courbe décalée verticalement.</p>';break;
+      case 'inf':h=eq('U(A) = ln '+f2(x1)+' + ½('+f2(x2)+' + 1)² = <b class="cu">'+f3(u)+'</b>')+
+        eq('Um₁ = 1/'+X1+' = '+f3(um[0])+'  ;  Um₂ = '+X2+' + 1 = '+f3(um[1]))+eq('TMS = 1 / ('+X1+'('+X2+'+1)) = <b class="ct">'+f3(tm)+'</b>');break;}
+    let read='';if(isFinite(tm)&&tm>0)read='<p>En A, tu es prêt à céder <b class="ct">'+f2(tm)+'</b> unité(s) de x₂ pour obtenir <b>1</b> unité de x₁ en plus, sans changer ta satisfaction.</p>';
+    el.innerHTML='<h3><span class="dot"></span>Ton panier A = '+A+'</h3>'+h+read;}
+};
+
+/* =============== MODULE 2 : CHOIX OPTIMAL =============== */
+const M2={
+  init(){this.P=new Plot($('#cv2'));this.v={};this.t=0;this.rev=0;utilPicker(2);
+    const ctl=$('#p2budget');ctl.innerHTML='<h3><span class="dot" style="background:var(--bud);box-shadow:0 0 10px var(--bud)"></span>Contrainte budgétaire</h3><div class="ufor m" id="m2bud"></div>';
+    this.sls=[];const mk=(lb,k,min,max,st)=>{const sl=slider(lb,min,max,st,()=>S.m2[k],v=>{S.m2[k]=v;save();this.panel();},C.bud);this.sls.push(sl);ctl.appendChild(sl);};
+    mk('p₁','p1',.5,10,.1);mk('p₂','p2',.5,10,.1);mk('R','R',5,100,1);
+    pointer($('#cv2'),(x,y)=>{const P=this.P;S.m2.probe={x1:clamp(P.dx(x),.02,P.X),x2:clamp(P.dy(y),0,P.Y)};this.panel();$('#h2').style.opacity=0;});
+    this.panel();},
+  onUtil(){if(S.type==='inf'){Object.assign(S.m2,{p1:1,p2:4,R:10});this.sls.forEach(s=>s.sync());save();}this.rev=0;this.panel();},onParam(){this.panel();},
+  target(){const {p1,p2,R}=S.m2,o=demand(S.type,S.q[S.type],p1,p2,R);return {p1,p2,R,L:1.15*Math.max(R/p1,R/p2,o.x1,o.x2)};},
+  draw(dt){const P=this.P;if(!P.begin())return;this.t+=dt;this.rev=Math.min(1,this.rev+dt/1);
+    lerpObj(this.v,this.target(),dt,9);const {p1,p2,R,L}=this.v,t=S.type,q=DQ[t],c=P.ctx;P.X=L;P.Y=L;P.axes();P.clip();
+    // ensemble budgétaire
+    c.save();const g=c.createLinearGradient(P.px(0),P.py(0),P.px(R/p1*.5),P.py(R/p2*.5));g.addColorStop(0,'rgba(251,146,60,.16)');g.addColorStop(1,'rgba(251,146,60,.05)');
+    c.fillStyle=g;c.beginPath();c.moveTo(P.px(0),P.py(0));c.lineTo(P.px(R/p1),P.py(0));c.lineTo(P.px(0),P.py(R/p2));c.closePath();c.fill();
+    c.strokeStyle='rgba(251,146,60,.08)';c.lineWidth=1;for(let i=1;i<14;i++){const f=i/14;c.beginPath();c.moveTo(P.px(R/p1*f),P.py(0));c.lineTo(P.px(0),P.py(R/p2*f));c.stroke();}c.restore();
+    const o=demand(t,q,p1,p2,R),u=U(t,q,o.x1,o.x2);
+    // famille de courbes
+    [.45,.7,1.3,1.6].forEach((s,k)=>{const uu=U(t,q,o.x1*s,o.x2*s);if(!isFinite(uu))return;P.stroke(curve(t,q,uu,P.X,P.Y),lerpCol(.15+k*.2),1.6,{alpha:.45,frac:this.rev});});
+    P.stroke(curve(t,q,u,P.X,P.Y),C.u,3.2,{glow:C.u,blur:14,frac:this.rev});
+    P.stroke([[0,R/p2],[R/p1,0]],C.bud,3.2,{glow:C.bud,blur:10});
+    if(o.kind==='indet')P.stroke([[0,R/p2],[R/p1,0]],C.opt,5,{glow:C.opt,blur:18,alpha:.8});
+    // panier test
+    const pr=S.m2.probe;
+    if(pr){const up=U(t,q,pr.x1,pr.x2);if(isFinite(up))P.stroke(curve(t,q,up,P.X,P.Y),'#e5e7eb',1.6,{dash:[5,5],alpha:.7});P.dot(pr.x1,pr.x2,5.5,'#e5e7eb',{blur:8});P.text('T',pr.x1,pr.x2,'#e5e7eb',{dx:8,dy:-10,font:'800 13px -apple-system,sans-serif'});}
+    P.guides(o.x1,o.x2,C.opt);
+    const pul=1+.3*Math.sin(this.t*3.5);P.dot(o.x1,o.x2,7,C.opt,{ring:14*pul,ringA:.18,core:'#fff7d6'});
+    P.text('E*',o.x1,o.x2,C.opt,{dx:10,dy:-12,font:'800 14px -apple-system,sans-serif'});
+    P.unclip();
+    P.text('R/p₁ = '+f2(R/p1),R/p1,0,C.bud,{al:'center',dy:-12,bg:'rgba(10,10,16,.75)',font:'700 11px -apple-system,sans-serif'});
+    P.text('R/p₂ = '+f2(R/p2),0,R/p2,C.bud,{dx:8,bg:'rgba(10,10,16,.75)',font:'700 11px -apple-system,sans-serif'});
+    return true;},
+  panel(){const t=S.type,q=S.q[t],{p1,p2,R}=S.m2,o=demand(t,q,p1,p2,R),u=U(t,q,o.x1,o.x2),tm=TMS(t,q,o.x1,o.x2),r=p1/p2;
+    $('#m2bud').innerHTML=f2(p1)+' '+X1+' + '+f2(p2)+' '+X2+' = '+f2(R)+'<div class="small" style="font-family:-apple-system,sans-serif;margin-top:2px">pente = −p₁/p₂ = −'+f3(r)+' · prix relatif du bien 1</div>';
+    const kinds={int:'Solution intérieure (tangence)',coin1:'Solution en coin : tout en bien 1',coin2:'Solution en coin : tout en bien 2',coude:'Solution au coude du L',indet:'Infinité d’optimums (toute la droite)'};
+    $('#p2res').innerHTML='<h3><span class="dot" style="background:var(--opt);box-shadow:0 0 10px var(--opt)"></span>Panier optimal E*</h3>'+
+      '<div class="grid3"><div class="tile"><div class="t">x₁*</div><div class="v co">'+f3(o.x1)+'</div></div><div class="tile"><div class="t">x₂*</div><div class="v co">'+f3(o.x2)+'</div></div><div class="tile"><div class="t">U*</div><div class="v cu">'+f3(u)+'</div></div></div>'+
+      '<div class="badges" style="margin-top:10px"><span class="badge b-g">'+kinds[o.kind]+'</span></div>'+
+      eq('Vérif. budget : '+f2(p1)+' × '+f3(o.x1)+' + '+f2(p2)+' × '+f3(o.x2)+' = <b>'+f3(p1*o.x1+p2*o.x2)+'</b> = R');
+    this.why(t,q,p1,p2,R,o,u,tm,r);this.probe();},
+  why(t,q,p1,p2,R,o,u,tm,r){let s=[];const L='ℒ',lam='λ';
+    switch(t){
+      case 'cd':{const a=q.a,b=1-a,k=b*p1/(a*p2);s=[
+        'On maximise U sous la contrainte de budget :'+eq(L+' = '+X1+'<sup>'+f2(a)+'</sup>'+X2+'<sup>'+f2(b)+'</sup> + '+lam+'('+f2(R)+' − '+f2(p1)+X1+' − '+f2(p2)+X2+')'),
+        'Conditions du premier ordre :'+eq('∂'+L+'/∂'+X1+' = a·U/'+X1+' − '+lam+'p₁ = 0')+eq('∂'+L+'/∂'+X2+' = (1−a)·U/'+X2+' − '+lam+'p₂ = 0')+eq('∂'+L+'/∂'+lam+' = R − p₁'+X1+' − p₂'+X2+' = 0'),
+        'On divise les deux premières : c’est la règle d’or <b>TMS = p₁/p₂</b>.'+eq('a '+X2+' / ((1−a) '+X1+') = p₁/p₂ ⇒ '+X2+' = ((1−a)p₁ / (a p₂)) '+X1+' = '+f3(k)+' '+X1),
+        'On remplace dans le budget :'+eq(f2(p1)+' '+X1+' + '+f2(p2)+' × '+f3(k)+' '+X1+' = '+f2(R)+' ⇒ '+X1+'* = '+f2(R)+' / '+f3(p1+p2*k)+' = <b class="co">'+f3(o.x1)+'</b>'),
+        eq(X2+'* = '+f3(k)+' × '+f3(o.x1)+' = <b class="co">'+f3(o.x2)+'</b>'),
+        'Multiplicateur (utilité marginale du revenu) :'+eq(lam+'* = Um₁/p₁ = '+f3(UM(t,q,o.x1,o.x2)[0])+' / '+f2(p1)+' = '+f3(UM(t,q,o.x1,o.x2)[0]/p1)),
+        'Raccourci à retenir : '+eq(X1+'* = a R/p₁ = '+f2(a)+' × '+f2(R)+'/'+f2(p1)+'  ;  '+X2+'* = (1−a) R/p₂')+'<span class="small">On dépense toujours la part a du revenu en bien 1.</span>'];
+        break;}
+      case 'sub':{const a=q.a,b=q.b;s=[
+        'Les courbes sont des droites : TMS constant, il n’y a <b>pas de tangence</b> possible (sauf si les pentes sont égales).'+eq('TMS = a/b = '+f3(a/b)+'   vs   p₁/p₂ = '+f3(r)),
+        'Comparer l’utilité obtenue par euro :'+eq('Um₁/p₁ = '+fr(a)+'/'+f2(p1)+' = '+f3(a/p1)+'   ;   Um₂/p₂ = '+fr(b)+'/'+f2(p2)+' = '+f3(b/p2)),
+        o.kind==='coin1'?'Le bien 1 « rapporte » plus par euro ⇒ tout le revenu en bien 1 :'+eq(X1+'* = R/p₁ = '+f2(R)+'/'+f2(p1)+' = <b class="co">'+f3(o.x1)+'</b>  ;  '+X2+'* = 0'):
+        o.kind==='coin2'?'Le bien 2 « rapporte » plus par euro ⇒ tout le revenu en bien 2 :'+eq(X1+'* = 0  ;  '+X2+'* = R/p₂ = '+f2(R)+'/'+f2(p2)+' = <b class="co">'+f3(o.x2)+'</b>'):
+        'Égalité : la courbe d’indifférence est confondue avec la droite de budget. <b>Tous</b> les paniers de la droite sont optimaux (on affiche le milieu).',
+        '<span class="small">Le Lagrangien ne marche pas ici : il cherche une tangence intérieure qui n’existe pas.</span>'];break;}
+      case 'comp':{const a=q.a,b=q.b;s=[
+        'Courbes en L : l’optimum est au <b>coude</b>, là où rien n’est gaspillé.'+eq(fr(a)+' '+X1+' = '+fr(b)+' '+X2+' ⇒ '+X2+' = ('+fr(a)+'/'+fr(b)+') '+X1),
+        'On remplace dans le budget :'+eq(f2(p1)+' '+X1+' + '+f2(p2)+' × '+f3(a/b)+' '+X1+' = '+f2(R)),
+        eq(X1+'* = bR / (b p₁ + a p₂) = '+fr(b)+'×'+f2(R)+' / ('+fr(b)+'×'+f2(p1)+' + '+fr(a)+'×'+f2(p2)+') = <b class="co">'+f3(o.x1)+'</b>'),
+        eq(X2+'* = aR / (b p₁ + a p₂) = <b class="co">'+f3(o.x2)+'</b>'),
+        '<span class="small">Pas de Lagrangien : U n’est pas dérivable au coude, le TMS n’y est pas défini (il « saute » de +∞ à 0).</span>'];break;}
+      case 'ql':{const a=q.a;s=[
+        eq(L+' = '+fr(a)+' ln '+X1+' + '+X2+' + '+lam+'('+f2(R)+' − '+f2(p1)+X1+' − '+f2(p2)+X2+')'),
+        'CPO :'+eq(fr(a)+'/'+X1+' = '+lam+'p₁   ;   1 = '+lam+'p₂ ⇒ '+lam+' = 1/p₂ = '+f3(1/p2)),
+        'Donc TMS = α/'+X1+' = p₁/p₂ :'+eq(X1+' = α p₂/p₁ = '+fr(a)+' × '+f2(p2)+' / '+f2(p1)+' = '+f3(a*p2/p1)),
+        o.kind==='int'?'Le reste du budget va au bien 2 :'+eq(X2+'* = R/p₂ − α = '+f2(R)+'/'+f2(p2)+' − '+fr(a)+' = <b class="co">'+f3(o.x2)+'</b>')+'<span class="small">x₁* ne dépend pas de R : tout revenu supplémentaire va au bien 2.</span>':
+          'Mais alors x₂ = R/p₂ − α = '+f3(R/p2-a)+' < 0 : impossible ! ⇒ <b>solution en coin</b>'+eq(X1+'* = R/p₁ = <b class="co">'+f3(o.x1)+'</b>  ;  '+X2+'* = 0')+'<span class="small">En ce coin, TMS = '+f3(tm)+' > p₁/p₂ = '+f3(r)+' : on voudrait encore plus de x₁ mais on n’a plus de x₂ à céder.</span>'];break;}
+      case 'inf':{s=[
+        eq(L+' = ln '+X1+' + ½('+X2+'+1)² + '+lam+'(R − p₁'+X1+' − p₂'+X2+')'),
+        'CPO :'+eq('1/'+X1+' = '+lam+'p₁   ;   '+X2+' + 1 = '+lam+'p₂')+'d’où TMS = 1/('+X1+'('+X2+'+1)) = p₁/p₂ :'+eq(X1+'('+X2+'+1) = p₂/p₁ = '+f3(p2/p1)),
+        o.kind==='int'?'On pose y = x₂ + 1 et on remplace dans le budget : p₂/y + p₂(y − 1) = R'+eq('y² − (R/p₂ + 1) y + 1 = 0 ⇒ y = '+f3(o.x2+1))+eq(X2+'* = y − 1 = <b class="co">'+f3(o.x2)+'</b>  ;  '+X1+'* = p₂/(p₁ y) = <b class="co">'+f3(o.x1)+'</b>'):
+          'Ici R ≤ p₂ : la tangence donnerait x₂ < 0 ⇒ <b>solution en coin</b>'+eq(X1+'* = R/p₁ = <b class="co">'+f3(o.x1)+'</b>  ;  '+X2+'* = 0')];break;}}
+    const cond=(o.kind==='int')?'<div class="badges"><span class="badge b-n">TMS en E* = '+f3(tm)+'</span><span class="badge b-g">p₁/p₂ = '+f3(r)+'</span></div>':'';
+    $('#p2why').innerHTML='<details open><summary class="sumrow"><h3 style="margin:0"><span class="dot" style="background:var(--opt);box-shadow:0 0 10px var(--opt)"></span>Pourquoi ce panier ?</h3><span class="chev">›</span></summary><div style="margin-top:10px">'+cond+'<ol class="steps">'+s.map(x=>'<li>'+x+'</li>').join('')+'</ol></div></details>';},
+  probe(){const el=$('#p2probe'),pr=S.m2.probe;if(!pr){el.style.display='none';return;}el.style.display='';
+    const t=S.type,q=S.q[t],{p1,p2,R}=S.m2,sp=p1*pr.x1+p2*pr.x2,u=U(t,q,pr.x1,pr.x2),tm=TMS(t,q,pr.x1,pr.x2),r=p1/p2,o=demand(t,q,p1,p2,R),uo=U(t,q,o.x1,o.x2);
+    let msg;
+    if(sp>R*1.015)msg='<span class="badge b-ko">Hors budget</span><p>Ce panier coûte '+f2(sp)+' > R = '+f2(R)+'. Il est inaccessible (au-dessus de la droite orange).</p>';
+    else if(sp<R*.985)msg='<span class="badge b-n">Budget non épuisé</span><p>Il te reste '+f2(R-sp)+' €. Par <b>monotonie</b>, dépenser ce reste augmente U : ce panier ne peut pas être optimal.</p>';
+    else if(Math.abs(u-uo)<1e-3*Math.max(1,Math.abs(uo)))msg='<span class="badge b-ok">Optimal</span><p>Ce panier atteint l’utilité maximale U* = '+f3(uo)+'.</p>';
+    else if(tm>r)msg='<span class="badge b-g">Sur la droite, mais pas optimal</span><p>TMS = '+f3(tm)+' > p₁/p₂ = '+f3(r)+' : tu valorises le bien 1 <b>plus</b> que ce que le marché le fait payer. Échange du x₂ contre du x₁ : U augmente.</p>';
+    else if(tm<r)msg='<span class="badge b-g">Sur la droite, mais pas optimal</span><p>TMS = '+f3(tm)+' < p₁/p₂ = '+f3(r)+' : le bien 1 te coûte plus qu’il ne te rapporte. Achète moins de x₁ et plus de x₂ : U augmente.</p>';
+    else msg='<span class="badge b-g">Sur la droite</span><p>Au coude, compare avec E*.</p>';
+    el.innerHTML='<div class="sumrow"><h3 style="margin:0"><span class="dot" style="background:#e5e7eb;box-shadow:none"></span>Panier test T = ('+f2(pr.x1)+' ; '+f2(pr.x2)+')</h3><button class="btn ghost sm" id="clrp">Effacer</button></div>'+
+      eq('Dépense = '+f2(p1)+'×'+f2(pr.x1)+' + '+f2(p2)+'×'+f2(pr.x2)+' = '+f2(sp)+'  ;  U(T) = '+f3(u)+'  vs  U* = '+f3(uo))+msg;
+    $('#clrp').onclick=()=>{S.m2.probe=null;this.probe();};}
+};
+
+/* =============== MODULE 3 : DEMANDE =============== */
+const M3={
+  RNG:{p:[.5,10],R:[.5,60]},
+  init(){this.A=new Plot($('#cv3a'));this.B=new Plot($('#cv3b'),{xl:'x₁',yl:'p₁'});this.t=0;this.play=false;utilPicker(3);
+    const seg=$('#m3mode');seg.querySelectorAll('button').forEach(b=>b.onclick=()=>{S.m3.mode=b.dataset.v;save();this.ctl();this.panel();});
+    pointer($('#cv3b'),(x,y)=>{const P=this.B,m=S.m3.mode,v=clamp(P.dy(y),this.RNG[m][0],this.RNG[m][1]);this.play=false;
+      if(m==='p')S.m3.p1=Math.round(v*10)/10;else S.m3.R=Math.round(v);save();this.syncCtl();this.panel();});
+    this.ctl();this.panel();},
+  onUtil(){if(S.type==='inf'){Object.assign(S.m3,{p1:2,p2:4,R:20});this.syncCtl();save();}this.panel();},onParam(){this.panel();},
+  ctl(){const el=$('#p3ctl'),m=S.m3.mode;$('#m3mode').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===m));
+    $('#h3a').textContent=m==='p'?'Courbe prix-consommation':'Courbe revenu-consommation';
+    $('#h3b').textContent=m==='p'?'Demande x₁(p₁) — glisse pour changer p₁':'Courbe d’Engel — glisse pour changer R';
+    this.B.yl=m==='p'?'p₁':'R';
+    el.innerHTML='<div class="sumrow"><h3 style="margin:0"><span class="dot" style="background:var(--bud);box-shadow:0 0 10px var(--bud)"></span>Prix et revenu</h3><button class="btn sm" id="play"></button></div>';
+    this.sl=[];const mk=(lb,k,min,max,st,col)=>{const s=slider(lb,min,max,st,()=>S.m3[k],v=>{S.m3[k]=v;this.play=false;this.updPlay();save();this.panel();},col);this.sl.push(s);el.appendChild(s);};
+    if(m==='p'){mk('p₁ ●','p1',.5,10,.1,C.opt);mk('p₂','p2',.5,10,.1,C.bud);mk('R','R',.5,60,.5,C.bud);}
+    else{mk('R ●','R',.5,60,.5,C.opt);mk('p₁','p1',.5,10,.1,C.bud);mk('p₂','p2',.5,10,.1,C.bud);}
+    $('#play').onclick=()=>{this.play=!this.play;this.ph=null;this.updPlay();};this.updPlay();},
+  updPlay(){const b=$('#play');if(b)b.innerHTML=this.play?'<svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="1" width="3.5" height="10" rx="1" fill="#fff"/><rect x="7.5" y="1" width="3.5" height="10" rx="1" fill="#fff"/></svg> Pause':'<svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z" fill="#fff"/></svg> Animer';},
+  syncCtl(){(this.sl||[]).forEach(s=>s.sync());},
+  path(){const t=S.type,q=DQ[t],{mode,p1,p2,R}=S.m3,[lo,hi]=this.RNG[mode],pts=[];
+    for(let i=0;i<=220;i++){const v=lo+(hi-lo)*i/220;const o=mode==='p'?demand(t,q,v,p2,R):demand(t,q,p1,p2,v);pts.push({v,x1:o.x1,x2:o.x2});}return pts;},
+  draw(dt){this.t+=dt;const m=S.m3.mode;
+    if(this.play){if(this.ph==null){const [lo,hi]=this.RNG[m],cur=m==='p'?S.m3.p1:S.m3.R;this.ph=Math.acos(clamp(1-2*(cur-lo)/(hi-lo),-1,1));}
+      this.ph+=dt*.55;const [lo,hi]=this.RNG[m],v=lo+(hi-lo)*(1-Math.cos(this.ph))/2;
+      if(m==='p')S.m3.p1=v;else S.m3.R=v;this.syncCtl();this._pc=(this._pc||0)+dt;if(this._pc>.12){this._pc=0;this.panel();}}
+    const A=this.A,B=this.B;if(!A.begin())return;B.begin();
+    const t=S.type,q=DQ[t],{p1,p2,R}=S.m3,path=this.path(),o=demand(t,q,p1,p2,R),u=U(t,q,o.x1,o.x2);
+    const mx1=Math.max(...path.map(p=>p.x1)),mx2=Math.max(...path.map(p=>p.x2));
+    A.X=Math.max(1,1.12*mx1);A.Y=Math.max(1,1.12*Math.max(mx2,m==='p'?R/p2:0));
+    A.axes();A.clip();const c=A.ctx;
+    // budgets de fond
+    const ghosts=m==='p'?[.75,1,1.5,2.2,3.5,6,9]:[8,16,24,32,40,48,56];
+    ghosts.forEach(g=>{const P1=m==='p'?g:p1,RR=m==='p'?R:g;A.stroke([[0,RR/p2],[RR/P1,0]],'rgba(251,146,60,.22)',1.2);const og=demand(t,q,P1,p2,RR);A.dot(og.x1,og.x2,2.6,'rgba(251,191,36,.6)',{blur:0});});
+    A.stroke(curve(t,q,u,A.X,A.Y),C.u,2.6,{glow:C.u,blur:10});
+    A.stroke([[0,R/p2],[R/p1,0]],C.bud,3,{glow:C.bud,blur:8});
+    A.stroke(path.map(p=>[p.x1,p.x2]),C.opt,2.6,{dash:[1,6],alpha:.95});
+    A.stroke(path.map(p=>[p.x1,p.x2]),'rgba(251,191,36,.35)',6,{alpha:.5});
+    A.guides(o.x1,o.x2,C.opt);A.dot(o.x1,o.x2,6.5,C.opt,{ring:12,ringA:.2,core:'#fff7d6'});
+    A.unclip();
+    // demande / Engel
+    const v=m==='p'?p1:R;B.X=Math.max(1,1.12*mx1);B.Y=this.RNG[m][1]*1.04;B.axes();B.clip();
+    const dpts=path.map(p=>[p.x1,p.v]);
+    // remplissage dégradé sous la courbe
+    const g=B.ctx.createLinearGradient(0,B.py(B.Y),0,B.py(0));g.addColorStop(0,'rgba(251,191,36,.12)');g.addColorStop(1,'rgba(251,191,36,0)');
+    B.ctx.save();B.ctx.fillStyle=g;B.path(dpts);B.ctx.lineTo(B.px(0),B.py(dpts[dpts.length-1][1]));B.ctx.lineTo(B.px(0),B.py(dpts[0][1]));B.ctx.closePath();B.ctx.fill();B.ctx.restore();
+    B.stroke(dpts,C.opt,3,{glow:C.opt,blur:10});
+    B.guides(o.x1,v,'#fff');B.dot(o.x1,v,6.5,C.opt,{ring:12,ringA:.2,core:'#fff7d6'});
+    B.text((m==='p'?'p₁ = ':'R = ')+f2(v)+' → x₁ = '+f2(o.x1),o.x1,v,'#fff',{dx:12,dy:-14,bg:'rgba(10,10,16,.78)',al:o.x1>B.X*.55?'right':'left'});
+    B.unclip();return true;},
+  panel(){const t=S.type,q=S.q[t],{mode,p1,p2,R}=S.m3,L=local(t,q,p1,p2,R),x1=L.x.x1;
+    const e=1e-7;let rev,pr;
+    if(L.dxdR>e)rev='<span class="badge b-ok">Bien normal</span>'+(L.epsR>1+1e-6?'<span class="badge b-n">Bien de luxe (ε_R > 1)</span>':L.epsR<1-1e-6?'<span class="badge b-n">Bien de nécessité (0 < ε_R < 1)</span>':'<span class="badge b-n">ε_R = 1</span>');
+    else if(L.dxdR<-e)rev='<span class="badge b-ko">Bien inférieur</span>';else rev='<span class="badge b-n">Effet revenu nul (bien « neutre »)</span>';
+    if(L.dxdp<-e)pr='<span class="badge b-ok">Bien ordinaire</span>';else if(L.dxdp>e)pr='<span class="badge b-ko">Bien Giffen</span>';else pr='<span class="badge b-n">Insensible à p₁ ici</span>';
+    $('#p3class').innerHTML='<h3><span class="dot" style="background:var(--opt);box-shadow:0 0 10px var(--opt)"></span>Classement au point actuel</h3><div class="badges">'+rev+pr+'</div>'+
+      '<div class="grid3"><div class="tile"><div class="t">x₁</div><div class="v co">'+f3(x1)+'</div></div><div class="tile"><div class="t">ε-prix</div><div class="v">'+f3(L.epsP)+'</div></div><div class="tile"><div class="t">ε-revenu</div><div class="v">'+f3(L.epsR)+'</div></div></div>'+
+      eq('ε-prix = (∂'+X1+'/∂p₁)·p₁/'+X1+' = '+par(L.dxdp)+' × '+f2(p1)+'/'+f3(x1)+' = '+f3(L.epsP))+
+      eq('ε-revenu = (∂'+X1+'/∂R)·R/'+X1+' = '+par(L.dxdR)+' × '+f2(R)+'/'+f3(x1)+' = '+f3(L.epsR))+
+      '<p class="small" style="margin-top:10px">Équation de Slutsky (pente de la demande = effet substitution + effet revenu) :</p>'+
+      eq('∂'+X1+'/∂p₁ = ∂h₁/∂p₁ − '+X1+'·∂'+X1+'/∂R')+eq(f3(L.dxdp)+' = <span class="ces">'+par(L.dhdp)+'</span> + <span class="cer">'+par(L.inc)+'</span>')+
+      '<p class="small">h₁ = demande hicksienne (à utilité constante). Le terme vert est toujours ≤ 0 ; le rose est négatif pour un bien normal, positif pour un bien inférieur.</p>';
+    const ex={
+      cd:['Cobb-Douglas',eq(X1+' = aR/p₁   ;   '+X2+' = (1−a)R/p₂'),'x₁ baisse avec p₁ (ordinaire) et monte avec R (normal). ε-prix = −1 et ε-revenu = 1 partout. x₂ ne dépend pas de p₁ : la courbe prix-consommation est <b>horizontale</b>. La courbe d’Engel est une droite passant par l’origine.'],
+      sub:['Substituts parfaits',eq(X1+' = R/p₁ si p₁/p₂ < a/b   ;   0 si p₁/p₂ > a/b'),'La demande « saute » quand p₁/p₂ franchit a/b = '+f3(q.a/q.b)+' (p₁ = '+f3(q.a/q.b*p2)+') : on bascule d’un coin à l’autre. Quand on achète le bien 1, ε-prix = −1 ; normal.'],
+      comp:['Compléments parfaits',eq(X1+' = bR / (b p₁ + a p₂)'),'Normal et ordinaire. Le chemin d’expansion est la droite des coudes x₂ = (a/b)x₁. Effet de substitution nul : tout l’effet prix est un effet revenu.'],
+      ql:['Quasi-linéaire',eq(X1+' = α p₂/p₁  (si R ≥ α p₂)'),'Au-delà du seuil R = αp₂ = '+f3(q.a*p2)+', x₁ ne dépend <b>plus</b> de R : effet revenu nul, la courbe d’Engel devient verticale. En dessous, on est en coin (tout en x₁) et x₁ = R/p₁ est normal.'],
+      inf:['Exemple de bien inférieur',eq('U = ln '+X1+' + ½('+X2+'+1)²')+eq(X1+' = p₂ / (p₁ y)  avec  y = [m + √(m² − 4)]/2,  m = R/p₂ + 1'),'Tant que R ≤ p₂ (= '+f2(p2)+'), on est en coin : x₁ = R/p₁ augmente avec R. Au-delà, y augmente avec R donc <b>x₁ diminue</b> : bien inférieur. Pourquoi ? L’utilité marginale de x₂ (= x₂+1) <i>augmente</i> avec x₂ : plus on est riche, plus on préfère x₂. Passe en mode « Faire varier R » pour voir la courbe d’Engel en cloche.']};
+    const E=ex[t];$('#p3expl').innerHTML='<h3><span class="dot"></span>Fonction de demande · '+E[0]+'</h3>'+E[1]+'<p>'+E[2]+'</p>'+
+      (t!=='inf'?'<p class="small">Les 4 utilités du cours ne donnent jamais de bien inférieur (Cobb-Douglas, substituts et compléments sont homothétiques ⇒ toujours normaux ; la quasi-linéaire donne au pire un effet revenu nul). Choisis « Bien inférieur » pour voir un contre-exemple.</p>':'');
+    $('#p3giffen').innerHTML='<h3><span class="dot" style="background:var(--er);box-shadow:0 0 10px var(--er)"></span>Normal, inférieur, Giffen : le résumé</h3>'+
+      '<p><b>Normal</b> : R ↑ ⇒ x₁ ↑. <b>Inférieur</b> : R ↑ ⇒ x₁ ↓ (ex. produits bas de gamme).</p>'+
+      '<p><b>Ordinaire</b> : p₁ ↑ ⇒ x₁ ↓. <b>Giffen</b> : p₁ ↑ ⇒ x₁ ↑ (très rare).</p>'+
+      '<p>Giffen ⇒ forcément <b>inférieur</b>, et en plus l’effet revenu (rose) doit être plus fort que l’effet de substitution (vert). Un bien normal ne peut <i>jamais</i> être Giffen : les deux effets vont dans le même sens.</p>'+
+      '<p class="small">Aucune utilité de ce labo n’est Giffen : même dans l’exemple inférieur, x₁ = p₂/(p₁y) baisse quand p₁ monte (y ne dépend pas de p₁) — l’effet revenu y est trop faible.</p>';}
+};
+
+/* =============== MODULE 4 : EFFETS =============== */
+const M4={
+  init(){this.P=new Plot($('#cv4'));this.Q=new Plot($('#cv4b'),{pad:{l:38,r:16,t:10,b:10}});this.v={};this.t=0;this.ph=0;utilPicker(4);
+    $('#m4meth').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.m4.method=b.dataset.v;save();this.seg();this.ph=0;this.panel();});
+    const el=$('#p4ctl');el.innerHTML='<div class="sumrow"><h3 style="margin:0"><span class="dot" style="background:var(--bud);box-shadow:0 0 10px var(--bud)"></span>Variation du prix p₁</h3><button class="btn sm" id="replay"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z" fill="#fff"/></svg> Rejouer</button></div><div id="m4dir" class="small" style="margin:4px 0 2px"></div>';
+    this.sls=[];const mk=(lb,k,min,max,st,col)=>{const sl=slider(lb,min,max,st,()=>S.m4[k],v=>{S.m4[k]=v;save();this.ph=4;this.panel();},col);this.sls.push(sl);el.appendChild(sl);};
+    mk('p₁ initial','p1',.5,10,.1,'#e5e7eb');mk('p₁′ final','p1n',.5,10,.1,C.bud);mk('p₂','p2',.5,10,.1,C.bud);mk('R','R',5,100,1,C.bud);
+    el.querySelectorAll('.lb').forEach(l=>l.style.fontSize='13px');el.querySelectorAll('.sl').forEach(s=>s.style.gridTemplateColumns='74px 1fr 50px');
+    $('#replay').onclick=()=>{this.ph=0;};this.seg();this.panel();},
+  onUtil(){if(S.type==='inf'){Object.assign(S.m4,{p1:2,p1n:1,p2:4,R:8});this.sls.forEach(s=>s.sync());save();}this.ph=0;this.panel();},onParam(){this.ph=4;this.panel();},
+  enter(){this.ph=0;},
+  seg(){$('#m4meth').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.m4.method));},
+  target(){const {p1,p1n,p2,R,method}=S.m4,d=decomp(S.type,S.q[S.type],p1,p1n,p2,R,method);
+    const m=Math.max(R/p1,R/p1n,R/p2,d.Rc/p1n,d.Rc/p2,d.A.x1,d.B.x1,d.C.x1,d.A.x2,d.B.x2,d.C.x2),mx=Math.max(d.A.x1,d.B.x1,d.C.x1),my=Math.max(d.A.x2,d.B.x2,d.C.x2);
+    return {p1,p1n,p2,R,LX:Math.max(1.25*mx,Math.min(1.1*m,1.7*mx))||1.1*m,LY:Math.max(1.25*my,Math.min(1.1*m,1.7*my))||1.1*m};},
+  draw(dt){const P=this.P,Q=this.Q;if(!P.begin())return;Q.begin();this.t+=dt;this.ph=Math.min(4,this.ph+dt*1.25);
+    lerpObj(this.v,this.target(),dt,9);const {p1,p1n,p2,R,LX,LY}=this.v,L=LX,t=S.type,q=DQ[t],meth=S.m4.method,c=P.ctx;
+    const d=decomp(t,q,p1,p1n,p2,R,meth),{A,B,C:Cc}=d;P.X=LX;P.Y=LY;P.axes();P.clip();
+    const ph=this.ph,a1=clamp(ph,0,1),a2=clamp(ph-1,0,1),a3=clamp(ph-2,0,1);
+    P.stroke([[0,R/p2],[R/p1,0]],C.bud,2.2,{alpha:.45});
+    P.stroke(curve(t,q,d.uA,P.X,P.Y),C.u,2.6,{glow:C.u,blur:10,frac:a1});
+    if(a2>0){P.stroke([[0,d.Rc/p2],[d.Rc/p1n,0]],C.tms,2.2,{dash:[7,6],alpha:a2});
+      if(meth==='slutsky')P.stroke(curve(t,q,d.uB,P.X,P.Y),C.u,1.4,{dash:[3,5],alpha:.55*a2});}
+    if(a3>0){P.stroke([[0,R/p2],[R/p1n,0]],C.bud,3,{glow:C.bud,blur:10,alpha:a3});
+      P.stroke(curve(t,q,d.uC,P.X,P.Y),'#ddd6fe',2.4,{alpha:a3,frac:a3});}
+    if(a1>0){P.guides(A.x1,A.x2,'#fff');P.dot(A.x1,A.x2,6.5,'#ffffff',{ring:12,ringA:.15*a1});P.text('A',A.x1,A.x2,'#fff',{dx:-16,dy:-10,font:'800 14px -apple-system,sans-serif'});}
+    if(a2>0){const bx=A.x1+(B.x1-A.x1)*a2,by=A.x2+(B.x2-A.x2)*a2;P.guides(bx,by,C.tms);P.dot(bx,by,6.5,C.tms,{ring:12,ringA:.18});P.text('B',bx,by,C.tms,{dx:9,dy:-12,font:'800 14px -apple-system,sans-serif'});}
+    if(a3>0){const cx=B.x1+(Cc.x1-B.x1)*a3,cy=B.x2+(Cc.x2-B.x2)*a3;P.guides(cx,cy,C.opt);P.dot(cx,cy,7,C.opt,{ring:13,ringA:.2,core:'#fff7d6'});P.text('C',cx,cy,C.opt,{dx:10,dy:12,font:'800 14px -apple-system,sans-serif'});}
+    P.unclip();
+    // bande : décomposition sur l'axe x1
+    Q.X=L;Q.Y=1;const qc=Q.ctx,y0=Q.h-22;qc.save();qc.strokeStyle='rgba(255,255,255,.35)';qc.lineWidth=1.5;qc.beginPath();qc.moveTo(Q.px(0),y0);qc.lineTo(Q.w-Q.pad.r,y0);qc.stroke();
+    qc.font='600 10.5px -apple-system,sans-serif';qc.fillStyle='rgba(200,200,220,.5)';qc.textAlign='center';const st=niceStep(L/5);for(let x=0;x<=L*1.0001;x+=st){qc.fillRect(Q.px(x)-.5,y0-3,1,6);qc.fillText(fr(x,2),Q.px(x),y0+12);}
+    qc.textAlign='left';qc.font='italic 600 12px Georgia,serif';qc.fillStyle='#d8d8e6';qc.fillText('x₁',6,y0+1);qc.restore();
+    const row=(y,xa,xb,col,lab,al)=>{if(al<=0)return;qc.save();qc.globalAlpha=al;const X0=Q.px(xa),X1=Q.px(xa+(xb-xa)*al);
+      if(Math.abs(X1-X0)<2){qc.fillStyle=col;qc.beginPath();qc.arc(X0,y,3.5,0,7);qc.fill();}else arrowPx(qc,X0,y,X1,y,col,3.2);
+      qc.font='700 11px -apple-system,sans-serif';qc.fillStyle=col;qc.textBaseline='middle';const right=Math.max(X0,X1),left=Math.min(X0,X1);
+      if(right+90<Q.w){qc.textAlign='left';qc.fillText(lab,right+8,y);}else{qc.textAlign='right';qc.fillText(lab,left-8,y);}qc.restore();};
+    row(16,A.x1,B.x1,C.es,'ES '+f2(d.ES[0]),a2);row(36,B.x1,Cc.x1,C.er,'ER '+f2(d.ER[0]),a3);row(56,A.x1,Cc.x1,'#fff','Total '+f2(d.ET[0]),a3);
+    return true;},
+  panel(){const t=S.type,q=S.q[t],{p1,p1n,p2,R,method}=S.m4,d=decomp(t,q,p1,p1n,p2,R,method),{A,B,C:Cc}=d,H=method==='hicks';
+    $('#m4dir').innerHTML=p1n<p1?'Baisse de p₁ : '+f2(p1)+' → '+f2(p1n)+' (le bien 1 devient relativement moins cher)':p1n>p1?'Hausse de p₁ : '+f2(p1)+' → '+f2(p1n)+' (le bien 1 devient relativement plus cher)':'p₁′ = p₁ : aucun effet. Bouge le curseur p₁′.';
+    const sg=x=>(x>1e-9?'+':'')+f3(x);
+    $('#p4tab').innerHTML='<h3><span class="dot"></span>Les 3 paniers · '+(H?'Hicks':'Slutsky')+'</h3>'+
+      '<table class="t"><tr><th>Panier</th><th>x₁</th><th>x₂</th><th>U</th></tr>'+
+      '<tr><td><b>A</b> initial</td><td>'+f3(A.x1)+'</td><td>'+f3(A.x2)+'</td><td>'+f3(d.uA)+'</td></tr>'+
+      '<tr><td><b class="ct">B</b> intermédiaire</td><td>'+f3(B.x1)+'</td><td>'+f3(B.x2)+'</td><td>'+f3(d.uB)+'</td></tr>'+
+      '<tr><td><b class="co">C</b> final</td><td>'+f3(Cc.x1)+'</td><td>'+f3(Cc.x2)+'</td><td>'+f3(d.uC)+'</td></tr></table>'+
+      '<table class="t" style="margin-top:10px"><tr><th>Effet</th><th>sur x₁</th><th>sur x₂</th></tr>'+
+      '<tr><td class="ces"><b>Substitution</b> (A→B)</td><td class="ces">'+sg(d.ES[0])+'</td><td class="ces">'+sg(d.ES[1])+'</td></tr>'+
+      '<tr><td class="cer"><b>Revenu</b> (B→C)</td><td class="cer">'+sg(d.ER[0])+'</td><td class="cer">'+sg(d.ER[1])+'</td></tr>'+
+      '<tr><td><b>Total</b> (A→C)</td><td>'+sg(d.ET[0])+'</td><td>'+sg(d.ET[1])+'</td></tr></table>';
+    const s=[];
+    s.push('<b>A</b> = demande aux prix initiaux : '+eq('A = x(p₁ = '+f2(p1)+', p₂ = '+f2(p2)+', R = '+f2(R)+') = ('+f3(A.x1)+' ; '+f3(A.x2)+')'));
+    if(H)s.push('<b class="ct">B</b> (Hicks) : aux <i>nouveaux</i> prix, le panier le moins cher qui donne la <b>même utilité</b> que A (U = '+f3(d.uA)+'). B est sur la même courbe d’indifférence que A, tangent au budget compensé (pointillé cyan).'+eq("B = h(p₁' = "+f2(p1n)+', p₂, U = '+f3(d.uA)+') = ('+f3(B.x1)+' ; '+f3(B.x2)+')')+eq("Dépense minimale R'' = "+f2(p1n)+'×'+f3(B.x1)+' + '+f2(p2)+'×'+f3(B.x2)+' = '+f3(d.Rc)));
+    else s.push('<b class="ct">B</b> (Slutsky) : on donne juste assez de revenu pour pouvoir <b>racheter A</b> aux nouveaux prix (budget pointillé cyan, qui passe par A).'+eq("R' = R + (p₁' − p₁)·x₁ᴬ = "+f2(R)+' + ('+f2(p1n)+' − '+f2(p1)+') × '+f3(A.x1)+' = '+f3(d.Rc))+eq("B = x(p₁' = "+f2(p1n)+", p₂, R') = ("+f3(B.x1)+' ; '+f3(B.x2)+')'));
+    s.push('<b class="co">C</b> = demande aux nouveaux prix avec le vrai revenu :'+eq("C = x(p₁' = "+f2(p1n)+', p₂, R = '+f2(R)+') = ('+f3(Cc.x1)+' ; '+f3(Cc.x2)+')'));
+    s.push(eq('<span class="ces">ES = x₁ᴮ − x₁ᴬ = '+f3(d.ES[0])+'</span>   ;   <span class="cer">ER = x₁ᶜ − x₁ᴮ = '+f3(d.ER[0])+'</span>')+'Effet total = ES + ER = '+f3(d.ET[0])+'.');
+    const notes={cd:'Cobb-Douglas : ES et ER vont dans le même sens (bien normal).',sub:'Substituts parfaits : soit rien ne bouge, soit on bascule d’un coin à l’autre — l’effet de substitution est alors tout ou rien.',comp:'Compléments parfaits : <b>effet de substitution nul</b> (B = A pour Hicks) : on ne peut pas substituer, tout passe par l’effet revenu.',ql:'Quasi-linéaire (intérieur) : <b>effet revenu nul sur x₁</b>, tout l’effet prix sur x₁ est de la substitution.',inf:'Bien inférieur : l’effet revenu va <b>à l’opposé</b> de l’effet de substitution (mais reste plus petit : pas de Giffen).'};
+    s.push('<span class="small">'+notes[t]+' Slutsky garde le <i>pouvoir d’achat</i> constant, Hicks garde l’<i>utilité</i> constante : les deux ES diffèrent un peu, mais ont toujours le même signe (opposé à la variation du prix).</span>');
+    $('#p4steps').innerHTML='<h3><span class="dot" style="background:var(--es);box-shadow:0 0 10px var(--es)"></span>Comment on construit B</h3><ol class="steps">'+s.map(x=>'<li>'+x+'</li>').join('')+'</ol>';}
+};
+
+/* =============== MODULE 5 : ENTRAÎNEMENT =============== */
+const M5={
+  init(){this.st=Object.assign({ok:0,tot:0,streak:0,best:0},LS.get('stats',{}));this.cat=LS.get('cat','all');this.stats();this.cats();this.next();},
+  stats(){const s=this.st;$('#stats').innerHTML='<div class="tile"><div class="t">Réussis</div><div class="v">'+s.ok+'<span class="small"> / '+s.tot+'</span></div></div><div class="tile"><div class="t">Série</div><div class="v co">'+s.streak+'</div></div><div class="tile"><div class="t">Record</div><div class="v cu">'+s.best+'</div></div>';},
+  cats(){const el=$('#cats');el.innerHTML='';const all=Object.assign({all:'Tout'},MATH.CATS);
+    for(const k in all){const b=document.createElement('button');b.className='chip'+(this.cat===k?' on':'');b.textContent=all[k];b.onclick=()=>{this.cat=k;LS.set('cat',k);this.cats();this.next();};el.appendChild(b);}},
+  next(){this.ex=MATH.gen(this.cat);this.done=false;const ex=this.ex,el=$('#ex');
+    el.innerHTML='<span class="tag">'+MATH.CATS[ex.cat]+'</span><div style="font-size:17px;font-weight:750;margin-bottom:6px">'+ex.title+'</div><p>'+ex.html+'</p>'+
+      ex.asks.map((a,i)=>'<div class="qlab"><span>'+a.lb+'</span><span class="exp" id="exp'+i+'"></span></div><input class="ans" id="in'+i+'" inputmode="decimal" autocomplete="off" placeholder="ta réponse (ex. 2,5 ou 5/2)">').join('')+
+      '<p class="small" style="margin-top:8px">Arrondi à 0,01 près accepté.</p><div id="fb"></div><div class="row" style="margin-top:10px"><button class="btn ghost" id="skip" style="flex:1">Je sèche</button><button class="btn" id="chk" style="flex:1.4">Vérifier</button></div><div id="sol"></div>';
+    $('#chk').onclick=()=>this.check(false);$('#skip').onclick=()=>this.check(true);
+    ex.asks.forEach((a,i)=>$('#in'+i).addEventListener('keydown',e=>{if(e.key==='Enter'){const n=$('#in'+(i+1));if(n)n.focus();else this.check(false);}}));
+    $('#scroll').scrollTo({top:0,behavior:'smooth'});},
+  check(skip){if(this.done){this.next();return;}const ex=this.ex;let all=!skip;
+    if(!skip&&ex.asks.some((a,i)=>!isFinite(MATH.parseNum($('#in'+i).value)))){const fb=$('#fb');fb.innerHTML='<div class="fb bad">Entre une valeur numérique dans chaque case (ou « Je sèche »).</div>';return;}
+    ex.asks.forEach((a,i)=>{const inp=$('#in'+i),v=MATH.parseNum(inp.value),ok=!skip&&MATH.isOk(v,a.ans);if(!ok)all=false;inp.classList.add(ok?'good':'bad');inp.readOnly=true;
+      $('#exp'+i).innerHTML=ok?'<span style="color:var(--ok)">✓ '+fr(a.ans,3)+'</span>':'<span style="color:var(--ko)">attendu : '+fr(a.ans,3)+'</span>';});
+    const s=this.st;s.tot++;if(all){s.ok++;s.streak++;s.best=Math.max(s.best,s.streak);}else s.streak=0;LS.set('stats',s);this.stats();
+    $('#fb').innerHTML=all?'<div class="fb good">Exact ! Série : '+s.streak+'</div>':'<div class="fb bad">'+(skip?'Voici la correction détaillée.':'Pas tout à fait — regarde la correction.')+'</div>';
+    $('#sol').innerHTML='<div style="margin-top:14px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:800">Correction étape par étape</div><ol class="steps anim">'+ex.steps.map((x,i)=>'<li style="animation-delay:'+(i*.09)+'s">'+x+'</li>').join('')+'</ol>';
+    this.done=true;$('#chk').textContent='Exercice suivant';$('#skip').style.display='none';
+    if(all)$('#ex').classList.add('pulse');setTimeout(()=>$('#ex').classList.remove('pulse'),1300);}
+};
+
+/* =============== navigation & boucle =============== */
+const MODS=[M1,M2,M3,M4];
+const TITLES={1:'Préférences',2:'Choix optimal',3:'Demande',4:'Effets de prix',5:'Entraînement'};
+let tab=S.tab||1;
+function go(n){tab=n;S.tab=n;save();document.querySelectorAll('.view').forEach((v,i)=>v.classList.toggle('on',i+1===n));
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',+b.dataset.t===n));$('#title').textContent=TITLES[n];
+  $('#hpill').textContent=n===5?'Type partiel':'Chapitre 2';
+  if(n<=4){pickers.forEach(p=>p.render());MODS.forEach(m=>m.panel&&m.panel());}
+  if(n===4)M4.enter();if(n===2)M2.rev=0;if(n===1)M1.rev=Math.min(M1.rev,.3);
+  $('#scroll').scrollTop=0;}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>go(+b.dataset.t));
+M1.init();M2.init();M3.init();M4.init();M5.init();go(tab);
+let last=performance.now();
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;tweenQ(dt);
+  try{if(tab<=4)MODS[tab-1].draw(dt);}catch(e){console.error(e);}
+  requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+window.addEventListener('resize',()=>{});
+document.addEventListener('gesturestart',e=>e.preventDefault());
+document.addEventListener('dblclick',e=>e.preventDefault());
+})();
+</script>
+</body>
+</html>
