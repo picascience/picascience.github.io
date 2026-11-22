@@ -1,0 +1,9 @@
+{
+  "name": "Comète",
+  "emoji": "☄️",
+  "colors": ["#1e0b3a", "#fb923c"],
+  "category": "Jeux",
+  "added": "2026-11-22",
+  "description": "Runner infini : une orbe de lumière à travers 6 biomes — Classique, Gravité, Défi du jour, Zen + boutique d'orbes",
+  "icon": "icon.svg"
+}

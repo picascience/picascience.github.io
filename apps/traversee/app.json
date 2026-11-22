@@ -1,0 +1,9 @@
+{
+  "name": "Traversée",
+  "emoji": "🧊",
+  "colors": ["#0b3a26", "#a3e635"],
+  "category": "Jeux",
+  "added": "2026-11-22",
+  "description": "Fais traverser routes, rivières et rails à un petit cube — Classique, Nuit, Chrono, Express, Défi du jour + 7 cubes",
+  "icon": "icon.svg"
+}

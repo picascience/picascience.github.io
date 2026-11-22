@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-22T14:46:20.252Z",
+  "generated": "2026-11-22T21:27:11.038Z",
   "apps": [
     {
       "name": "Adhkar",
@@ -14,6 +14,19 @@
       "description": "Invocations authentiques du matin et du soir, compteur au toucher, série et tasbih libre",
       "icon": "apps/adhkar/icon.svg",
       "id": "adhkar"
+    },
+    {
+      "name": "Comète",
+      "emoji": "☄️",
+      "colors": [
+        "#1e0b3a",
+        "#fb923c"
+      ],
+      "category": "Jeux",
+      "added": "2026-11-22",
+      "description": "Runner infini : une orbe de lumière à travers 6 biomes — Classique, Gravité, Défi du jour, Zen + boutique d'orbes",
+      "icon": "apps/comete/icon.svg",
+      "id": "comete"
     },
     {
       "name": "Fractale",
@@ -79,6 +92,19 @@
       "description": "Boussole de la Qibla et horaires de prière calculés en local",
       "icon": "apps/qibla/icon.svg",
       "id": "qibla"
+    },
+    {
+      "name": "Traversée",
+      "emoji": "🧊",
+      "colors": [
+        "#0b3a26",
+        "#a3e635"
+      ],
+      "category": "Jeux",
+      "added": "2026-11-22",
+      "description": "Fais traverser routes, rivières et rails à un petit cube — Classique, Nuit, Chrono, Express, Défi du jour + 7 cubes",
+      "icon": "apps/traversee/icon.svg",
+      "id": "traversee"
     },
     {
       "name": "Caravane",
