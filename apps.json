@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-23T14:57:55.705Z",
+  "generated": "2026-11-23T21:54:45.464Z",
   "apps": [
     {
       "name": "Harada",
@@ -206,7 +206,7 @@
       ],
       "category": "Jeux",
       "added": "2026-11-18",
-      "description": "Un cristal par ligne, colonne et couleur, sans qu'ils se touchent : 200 niveaux, défi du jour et mode infini",
+      "description": "Un cristal par ligne, colonne et couleur, sans qu'ils se touchent : 200 niveaux, défi du jour, mode infini et guide stratégique illustré",
       "icon": "apps/cristaux/icon.svg",
       "id": "cristaux"
     },

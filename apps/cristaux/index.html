@@ -197,6 +197,114 @@ h1{font-size:46px;font-weight:900;letter-spacing:-1px;background:linear-gradient
 .loading div{display:flex;flex-direction:column;align-items:center;gap:12px;font-weight:800}
 .loading svg{width:70px;height:70px;animation:spin 1.2s cubic-bezier(.6,0,.4,1) infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- Guide stratégique ---------- */
+.ghero{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:16px;border-radius:22px;margin-bottom:14px;
+  background:linear-gradient(135deg,#f59e0b,#ef4444 60%,#d946ef);box-shadow:0 14px 30px -10px rgba(239,68,68,.6)}
+.ghero b{display:block;font-size:17px;font-weight:900}
+.ghero span{font-size:13px;font-weight:700;color:rgba(255,255,255,.9)}
+.ghi{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.22);display:grid;place-items:center;flex:none}
+.ghi svg{width:24px;height:24px}
+.glvl{display:flex;align-items:center;gap:8px;margin:16px 2px 8px;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.8px}
+.glvl span{background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.glvl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--a),transparent);opacity:.5}
+.glvl em{font-style:normal;color:var(--mut);order:3}
+.gitem{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px;border-radius:18px;background:var(--card);border:1px solid var(--line);margin-bottom:8px;transition:transform .12s}
+.gitem:active{transform:scale(.97)}
+.gitem i{width:34px;height:34px;flex:none;border-radius:11px;display:grid;place-items:center;font-style:normal;font-weight:900;font-size:15px;background:linear-gradient(135deg,var(--a),var(--b))}
+.gitem span{flex:1;font-size:12.5px;color:var(--mut);font-weight:600;line-height:1.3}
+.gitem b{display:block;color:var(--ink);font-size:15.5px;font-weight:900}
+.gitem .ok{width:20px;height:20px;flex:none}
+.gitem.rd i{opacity:.75}
+#lsBody{padding-bottom:40px}
+.lbadge{display:inline-block;padding:5px 11px;border-radius:99px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.8px;background:linear-gradient(135deg,var(--a),var(--b))}
+.lh{font-size:27px;font-weight:900;margin:8px 0 6px;line-height:1.1}
+.lintro{font-size:15px;line-height:1.45;color:#cfe3ff;font-weight:600}
+.lintro small{display:block;color:var(--mut);font-size:12.5px;margin-top:4px}
+.zn{color:var(--zc);font-weight:900;white-space:nowrap}
+.zn::before{content:"";display:inline-block;width:.72em;height:.72em;border-radius:3px;background:var(--zc);margin-right:3px;vertical-align:-1px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.demo{margin:16px 0 6px;padding:12px;border-radius:24px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.mb{width:min(100%,330px);margin:0 auto;aspect-ratio:1;border-radius:18px;padding:5px;background:linear-gradient(160deg,rgba(255,255,255,.16),rgba(255,255,255,.04));box-shadow:0 20px 40px -18px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.18);cursor:pointer}
+.mb.sm{width:100%;border-radius:12px;padding:3px;cursor:default}
+.mbin{position:relative;width:100%;height:100%;display:grid}
+.mb .cell .x{width:40%;height:40%;opacity:.55}
+.mb .cell .x.new{opacity:1;animation:xin .45s cubic-bezier(.2,1.6,.4,1);filter:drop-shadow(0 0 3px #ff2d55)}
+.mb .cell .x.tmp{opacity:.95;animation:xin .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes xin{0%{transform:scale(.2) rotate(-40deg);opacity:0}}
+.mb .cell .gem{width:80%;height:80%;filter:drop-shadow(0 3px 3px rgba(0,0,0,.35))}
+.mb .cell .gem.pop{animation:gempop .5s cubic-bezier(.2,1.6,.4,1)}
+.mb .cell .gem.ghost{opacity:.55;animation:ghost 1.4s ease-in-out infinite}
+@keyframes ghost{50%{opacity:.25;transform:scale(.9)}}
+.mb .cell.dim .tile{filter:brightness(.5)}
+.stripe{position:absolute;pointer-events:none;border-radius:8px;border:2.5px solid var(--gold);background:rgba(253,230,138,.16);box-shadow:0 0 14px rgba(253,230,138,.5);animation:band 1.6s ease-in-out infinite}
+.stripe.bad{border-color:#ff2d55;background:rgba(255,45,85,.2);box-shadow:0 0 16px rgba(255,45,85,.6)}
+@keyframes band{50%{opacity:.6}}
+.cap{display:flex;gap:10px;align-items:flex-start;min-height:64px;margin:12px 2px 4px;font-size:14.5px;font-weight:700;line-height:1.38;color:#eaf4ff}
+.cap .cnum{flex:none;background:rgba(253,230,138,.15);color:var(--gold);border-radius:9px;padding:3px 7px;font-size:12px;font-weight:900;margin-top:1px}
+.cap .ct{animation:msgin .35s cubic-bezier(.2,1.4,.4,1)}
+.ctrl{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px}
+.ctrl .nx{background:linear-gradient(135deg,#38bdf8,#6366f1);border-color:transparent;box-shadow:0 8px 20px -6px rgba(99,102,241,.8)}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.dots i{width:8px;height:8px;border-radius:9px;background:rgba(255,255,255,.18);transition:all .25s}
+.dots i.past{background:rgba(155,231,255,.5)}
+.dots i.on{width:22px;background:var(--gold)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;margin-top:10px;font-size:11.5px;font-weight:700;color:var(--mut)}
+.legend span{display:flex;align-items:center;gap:4px}
+.lgx{width:14px;height:14px;padding:2px;border-radius:4px;background:#2a3a5c}
+.lgb{width:16px;height:10px;border-radius:3px;border:2px solid var(--gold);background:rgba(253,230,138,.2)}
+.custom{margin-top:14px}
+.gcard{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:10px}
+.gh{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.8px;color:var(--ice);margin-bottom:10px}
+.gp{font-size:13.5px;color:#cfe3ff;font-weight:600;line-height:1.42;margin-top:8px}
+.mrow{display:flex;align-items:center;justify-content:center;gap:6px}
+.mcell{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11.5px;font-weight:800;color:var(--mut);text-align:center;line-height:1.2}
+.mtile{width:56px;height:56px;border-radius:12px;background:#6e5cf6;display:grid;place-items:center;box-shadow:inset 0 -3px 0 rgba(0,0,0,.14),inset 0 2px 0 rgba(255,255,255,.22)}
+.mtile .x{width:42%;height:42%}.mtile .gem{width:80%;height:80%}
+.marr{width:30px;height:16px;margin-bottom:28px}
+.vs{display:flex;gap:8px}
+.vs div{flex:1;border-radius:14px;padding:10px;font-size:12.5px;font-weight:600;line-height:1.35;color:#cfe3ff}
+.vs b{display:block;font-size:14px;margin-bottom:3px;color:#fff}
+.vs .bad{background:rgba(255,45,85,.12);border:1px solid rgba(255,45,85,.3)}
+.vs .good{background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.3)}
+.shapes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.shape{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;background:rgba(255,255,255,.05);border-radius:16px;padding:8px}
+.shape b{font-size:12.5px;font-weight:900;margin-top:4px}
+.shape span{font-size:10.5px;color:var(--mut);font-weight:700;line-height:1.2}
+.two{display:flex;gap:12px;align-items:center}.two .mb{width:42%;flex:none}.two .gp{margin:0}
+.flow{display:flex;flex-direction:column;align-items:stretch}
+.fnode{display:flex;align-items:center;gap:12px;text-align:left;padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--fc)}
+.fnode i{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:900;background:var(--fc)}
+.fnode span{flex:1;font-size:12.5px;color:var(--mut);font-weight:600;line-height:1.3}
+.fnode b{display:block;color:var(--ink);font-size:15px;font-weight:900}
+.fnode svg{width:18px;height:18px;flex:none}
+.fdown{display:flex;align-items:center;gap:6px;padding:3px 0 3px 18px;font-size:11px;font-weight:800;color:var(--mut)}
+.fdown svg{width:18px;height:22px}.fdown em{font-style:normal}
+.floop{display:flex;align-items:center;gap:10px;margin-top:12px;padding:12px;border-radius:16px;border:1.5px dashed rgba(253,230,138,.5);color:var(--gold);font-weight:800;font-size:13.5px;line-height:1.3}
+.floop svg{width:26px;height:26px;flex:none}
+.tips{display:flex;flex-direction:column;gap:8px}
+.tip{display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:16px;padding:12px}
+.tip i{width:28px;height:28px;flex:none;border-radius:9px;display:grid;place-items:center;font-style:normal;font-weight:900;font-size:13px;background:linear-gradient(135deg,#38bdf8,#6366f1)}
+.tip span{font-size:13px;color:#cfe3ff;font-weight:600;line-height:1.4}
+.tip b{display:block;color:#fff;font-size:14.5px;font-weight:900;margin-bottom:1px}
+.scale{display:flex;flex-direction:column;gap:6px}
+.scale div{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px}
+.ss{display:flex;gap:2px;width:70px}.ss svg{width:20px;height:20px}
+.ck{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;font-weight:700;color:#cfe3ff;line-height:1.35;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.ck:last-child{border:0}
+.ck i{width:22px;height:22px;flex:none;border-radius:7px;border:2px solid var(--ice);display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:900;color:var(--ice)}
+.plan{display:flex;flex-direction:column;gap:8px}
+.plan div{border-left:4px solid var(--pc);background:rgba(255,255,255,.04);border-radius:10px;padding:9px 11px;font-size:13px;font-weight:600;color:#cfe3ff;line-height:1.35}
+.plan b{display:block;color:var(--pc);font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.5px}
+.row3{display:flex;gap:8px;margin-top:12px}
+.btn.mini{flex:1;justify-content:center;padding:12px 6px;font-size:14px}
+.keep{margin-top:14px;padding:14px;border-radius:20px;background:linear-gradient(160deg,rgba(253,230,138,.12),rgba(253,230,138,.03));border:1px solid rgba(253,230,138,.28)}
+.keep .gh{color:var(--gold)}
+.kp{position:relative;padding:5px 0 5px 22px;font-size:14px;font-weight:700;line-height:1.38}
+.kp::before{content:"";position:absolute;left:3px;top:11px;width:9px;height:9px;transform:rotate(45deg);border-radius:2px;background:var(--gold)}
+.lend{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.glink{margin-left:6px;padding:3px 9px;border-radius:99px;background:rgba(253,230,138,.18);color:var(--gold);font-weight:900;font-size:12px;white-space:nowrap}
+.tut .tcard .tg{width:70px;height:70px}
+@media (max-height:780px){.logo{width:104px;height:104px}h1{font-size:38px}#home{gap:10px}.btn{padding:12px 16px}}
 </style>
 </head>
 <body>
@@ -224,6 +332,7 @@ h1{font-size:46px;font-weight:900;letter-spacing:-1px;background:linear-gradient
   </symbol>
   <symbol id="xm" viewBox="0 0 24 24"><path d="M5 5 L19 19 M19 5 L5 19" stroke="#fff" stroke-width="4" stroke-linecap="round"/></symbol>
   <symbol id="xbad" viewBox="0 0 24 24"><path d="M5 5 L19 19 M19 5 L5 19" stroke="#ff2d55" stroke-width="5" stroke-linecap="round"/></symbol>
+  <symbol id="xtmp" viewBox="0 0 24 24"><path d="M5 5 L19 19 M19 5 L5 19" stroke="#fb923c" stroke-width="4.5" stroke-linecap="round"/></symbol>
   <symbol id="dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" fill="#fff"/></symbol>
   <symbol id="star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.5L12 17.2 6.1 20.4l1.3-6.5L2.5 9.3l6.6-.8z" fill="url(#starG)" stroke="#c98a12" stroke-width="1" stroke-linejoin="round"/></symbol>
   <symbol id="flake" viewBox="0 0 24 24"><g stroke="#9be7ff" stroke-width="2.2" stroke-linecap="round" fill="none"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7"/><path d="M9.5 3.8 12 6l2.5-2.2M9.5 20.2 12 18l2.5 2.2M4 10.2l3-.7-.9-3M20 13.8l-3 .7.9 3M4 13.8l3 .7-.9 3M20 10.2l-3-.7.9-3"/></g></symbol>
@@ -241,6 +350,7 @@ h1{font-size:46px;font-weight:900;letter-spacing:-1px;background:linear-gradient
     <button class="btn" id="bDaily"><span class="ic" style="background:linear-gradient(135deg,#f59e0b,#ef4444)"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="15" r="2.2" fill="#fff"/></svg></span><span>Défi du jour<small id="dailySub">Une grille, la même pour tout le monde</small></span></button>
     <button class="btn" id="bWorlds"><span class="ic" style="background:linear-gradient(135deg,#14b8a6,#0ea5e9)"><svg viewBox="0 0 24 24"><g fill="#fff"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2" opacity=".7"/><rect x="3" y="13" width="8" height="8" rx="2" opacity=".7"/><rect x="13" y="13" width="8" height="8" rx="2" opacity=".45"/></g></svg></span><span>Mondes<small id="worldSub">200 niveaux · 6 mondes</small></span></button>
     <button class="btn" id="bInf"><span class="ic" style="background:linear-gradient(135deg,#8b5cf6,#d946ef)"><svg viewBox="0 0 24 24"><path d="M6.5 8.5c-2 0-3.5 1.5-3.5 3.5s1.5 3.5 3.5 3.5c3.5 0 7.5-7 11-7 2 0 3.5 1.5 3.5 3.5s-1.5 3.5-3.5 3.5c-3.5 0-7.5-7-11-7z" fill="none" stroke="#fff" stroke-width="2.4"/></svg></span><span>Infini<small>Grilles inédites générées à la volée</small></span></button>
+    <button class="btn" id="bGuide"><span class="ic" style="background:linear-gradient(135deg,#f59e0b,#d946ef)"><svg viewBox="0 0 24 24"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5zM20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z" fill="none" stroke="#fff" stroke-width="2"/><path d="M6.5 8h2.5M6.5 11h2.5M15 8h2.5M15 11h2.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Guide stratégique<small id="guideSub">Toutes les techniques, illustrées</small></span></button>
   </div>
   <button class="link" id="bRules">Comment jouer ?</button>
 </section>
@@ -255,6 +365,16 @@ h1{font-size:46px;font-weight:900;letter-spacing:-1px;background:linear-gradient
 <section class="screen" id="levels">
   <div class="top"><button class="iconbtn" data-back="worlds"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="ttl" id="lvTitle">Monde</div><div style="width:44px"></div></div>
   <div class="scroll"><div class="lvgrid" id="lvGrid"></div></div>
+</section>
+
+<!-- ===== Guide ===== -->
+<section class="screen" id="guide">
+  <div class="top"><button class="iconbtn" id="gdBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="ttl">Guide stratégique<small id="gdProg"></small></div><div style="width:44px"></div></div>
+  <div class="scroll" id="gdList"></div>
+</section>
+<section class="screen" id="lesson">
+  <div class="top"><button class="iconbtn" id="lsBack"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="ttl" id="lsTitle">Leçon</div><div style="width:44px"></div></div>
+  <div class="scroll" id="lsBody"></div>
 </section>
 
 <!-- ===== Jeu ===== -->
@@ -305,14 +425,14 @@ h1{font-size:46px;font-weight:900;letter-spacing:-1px;background:linear-gradient
     <div class="opt" data-k="timer"><span>Afficher le chrono</span><span class="sw"></span></div>
     <div class="opt" data-k="vibe"><span>Vibrations</span><span class="sw"></span></div>
   </div>
-  <div class="row2"><button class="btn" id="sRules">Règles</button><button class="btn primary" id="sClose">OK</button></div>
+  <div class="row2"><button class="btn" id="sRules">Règles</button><button class="btn" id="sGuide">Guide</button><button class="btn primary" id="sClose">OK</button></div>
 </div></div>
 
 <div class="modal" id="mRules"><div class="sheet">
   <h2>Comment jouer</h2><p class="sub">Place un cristal dans chaque zone de couleur.</p>
   <div class="tut" id="tut"></div>
   <div class="gest"><div><b>1 touche</b>une croix</div><div><b>2 touches</b>un cristal</div><div><b>Glisser</b>plusieurs croix</div></div>
-  <div style="margin-top:14px"><button class="btn primary" id="rClose" style="width:100%;justify-content:center">C'est parti</button></div>
+  <div style="margin-top:14px" class="row2"><button class="btn" id="rGuide">Guide stratégique</button><button class="btn primary" id="rClose">C'est parti</button></div>
 </div></div>
 
 <div class="modal" id="mInf"><div class="sheet">
@@ -326,6 +446,7 @@ h1{font-size:46px;font-weight:900;letter-spacing:-1px;background:linear-gradient
 
 <script src="./engine.js"></script>
 <script src="./levels.js"></script>
+<script src="./guide.js"></script>
 <script>
 (() => {
 'use strict';
@@ -369,7 +490,9 @@ function show(id) {
   current = id;
   if (id === 'home') renderHome();
   if (id === 'worlds') renderWorlds();
+  if (id === 'guide' && guide) guide.renderList();
 }
+let guide = null;
 document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => show(b.dataset.back));
 const modal = (id, on) => $('#' + id).classList.toggle('show', on);
 document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m && !['mWin', 'mFail'].includes(m.id)) m.classList.remove('show'); }));
@@ -399,6 +522,7 @@ $('#bWorlds').onclick = () => show('worlds');
 $('#bRules').onclick = () => openRules();
 $('#bDaily').onclick = () => startDaily();
 $('#bInf').onclick = () => openInf();
+$('#bGuide').onclick = () => guide.openFrom('home');
 
 // ---------- Mondes ----------
 function miniGrid(w) {
@@ -557,10 +681,12 @@ function renderLives() {
   el.style.display = settings.lives ? '' : 'none';
   el.innerHTML = [0, 1, 2].map(i => '<svg class="lf ' + (i >= G.lives ? 'gone' : '') + '" viewBox="0 0 24 24"><use href="#flake"/></svg>').join('');
 }
-function setMsg(t, hint) {
+function setMsg(t, hint, lesson) {
   const m = $('#msg'); m.className = 'msg' + (hint ? ' hint' : '');
-  m.innerHTML = t ? '<span class="pop">' + t + '</span>' : '';
+  const id = lesson && guide ? guide.lessonFor(lesson) : null;
+  m.innerHTML = t ? '<span class="pop">' + t + (id ? '<button class="glink" data-lesson="' + id + '">Comprendre ›</button>' : '') + '</span>' : '';
 }
+$('#msg').addEventListener('click', e => { const b = e.target.closest('[data-lesson]'); if (b && guide) { persist(); clearHL(); guide.open(b.dataset.lesson, 'game'); } });
 
 // ---------- Entrées tactiles ----------
 let drag = null;
@@ -671,7 +797,7 @@ $('#tHint').onclick = () => {
     update(); persist(); vibe(12);
     if (st.place != null) checkWin();
   };
-  if (basic.length) { highlight([], basic); setMsg('Ces cases touchent un cristal ou partagent sa ligne, sa colonne ou sa couleur : on les barre.', true); apply({ elim: basic }); return; }
+  if (basic.length) { highlight([], basic); setMsg('Ces cases touchent un cristal ou partagent sa ligne, sa colonne ou sa couleur : on les barre.', true, 'halo'); apply({ elim: basic }); return; }
   for (let guard = 0; guard < 200; guard++) {
     const st = s.findStep(4);
     if (!st) break;
@@ -683,7 +809,8 @@ $('#tHint').onclick = () => {
       else if (st.tech === 3) t = groupLabel(st.A, st.groups) + ' tiennent dans ' + st.k + ' ' + plural[st.B] + ' : le reste de ces ' + plural[st.B] + ' est barré.';
       else t = 'Si on met un cristal ici, ' + unitName(st.unit) + ' n\'a plus aucune place. Impasse : on barre.';
       highlight(st.tech === 4 ? [] : st.cells, st.place != null ? [st.place] : st.elim.filter(q => !known(q)));
-      setMsg(t, true);
+      const N2 = G.N, line = st.tech === 2 && st.unit.type === 'reg' && (new Set(st.cells.map(q => (q / N2) | 0)).size === 1 || new Set(st.cells.map(q => q % N2)).size === 1);
+      setMsg(t, true, line ? '2line' : st.tech);
       apply(st.place != null ? st : { elim: st.elim.filter(q => G.marks[q] === 0) });
       return;
     }
@@ -765,21 +892,22 @@ function openSettings() {
 }
 $('#sClose').onclick = () => modal('mSet', false);
 $('#sRules').onclick = () => { modal('mSet', false); openRules(); };
+$('#sGuide').onclick = () => { modal('mSet', false); persist(); guide.openFrom(current === 'game' ? 'game' : 'home'); };
 
 // ---------- Règles illustrées ----------
-function openRules() {
+function tutHTML() {
   const C = ['#7ed957', '#6e5cf6', '#f5a524', '#38bdf8'];
   const gem = '<svg viewBox="0 0 100 100"><use href="#gem"/></svg>', x = '<svg viewBox="0 0 24 24" style="width:50%;height:50%;opacity:.8"><use href="#xm"/></svg>', bad = '<svg viewBox="0 0 24 24" style="width:55%;height:55%"><use href="#xbad"/></svg>';
   const grid = (cols, content) => '<div class="tg" style="grid-template-columns:repeat(4,1fr)">' + cols.map((c, i) => '<i style="background:' + C[c] + '">' + (content[i] || '') + '</i>').join('') + '</div>';
   const A = [0, 0, 1, 1, 0, 2, 2, 1, 3, 2, 2, 1, 3, 3, 3, 1];
-  $('#tut').innerHTML =
-    '<div class="tcard">' + grid(A, { 1: gem, 0: x, 4: x }) + '<div><b>1 cristal par couleur</b><p>Chaque zone colorée contient exactement un cristal.</p></div></div>' +
+  return     '<div class="tcard">' + grid(A, { 1: gem, 0: x, 4: x }) + '<div><b>1 cristal par couleur</b><p>Chaque zone colorée contient exactement un cristal.</p></div></div>' +
     '<div class="tcard">' + grid(A, { 6: gem, 2: x, 10: x, 14: x, 4: x, 5: x, 7: x }) + '<div><b>1 par ligne et par colonne</b><p>Jamais deux cristaux sur la même ligne ou la même colonne.</p></div></div>' +
     '<div class="tcard">' + grid(A, { 5: gem, 0: bad, 1: x, 2: x, 4: x, 6: x, 8: x, 9: x, 10: x }) + '<div><b>Ils ne se touchent pas</b><p>Pas même en diagonale. Les 8 cases autour d\'un cristal restent vides.</p></div></div>' +
     '<div class="tcard"><div class="tg" style="grid-template-columns:repeat(3,1fr);width:52px;height:52px">' + [0, 1, 2].map(i => '<i style="background:rgba(155,231,255,.25)"><svg viewBox="0 0 24 24" style="width:70%;height:70%;opacity:' + (i < 2 ? 1 : .2) + '"><use href="#flake"/></svg></i>').join('') + '</div><div><b>Mode flocons</b><p>Un cristal mal placé fait fondre un flocon. Zéro erreur et zéro indice = 3 étoiles.</p></div></div>';
-  modal('mRules', true);
 }
+function openRules() { $('#tut').innerHTML = tutHTML(); modal('mRules', true); }
 $('#rClose').onclick = () => modal('mRules', false);
+$('#rGuide').onclick = () => { modal('mRules', false); if (current === 'game') persist(); guide.openFrom(current === 'game' ? 'game' : 'home'); };
 
 // ---------- Infini ----------
 function openInf() {
@@ -847,6 +975,13 @@ function snowLoop(t) {
 }
 addEventListener('resize', resizeFx); resizeFx(); requestAnimationFrame(snowLoop);
 document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
+
+// ---------- Guide stratégique ----------
+guide = window.CristauxGuide.init({
+  E, PALETTE, colorMap, $, load, save, vibe, tutHTML, show,
+  train(d) { infStats.diff = d; infStats.size = [7, 7, 8][d]; save('inf', infStats); genInf(); }
+});
+$('#guideSub').textContent = guide.count + ' leçons, du débutant à l\'expert';
 
 show('home');
 })();
