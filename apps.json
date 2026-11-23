@@ -1,7 +1,20 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-22T21:27:11.038Z",
+  "generated": "2026-11-23T10:54:26.624Z",
   "apps": [
+    {
+      "name": "Harada",
+      "emoji": "💍",
+      "colors": [
+        "#1c0c05",
+        "#e8a87c"
+      ],
+      "category": "Outils",
+      "added": "2026-11-23",
+      "description": "Méthode Harada pour se marier : 8 piliers, 64 actions, routine quotidienne et journal",
+      "icon": "apps/harada-mariage/icon.svg",
+      "id": "harada-mariage"
+    },
     {
       "name": "Adhkar",
       "emoji": "📿",

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#140a06">
+<title>Harada · Mariage</title>
+<style>
+:root{
+  --bg:#120906;--card:#1d110b;--card2:#26170f;--line:#3a2618;
+  --txt:#f6ece4;--mut:#b39a88;--gold:#f0c27b;--peach:#e8a87c;--ok:#4ade80;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+body{min-height:100vh;padding:env(safe-area-inset-top) 0 0}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.wrap{max-width:560px;margin:0 auto;padding:14px 14px calc(110px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 2px 14px}
+h1{font-size:22px;margin:0;letter-spacing:-.3px}
+h1 small{display:block;font-size:12px;color:var(--mut);font-weight:500;letter-spacing:0;margin-top:2px}
+.pct{font-weight:800;font-size:15px;color:var(--gold);background:var(--card2);border:1px solid var(--line);padding:6px 10px;border-radius:999px;white-space:nowrap}
+h2{font-size:15px;margin:18px 2px 8px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+
+/* mandala 3x3 */
+.m3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cell{position:relative;aspect-ratio:1;border-radius:16px;background:var(--card);border:1px solid var(--line);padding:8px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font-size:12.5px;line-height:1.2;overflow:hidden}
+.cell.p{background:linear-gradient(160deg,var(--c1),var(--c2));border-color:transparent;font-weight:700;font-size:13.5px}
+.cell.p .bar{position:absolute;left:10px;right:10px;bottom:9px;height:5px;border-radius:9px;background:rgba(0,0,0,.3);overflow:hidden}
+.cell.p .bar i{display:block;height:100%;background:#fff;border-radius:9px;transition:width .3s}
+.cell.p .n{font-size:11px;font-weight:600;opacity:.85;margin-top:4px}
+.cell.goal{background:radial-gradient(circle at 30% 20%,#5a3218,#1d110b 70%);border:2px solid var(--gold);font-weight:800;font-size:14px;color:var(--gold)}
+.cell.goal span{font-size:10.5px;color:var(--mut);font-weight:600;margin-top:5px}
+.cell.a{font-weight:500}
+.cell.a.done{background:linear-gradient(160deg,#173b23,#0f2617);border-color:#2f7a48}
+.cell.a.done::after{content:"";position:absolute;top:7px;right:7px;width:16px;height:16px;border-radius:50%;background:var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23052e12' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px no-repeat}
+.tag{position:absolute;top:6px;left:7px;font-size:9px;font-weight:700;letter-spacing:.4px;padding:2px 5px;border-radius:6px;background:rgba(255,255,255,.08);color:var(--mut)}
+.tag.r{color:var(--gold);background:rgba(240,194,123,.12)}
+.cell:active{transform:scale(.97)}
+
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--gold);font-weight:600;padding:6px 2px;margin-bottom:6px}
+.pill-head{border-radius:18px;padding:14px 16px;margin-bottom:12px;background:linear-gradient(160deg,var(--c1),var(--c2))}
+.pill-head b{font-size:19px}
+.pill-head p{margin:6px 0 0;font-size:13.5px;opacity:.92;line-height:1.4}
+
+/* full 9x9 */
+.scroll9{overflow-x:auto;margin:0 -14px;padding:0 14px 6px}
+.m9{display:grid;grid-template-columns:repeat(9,74px);gap:3px;width:max-content}
+.m9 .c{width:74px;height:74px;border-radius:8px;background:var(--card);border:1px solid var(--line);font-size:9.5px;line-height:1.15;padding:4px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+.m9 .c.p{background:linear-gradient(160deg,var(--c1),var(--c2));font-weight:700;font-size:10.5px;border:0}
+.m9 .c.g{border:2px solid var(--gold);color:var(--gold);font-weight:800;font-size:11px;background:#2a170b}
+.m9 .c.d{background:#123220;border-color:#2f7a48}
+.m9 .gap{margin-right:6px}.m9 .gapb{margin-bottom:6px}
+
+/* routine */
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;text-align:left;width:100%}
+.row .ck{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid #5b4332;display:grid;place-items:center}
+.row.on .ck{background:var(--ok);border-color:var(--ok)}
+.row.on .ck::after{content:"";width:12px;height:7px;border-left:3px solid #052e12;border-bottom:3px solid #052e12;transform:rotate(-45deg) translate(1px,-1px)}
+.row.on .t{color:var(--mut);text-decoration:line-through}
+.row .t{flex:1;font-size:14.5px;line-height:1.3}
+.row .s{font-size:11px;color:var(--mut);display:block;margin-top:2px;text-decoration:none}
+.dot{flex:none;width:9px;height:9px;border-radius:50%}
+.days{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;margin-top:6px}
+.days i{aspect-ratio:1;border-radius:5px;background:var(--card2)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-size:22px;color:var(--gold)}
+.stat span{font-size:11px;color:var(--mut)}
+
+/* forms */
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.card label{display:block;font-size:12px;color:var(--mut);font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+textarea,input{width:100%;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:15px;resize:vertical}
+textarea{min-height:84px;line-height:1.4}
+input:focus,textarea:focus{outline:2px solid var(--peach);border-color:transparent}
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.quad .card{margin:0;padding:10px}
+.quad textarea{min-height:110px;font-size:13.5px}
+.ayah{font-size:13.5px;line-height:1.5;color:#e9d6c6}
+.ayah .ar{font-size:20px;direction:rtl;text-align:right;color:var(--gold);line-height:1.8;margin-bottom:6px;font-family:"Geeza Pro","Amiri","Traditional Arabic",serif}
+.btn{display:block;width:100%;padding:13px;border-radius:14px;background:var(--gold);color:#2a1406;font-weight:800;text-align:center}
+.btn.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line);font-weight:600}
+.entry{border-top:1px solid var(--line);padding:10px 0 2px;font-size:14px;line-height:1.4;white-space:pre-wrap}
+.entry b{color:var(--peach);font-size:12px;display:block;margin-bottom:3px}
+
+/* sheet */
+.veil{position:fixed;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:.2s;z-index:20}
+.veil.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:560px;margin:0 auto;background:#1f130c;border-radius:22px 22px 0 0;border:1px solid var(--line);padding:18px 18px calc(48px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .25s ease}
+.sheet.on{transform:none}
+.sheet .grab{width:40px;height:5px;border-radius:9px;background:#5b4332;margin:-6px auto 12px}
+.sheet h3{margin:0 0 4px;font-size:19px;line-height:1.25}
+.sheet .meta{font-size:12px;color:var(--mut);margin-bottom:10px}
+.sheet .why{font-size:14.5px;line-height:1.5;color:#ead9cb;margin-bottom:14px;max-height:34vh;overflow:auto}
+.sheet .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* tabs */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:10;background:rgba(18,9,6,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 8px calc(34px + env(safe-area-inset-bottom))}
+nav .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--mut);padding:4px}
+nav button svg{width:24px;height:24px}
+nav button.on{color:var(--gold)}
+.hidden{display:none!important}
+.hint{font-size:12.5px;color:var(--mut);line-height:1.45;margin:10px 2px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;margin-bottom:12px}
+.seg button{flex:1;padding:8px;border-radius:9px;font-size:13px;font-weight:600;color:var(--mut)}
+.seg button.on{background:var(--card2);color:var(--txt)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="ttl">Objectif : me marier<small>Méthode Harada · grille 9×9</small></h1>
+    <div class="pct" id="gpct">0 %</div>
+  </header>
+
+  <!-- GRILLE -->
+  <section id="v-grid">
+    <div class="seg"><button data-g="m" class="on">Mandala</button><button data-g="f">Grille 9×9</button></div>
+    <div id="g-main"></div>
+    <div id="g-full" class="hidden"></div>
+  </section>
+
+  <!-- ROUTINE -->
+  <section id="v-routine" class="hidden"></section>
+
+  <!-- POURQUOI -->
+  <section id="v-why" class="hidden"></section>
+
+  <!-- JOURNAL -->
+  <section id="v-journal" class="hidden"></section>
+</div>
+
+<div class="veil" id="veil"></div>
+<div class="sheet" id="sheet"></div>
+
+<nav><div class="in">
+  <button data-v="grid" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Grille</button>
+  <button data-v="routine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg>Routine</button>
+  <button data-v="why"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>Pourquoi</button>
+  <button data-v="journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M9 9h6M9 13h6"/></svg>Journal</button>
+</div></nav>
+
+<script>
+/* ======== CONTENU ======== */
+// kind: "t" = tâche à faire une fois · "j" = routine quotidienne · "h" = routine hebdo
+const P = [
+ {id:"din",t:"Dîn",full:"Foi & piété",c:["#3a2a07","#b8860b"],
+  intro:"Ce qu'une famille pieuse regarde en premier chez un prétendant : sa religion et son caractère.",
+  a:[
+  ["Les 5 prières à l'heure","j","Le pilier de tout le reste. Une fille pieuse et sa famille demanderont d'abord : est-ce qu'il prie ?"],
+  ["1 page de Coran par jour","j","Petit mais constant. « L'acte le plus aimé d'Allah est le plus régulier, même s'il est petit » (Bukhârî, Muslim)."],
+  ["Du'a Al-Furqân (25:74)","j","« Rabbanā hab lanā min azwājinā wa dhurriyyātinā qurrata a'yun waj'alnā lil-muttaqīna imāmā » — Seigneur, accorde-nous, en nos épouses et nos descendants, la joie de nos yeux. À dire chaque jour, surtout en sujûd."],
+  ["Jeûner lundi ou jeudi","h","« Ô jeunes gens ! Que celui d'entre vous qui en a les moyens se marie… et celui qui ne le peut pas, qu'il jeûne, car c'est pour lui une protection » (Bukhârî 5066, Muslim 1400)."],
+  ["Baisser le regard","j","« Dis aux croyants de baisser leurs regards et de garder leur chasteté » (24:30). C'est la préparation directe au mariage."],
+  ["Istighfâr 100× par jour","j","Le Prophète ﷺ demandait pardon cent fois par jour (Muslim 2702). L'istighfâr ouvre les portes de la subsistance (Nûh 71:10-12)."],
+  ["Leçon d'arabe","h","Comprendre le Coran que tu récites, et pouvoir enseigner ta future famille. Continue tes leçons."],
+  ["2 rak'a de nuit","h","Le moment où les du'a sont exaucées. Demande-Lui une épouse pieuse à ce moment-là."]]},
+ {id:"ilm",t:"Savoir",full:"Science du mariage",c:["#0c2a3a","#2a7fa8"],
+  intro:"Arriver au mariage en sachant ce qu'on fait : droits, devoirs, contrat, vie de couple.",
+  a:[
+  ["Les droits de l'épouse","t","Nafaqa (dépenses), logement, bon comportement, justice, enseignement de la religion. Apprends-les avant qu'on te les demande."],
+  ["Les droits du mari","t","Savoir ce que la religion attend des deux côtés évite les attentes floues et les disputes."],
+  ["Fiqh du contrat","t","Wali de la fille, deux témoins, mahr, consentement. « Pas de mariage sans wali » (Abû Dâwûd 2085, Tirmidhî 1101)."],
+  ["Le foyer du Prophète ﷺ","t","Comment il vivait avec ses épouses : douceur, humour, aide à la maison. Lis un chapitre de sîra sur sa vie familiale."],
+  ["Istikhâra par cœur","t","Apprends la prière et la du'a d'istikhâra (Bukhârî 1162) : tu en auras besoin avant de dire oui."],
+  ["Gérer un conflit","t","Écouter, ne pas répondre dans la colère, ne pas impliquer tout le monde. Un cours ou un livre sur la vie de couple en islam."],
+  ["Questions à un imam","t","Pose tes questions sur le mariage jeune étudiant : mahr, logement, études. Un savant de confiance vaut mieux que 100 vidéos."],
+  ["Tes questions pour la rencontre","t","Prépare une liste : sa pratique, ses objectifs (études, enfants, ville), ce qu'elle attend d'un mari, sa relation avec sa famille."]]},
+ {id:"mal",t:"Argent",full:"Argent halal",c:["#0d3320","#1f9d55"],
+  intro:"Pouvoir payer un mahr et entretenir un foyer simple, sans riba. « S'ils sont pauvres, Allah les enrichira par Sa grâce » (24:32).",
+  a:[
+  ["Budget mahr + walîma","t","Chiffre un mariage simple : mahr, petite walîma, installation. « Le meilleur mariage est le plus facile » (Abû Dâwûd 2117)."],
+  ["Compte épargne sans intérêts","t","Un compte séparé, juste pour le mariage, sans riba. Ce qui y entre n'en sort pas."],
+  ["Mettre de côté chaque semaine","h","Même 10 ou 20 €. Ce qui compte c'est l'habitude et que le compteur monte."],
+  ["1 client freelance","t","Un site pour un artisan ou un commerce, comme celui du garage. Un client = un vrai revenu halal."],
+  ["Un revenu régulier","t","Job étudiant, missions, cours particuliers… quelque chose qui tombe chaque mois. Une famille regarde la stabilité."],
+  ["Rendre 1 appli rentable","t","Choisis UNE appli ou un projet (ex. Karimnaute) et pousse-le jusqu'à la première vente."],
+  ["Suivre ses dépenses","h","Chaque dimanche, 5 minutes : où est parti l'argent cette semaine ? Un futur chef de famille sait compter."],
+  ["Une sadaqa par semaine","h","« La sadaqa ne diminue en rien les biens » (Muslim 2588). Petite mais régulière."]]},
+ {id:"dau",t:"Dauphine",full:"Études",c:["#1e1b4b","#6366f1"],
+  intro:"Les études, c'est ton avenir et ta crédibilité devant la famille de la fille. Ne pas les sacrifier.",
+  a:[
+  ["Valider la L1 IASO","t","L'objectif de l'année. Un étudiant qui réussit rassure un futur beau-père."],
+  ["1 h de révision par jour","j","Compta, micro, macro, maths : un peu chaque jour vaut mieux que tout la veille."],
+  ["Rattraper la micro","t","Chapitre 2 : préférences, utilité, choix du consommateur. Utilise Micro Lab."],
+  ["Réussir les QCM notés","t","Compta et macro : chaque QCM réussi, c'est des points gagnés sans stress au partiel."],
+  ["Planning du dimanche","h","Ton emploi du temps change chaque semaine : pose cours, révisions, travail et dîn sur la semaine."],
+  ["Viser stage ou alternance","t","Rémunéré si possible : expérience + revenu + avenir clair. Commence à repérer les offres."],
+  ["Garder la bourse","h","Assiduité aux cours et aux examens : la bourse est un revenu, ne la perds pas."],
+  ["Ton projet pro en 5 lignes","t","Ce que tu veux faire dans 5 ans (IA, ingé, entrepreneur…). Tu devras l'expliquer à sa famille."]]},
+ {id:"dar",t:"Logement",full:"Logement & foyer",c:["#3b1d0a","#d97706"],
+  intro:"Un toit pour ton épouse, c'est un de ses droits. Avoir un plan clair, même modeste.",
+  a:[
+  ["Décider du plan logement","t","Chez les parents au début, studio, appart près de Dauphine ? Ce qui compte c'est un espace à vous deux."],
+  ["Estimer loyer + charges","t","Regarde les prix réels près de Dauphine et ailleurs sur ta ligne. Note le montant minimum réaliste."],
+  ["Simuler l'APL","t","Sur caf.fr : en tant qu'étudiant boursier, en couple, ça peut changer beaucoup le budget."],
+  ["Logement CROUS couple","t","Le CROUS propose parfois des logements pour couples. Renseigne-toi sur les conditions."],
+  ["Dossier locatif + Visale","t","Pièces prêtes, garant ou garantie Visale (gratuite pour les jeunes). Le jour où tu trouves, tu signes."],
+  ["Liste du minimum","t","Lit, cuisine de base, table… Ce qu'il faut vraiment pour commencer, et ce que ça coûte."],
+  ["Gérer un foyer","t","Factures, courses, assurance, impôts : apprends comment ça marche chez toi, demande à tes parents."],
+  ["Budget du couple","t","Une page : loyer, courses, transport, téléphone, épargne. Tu dois pouvoir la montrer."]]},
+ {id:"akh",t:"Caractère",full:"Akhlâq & soi",c:["#3a0a24","#be185d"],
+  intro:"« Le meilleur d'entre vous est le meilleur envers sa famille » (Tirmidhî 3895). Le futur mari se construit maintenant.",
+  a:[
+  ["Aider à la maison","j","Le Prophète ﷺ était au service de sa famille (Bukhârî 676). Vaisselle, ménage, courses : commence chez tes parents."],
+  ["Savoir cuisiner 5 plats","t","Une vraie autonomie. Apprends 5 plats simples et équilibrés."],
+  ["Maîtriser sa colère","j","« Ne te mets pas en colère » répété trois fois (Bukhârî 6116). Le soir, note si tu as réussi."],
+  ["Tenir parole, être à l'heure","j","La fiabilité, c'est ce qui donne confiance à une famille."],
+  ["Sport 3× par semaine","h","Un corps en forme, de l'énergie, de la discipline. Coche chaque semaine où tu as fait tes 3 séances."],
+  ["Coucher tôt, réveil Fajr","j","Le rythme de vie d'un homme stable commence là."],
+  ["Hygiène & sunna de la fitra","h","Propreté, parfum, tenue correcte, et les 40 jours de la fitra (voir l'appli Fitra 40)."],
+  ["Bien traiter parents et sœur","j","Comment tu traites les femmes de ta famille, c'est comment tu traiteras ta femme."]]},
+ {id:"usr",t:"Entourage",full:"Famille & réseau",c:["#08343a","#0e9aa7"],
+  intro:"Le mariage halal passe par les familles et les gens de confiance, pas par les DM.",
+  a:[
+  ["En parler à tes parents","t","Explique ton projet calmement : pourquoi maintenant, ton plan pour les études et l'argent."],
+  ["Obtenir leur soutien","t","Leur bénédiction et leur aide comptent énormément, et c'est souvent eux qui feront la démarche."],
+  ["Que la famille cherche","t","Demande à ta famille de proposer des filles pieuses qu'ils connaissent."],
+  ["Parler à l'imam","t","L'imam de ta mosquée connaît des familles et peut te recommander."],
+  ["Frères de l'asso Dauphine","t","Des frères de confiance qui te connaissent et peuvent témoigner de toi, ou connaître des sœurs à présenter via leurs familles."],
+  ["Conseils de 2 frères mariés","t","Demande à deux frères mariés jeunes : leurs erreurs, ce qu'ils referaient, l'argent."],
+  ["Présence à la mosquée","h","Être vu, connu et apprécié dans ta communauté. C'est là que se font les recommandations."],
+  ["Rendre service","h","Aider quelqu'un chaque semaine. La bonne réputation précède la demande en mariage."]]},
+ {id:"tal",t:"Démarche",full:"Démarche halal",c:["#2a1450","#9333ea"],
+  intro:"Chercher, rencontrer et décider de la bonne façon, dans le cadre que la religion a tracé.",
+  a:[
+  ["Écrire tes critères","t","La religion d'abord : « On épouse une femme pour quatre raisons… Choisis celle qui a la religion » (Bukhârî 5090, Muslim 1466). Puis le reste, par ordre d'importance."],
+  ["Écrire ce que tu apportes","t","Tes qualités, tes défauts honnêtement, ton projet de vie. Ce qu'une famille doit savoir de toi."],
+  ["Passer par le wali","t","Aucune relation cachée : tu t'adresses à son père ou son tuteur. C'est la porte qu'Allah bénit."],
+  ["Rencontre avec un mahram","t","Jamais seul avec elle : « Qu'un homme ne s'isole pas avec une femme sans mahram » (Bukhârî, Muslim)."],
+  ["La voir (nadhra)","t","« Regarde-la, cela est plus propice à l'entente entre vous » (Tirmidhî 1087). Une rencontre encadrée, c'est sunna."],
+  ["Prier l'istikhâra","t","Avant de dire oui : 2 rak'a et la du'a d'istikhâra, puis avancer en faisant confiance à Allah."],
+  ["Consulter des sages","t","L'istichâra : demander l'avis de gens sages qui connaissent la famille."],
+  ["Mahr et mariage simples","t","Ne pas attendre des années pour une grande fête. Simple, halal, béni."]]}
+];
+const KIND={t:"À faire",j:"Chaque jour",h:"Chaque semaine"};
+const POS=[0,1,2,3,5,6,7,8]; // positions autour du centre
+
+/* ======== ÉTAT ======== */
+const KEY="harada-mariage:v1";
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+S=Object.assign({done:{},edit:{},log:{},journal:[],goal:{}},S||{});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+const pad=n=>String(n).padStart(2,"0");
+const dkey=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const today=()=>dkey(new Date());
+function weekKey(d=new Date()){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);return "S"+dkey(x)}
+const aid=(p,i)=>P[p].id+i;
+const label=(p,i)=>S.edit[aid(p,i)]||P[p].a[i][0];
+function isDone(p,i){
+  const k=P[p].a[i][1],id=aid(p,i);
+  if(k==="t")return !!S.done[id];
+  const per=k==="j"?today():weekKey();
+  return !!(S.log[per]&&S.log[per][id]);
+}
+function toggle(p,i){
+  const k=P[p].a[i][1],id=aid(p,i);
+  if(k==="t"){S.done[id]=!S.done[id];if(!S.done[id])delete S.done[id]}
+  else{const per=k==="j"?today():weekKey();S.log[per]=S.log[per]||{};
+    if(S.log[per][id])delete S.log[per][id];else S.log[per][id]=1}
+  save();render();
+}
+const pDone=p=>P[p].a.filter((_,i)=>isDone(p,i)).length;
+function globalPct(){let n=0;P.forEach((_,p)=>n+=pDone(p));return Math.round(n/64*100)}
+
+/* ======== RENDU ======== */
+let view="grid",gmode="m",open=-1;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const goalTxt=()=>S.goal.title||"Me marier";
+
+function render(){
+  $("#gpct").textContent=globalPct()+" %";
+  $("#ttl").firstChild.textContent="Objectif : "+goalTxt().toLowerCase().replace(/^./,c=>c);
+  if(view==="grid")renderGrid();
+  if(view==="routine")renderRoutine();
+  if(view==="why")renderWhy();
+  if(view==="journal")renderJournal();
+}
+
+function renderGrid(){
+  $("#g-main").classList.toggle("hidden",gmode!=="m");
+  $("#g-full").classList.toggle("hidden",gmode!=="f");
+  if(gmode==="f")return renderFull();
+  let h="";
+  if(open<0){
+    const cells=Array(9);
+    cells[4]=`<div class="cell goal">${esc(goalTxt())}<span>${S.goal.date?"avant le "+fmtDate(S.goal.date):"halal · le plus vite possible"}</span></div>`;
+    P.forEach((p,i)=>{const d=pDone(i);
+      cells[POS[i]]=`<button class="cell p" style="--c1:${p.c[0]};--c2:${p.c[1]}" data-p="${i}">${esc(p.t)}<span class="n">${d}/8</span><span class="bar"><i style="width:${d/8*100}%"></i></span></button>`});
+    h=`<div class="m3">${cells.join("")}</div>
+    <p class="hint">Touche un pilier pour voir ses 8 actions. Les actions <b style="color:var(--gold)">quotidiennes</b> et <b style="color:var(--gold)">hebdo</b> se cochent chaque jour/semaine dans l'onglet Routine ; les autres se cochent une fois pour toutes.</p>`;
+  }else{
+    const p=P[open],cells=Array(9);
+    cells[4]=`<div class="cell p" style="--c1:${p.c[0]};--c2:${p.c[1]}">${esc(p.full)}<span class="n">${pDone(open)}/8</span></div>`;
+    p.a.forEach((a,i)=>{
+      cells[POS[i]]=`<button class="cell a ${isDone(open,i)?"done":""}" data-a="${i}"><span class="tag ${a[1]!=="t"?"r":""}">${a[1]==="j"?"JOUR":a[1]==="h"?"SEM.":"1×"}</span>${esc(label(open,i))}</button>`});
+    h=`<button class="back" id="bk">‹ Les 8 piliers</button>
+    <div class="pill-head" style="--c1:${p.c[0]};--c2:${p.c[1]}"><b>${esc(p.full)}</b><p>${esc(p.intro)}</p></div>
+    <div class="m3">${cells.join("")}</div>`;
+  }
+  $("#g-main").innerHTML=h;
+}
+
+function renderFull(){
+  // 9x9 : bloc (br,bc) ; bloc central = piliers, bloc i = actions du pilier
+  let h='<div class="scroll9"><div class="m9">';
+  for(let r=0;r<9;r++)for(let c=0;c<9;c++){
+    const br=Math.floor(r/3),bc=Math.floor(c/3),b=br*3+bc,cr=r%3,cc=c%3,ci=cr*3+cc;
+    const cls=(c%3===2&&c<8?" gap":"")+(r%3===2&&r<8?" gapb":"");
+    if(b===4){
+      if(ci===4)h+=`<div class="c g${cls}">${esc(goalTxt())}</div>`;
+      else{const pi=POS.indexOf(ci),p=P[pi];h+=`<div class="c p${cls}" style="--c1:${p.c[0]};--c2:${p.c[1]}">${esc(p.t)}</div>`}
+    }else{
+      const pi=POS.indexOf(b),p=P[pi];
+      if(ci===4)h+=`<div class="c p${cls}" style="--c1:${p.c[0]};--c2:${p.c[1]}">${esc(p.t)}</div>`;
+      else{const ai=POS.indexOf(ci);h+=`<button class="c${isDone(pi,ai)?" d":""}${cls}" data-pa="${pi},${ai}">${esc(label(pi,ai))}</button>`}
+    }
+  }
+  h+='</div></div><p class="hint">Fais glisser la grille. C\'est la « feuille Open Window 64 » de la méthode Harada : 1 objectif, 8 piliers, 64 actions. Touche une case pour la détailler.</p>';
+  $("#g-full").innerHTML=h;
+}
+
+function renderRoutine(){
+  const t=today(),w=weekKey();
+  const daily=[],weekly=[];
+  P.forEach((p,pi)=>p.a.forEach((a,ai)=>{if(a[1]==="j")daily.push([pi,ai]);if(a[1]==="h")weekly.push([pi,ai])}));
+  const dn=daily.filter(([p,a])=>isDone(p,a)).length;
+  // série : jours consécutifs avec ≥ 80 % de la routine quotidienne
+  const ok=k=>{const L=S.log[k]||{};return daily.filter(([p,a])=>L[aid(p,a)]).length>=Math.ceil(daily.length*.8)};
+  let streak=0;const d=new Date();if(!ok(dkey(d)))d.setDate(d.getDate()-1);
+  while(ok(dkey(d))&&streak<999){streak++;d.setDate(d.getDate()-1)}
+  let best=0;Object.keys(S.log).filter(k=>!k.startsWith("S")).forEach(k=>{if(ok(k))best++});
+  const row=([p,a],per)=>`<button class="row ${isDone(p,a)?"on":""}" data-pa="${p},${a}" data-tg="1"><span class="ck"></span><span class="dot" style="background:${P[p].c[1]}"></span><span class="t">${esc(label(p,a))}<span class="s">${esc(P[p].full)}</span></span></button>`;
+  let days="";for(let i=13;i>=0;i--){const x=new Date();x.setDate(x.getDate()-i);const L=S.log[dkey(x)]||{};const n=daily.filter(([p,a])=>L[aid(p,a)]).length;const r=n/daily.length;
+    days+=`<i title="${dkey(x)}" style="background:${r===0?"var(--card2)":`rgba(240,194,123,${.2+r*.8})`}"></i>`}
+  $("#v-routine").innerHTML=`
+  <div class="stats"><div class="stat"><b>${dn}/${daily.length}</b><span>aujourd'hui</span></div><div class="stat"><b>${streak}</b><span>jours de suite</span></div><div class="stat"><b>${best}</b><span>jours réussis</span></div></div>
+  <div class="days">${days}</div>
+  <p class="hint">Un jour est « réussi » à partir de 80 % de la routine. Les 14 derniers jours au-dessus.</p>
+  <h2>Chaque jour · ${fmtDate(t)}</h2><div class="list">${daily.map(x=>row(x)).join("")}</div>
+  <h2>Cette semaine</h2><div class="list">${weekly.map(x=>row(x)).join("")}</div>`;
+}
+
+function renderWhy(){
+  const g=S.goal,q=g.q||["","","",""];
+  $("#v-why").innerHTML=`
+  <div class="card"><label>Mon objectif</label><input id="gt" value="${esc(g.title||"")}" placeholder="Me marier"></div>
+  <div class="card"><label>Date cible</label><input id="gd" type="date" value="${esc(g.date||"")}"></div>
+  <h2>Pourquoi je veux me marier</h2>
+  <p class="hint" style="margin-top:0">Les 4 cases du formulaire Harada : un but qui a du sens pour toi ET pour les autres tient sur la durée.</p>
+  <div class="quad">
+    <div class="card"><label>Pour moi · concret</label><textarea data-q="0" placeholder="Ex. un foyer stable, ne plus être seul…">${esc(q[0])}</textarea></div>
+    <div class="card"><label>Pour moi · intérieur</label><textarea data-q="1" placeholder="Ex. compléter la moitié de ma religion, préserver mon regard…">${esc(q[1])}</textarea></div>
+    <div class="card"><label>Pour les autres · concret</label><textarea data-q="2" placeholder="Ex. rendre mes parents fiers, fonder une famille…">${esc(q[2])}</textarea></div>
+    <div class="card"><label>Pour les autres · intérieur</label><textarea data-q="3" placeholder="Ex. élever des enfants pieux, être un exemple…">${esc(q[3])}</textarea></div>
+  </div>
+  <h2>À relire chaque matin</h2>
+  <div class="card ayah"><div class="ar">وَأَنكِحُوا الْأَيَامَىٰ مِنكُمْ وَالصَّالِحِينَ مِنْ عِبَادِكُمْ وَإِمَائِكُمْ ۚ إِن يَكُونُوا فُقَرَاءَ يُغْنِهِمُ اللَّهُ مِن فَضْلِهِ</div>
+  « Mariez les célibataires d'entre vous et les gens de bien parmi vos serviteurs et servantes. S'ils sont pauvres, Allah les rendra riches par Sa grâce. » — An-Nûr 24:32</div>
+  <div class="card ayah"><div class="ar">رَبِّ إِنِّي لِمَا أَنزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ</div>
+  « Seigneur, j'ai grand besoin du bien que Tu feras descendre vers moi. » — Du'a de Mûsâ, Al-Qasas 28:24, juste avant qu'Allah ne lui facilite son mariage.</div>
+  <h2>Réglages</h2>
+  <button class="btn ghost" id="rst">Remettre la grille à zéro</button>`;
+}
+
+function renderJournal(){
+  const t=today(),cur=(S.journal.find(e=>e.d===t)||{});
+  $("#v-journal").innerHTML=`
+  <p class="hint" style="margin-top:0">Le journal Harada : 2 minutes le soir. Ce qui a marché, ce qui a bloqué, ce que je fais demain.</p>
+  <div class="card"><label>Ce qui a marché aujourd'hui</label><textarea id="j1">${esc(cur.a||"")}</textarea></div>
+  <div class="card"><label>Ce qui a bloqué</label><textarea id="j2">${esc(cur.b||"")}</textarea></div>
+  <div class="card"><label>Demain, ma priorité</label><textarea id="j3">${esc(cur.c||"")}</textarea></div>
+  <button class="btn" id="jsave">Enregistrer ${fmtDate(t)}</button>
+  <h2>Historique</h2>
+  <div>${S.journal.filter(e=>e.d!==t).slice().reverse().slice(0,30).map(e=>`<div class="entry"><b>${fmtDate(e.d)}</b>${e.a?"✓ "+esc(e.a)+"\n":""}${e.b?"✗ "+esc(e.b)+"\n":""}${e.c?"→ "+esc(e.c):""}</div>`).join("")||'<p class="hint">Rien encore.</p>'}</div>`;
+}
+
+function fmtDate(k){const[y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString("fr-FR",{weekday:"short",day:"numeric",month:"short"})}
+
+/* ======== FICHE ACTION ======== */
+let sh=null;
+function sheet(p,i){
+  sh=[p,i];const a=P[p].a[i],d=isDone(p,i);
+  $("#sheet").innerHTML=`<div class="grab"></div>
+  <h3 id="sht">${esc(label(p,i))}</h3>
+  <div class="meta">${esc(P[p].full)} · ${KIND[a[1]]}${a[1]!=="t"?(d?" · fait "+(a[1]==="j"?"aujourd'hui":"cette semaine"):""):(d?" · fait":"")}</div>
+  <div class="why">${esc(a[2])}</div>
+  <div class="acts"><button class="btn ghost" id="sedit">Renommer</button><button class="btn" id="stog">${d?"Décocher":"C'est fait"}</button></div>`;
+  $("#sheet").classList.add("on");$("#veil").classList.add("on");
+}
+function close(){$("#sheet").classList.remove("on");$("#veil").classList.remove("on");sh=null}
+$("#veil").onclick=close;
+$("#sheet").addEventListener("click",e=>{
+  if(!sh)return;
+  if(e.target.id==="stog"){toggle(sh[0],sh[1]);close()}
+  if(e.target.id==="sedit"){const id=aid(sh[0],sh[1]);const v=prompt("Nouveau texte de la case :",label(sh[0],sh[1]));
+    if(v!==null){if(v.trim())S.edit[id]=v.trim().slice(0,60);else delete S.edit[id];save();render();sheet(sh[0],sh[1])}}
+});
+
+/* ======== ÉVÉNEMENTS ======== */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.v){view=b.dataset.v;document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
+    ["grid","routine","why","journal"].forEach(v=>$("#v-"+v).classList.toggle("hidden",v!==view));window.scrollTo(0,0);render();return}
+  if(b.dataset.g){gmode=b.dataset.g;document.querySelectorAll(".seg button").forEach(x=>x.classList.toggle("on",x===b));render();return}
+  if(b.dataset.p!==undefined){open=+b.dataset.p;render();window.scrollTo(0,0);return}
+  if(b.id==="bk"){open=-1;render();return}
+  if(b.dataset.a!==undefined){sheet(open,+b.dataset.a);return}
+  if(b.dataset.pa){const[p,a]=b.dataset.pa.split(",").map(Number);if(b.dataset.tg)toggle(p,a);else sheet(p,a);return}
+  if(b.id==="jsave"){const t=today();S.journal=S.journal.filter(x=>x.d!==t);
+    const en={d:t,a:$("#j1").value.trim(),b:$("#j2").value.trim(),c:$("#j3").value.trim()};
+    if(en.a||en.b||en.c)S.journal.push(en);save();b.textContent="Enregistré ✓";setTimeout(render,900);return}
+  if(b.id==="rst"){if(confirm("Effacer toutes les cases cochées, la routine et le journal ?")){S={done:{},edit:{},log:{},journal:[],goal:S.goal};save();render()}}
+});
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.id==="gt"){S.goal.title=t.value.trim();save();$("#gpct").textContent=globalPct()+" %";$("#ttl").firstChild.textContent="Objectif : "+goalTxt().toLowerCase()}
+  if(t.id==="gd"){S.goal.date=t.value;save()}
+  if(t.dataset.q!==undefined){S.goal.q=S.goal.q||["","","",""];S.goal.q[+t.dataset.q]=t.value;save()}
+});
+render();
+</script>
+</body>
+</html>
