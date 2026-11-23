@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-23T10:54:26.624Z",
+  "generated": "2026-11-23T12:29:39.938Z",
   "apps": [
     {
       "name": "Harada",
@@ -14,6 +14,19 @@
       "description": "Méthode Harada pour se marier : 8 piliers, 64 actions, routine quotidienne et journal",
       "icon": "apps/harada-mariage/icon.svg",
       "id": "harada-mariage"
+    },
+    {
+      "name": "Quench",
+      "emoji": "🧲",
+      "colors": [
+        "#141619",
+        "#D9381E"
+      ],
+      "category": "Jeux",
+      "added": "2026-11-23",
+      "description": "Opérateur d'accélérateur face à CORTEX-9 : trie les traces, sabote juste assez, évite le quench",
+      "icon": "apps/quench/icon.svg",
+      "id": "quench"
     },
     {
       "name": "Adhkar",

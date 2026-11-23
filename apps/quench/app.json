@@ -1,0 +1,9 @@
+{
+  "name": "Quench",
+  "emoji": "🧲",
+  "colors": ["#141619", "#D9381E"],
+  "category": "Jeux",
+  "added": "2026-11-23",
+  "description": "Opérateur d'accélérateur face à CORTEX-9 : trie les traces, sabote juste assez, évite le quench",
+  "icon": "icon.svg"
+}

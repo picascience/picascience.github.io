@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#141619">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>QUENCH // 0.01%</title>
+<style>
+:root{
+  --ink:#141619; --ink2:#1b1e22; --paper:#F4F1EA; --red:#D9381E; --cy:#0077B6;
+  --line:rgba(244,241,234,.16); --line2:rgba(244,241,234,.32); --dim:rgba(244,241,234,.55);
+  --mono:"JetBrains Mono","Space Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0c0d0f;color:var(--paper);font-family:var(--mono);overflow:hidden;
+  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer}
+#app{position:relative;height:100vh;height:100dvh;width:min(100vw,calc(100dvh * 9 / 16));margin:0 auto;background:var(--ink);
+  display:flex;flex-direction:column;gap:8px;overflow:hidden;
+  padding:calc(env(safe-area-inset-top) + 10px) 14px calc(env(safe-area-inset-bottom) + 34px)}
+@media (min-width:601px){#app{border-left:1px solid var(--line);border-right:1px solid var(--line)}}
+@media (max-width:600px){#app{width:100vw}}
+
+/* ---------- top ---------- */
+.top{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.14em}
+.brand b{font-weight:700}
+.brand span{color:var(--dim)}
+.tiny{font-size:10px;letter-spacing:.1em;color:var(--dim);padding:6px 0 6px 8px}
+.tiny:active{color:var(--paper)}
+
+/* ---------- HUD ---------- */
+.hud{display:grid;grid-template-columns:1.15fr 1.15fr .9fr;border:1px solid var(--line2)}
+.g{padding:7px 8px 8px;border-right:1px solid var(--line2);min-width:0}
+.g:last-child{border-right:0}
+.lab{font-size:8.5px;line-height:1.5;letter-spacing:.12em;color:var(--dim);white-space:nowrap;padding-top:1px}
+.val{font-size:19px;font-weight:700;margin:3px 0 5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.val small{font-size:10px;font-weight:400;color:var(--dim);margin-left:2px}
+.bar{position:relative;height:6px;border:1px solid var(--line2)}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--paper)}
+.bar s{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--paper);opacity:.7}
+#gO .bar i{background:var(--cy)}
+.sc{display:flex;justify-content:space-between;font-size:7.5px;color:var(--dim);margin-top:3px;letter-spacing:.04em}
+#gT.warn .val{color:var(--red)} #gT.warn .bar i{background:var(--red)}
+#gT.warn{animation:blink .7s steps(2) infinite}
+#gO.warn{animation:blinkc .7s steps(2) infinite}
+#gO.warn .val{color:#3d9ad6}
+@keyframes blink{50%{box-shadow:inset 0 0 0 1px var(--red)}}
+@keyframes blinkc{50%{box-shadow:inset 0 0 0 1px var(--cy)}}
+.disc{font-size:9px;color:var(--dim);margin-top:2px;letter-spacing:.06em}
+
+/* ---------- log ---------- */
+.log{border:1px solid var(--line);border-left:2px solid var(--cy);padding:7px 9px;font-size:10.5px;line-height:1.4;height:46px;overflow:hidden}
+.log .who{color:var(--cy);font-weight:700;filter:brightness(1.5)}
+.log.hot{border-left-color:var(--red)}
+.log.hot #log{color:var(--red)}
+.caret{display:inline-block;width:6px;height:11px;background:var(--paper);vertical-align:-1px;margin-left:2px;animation:car 1s steps(2) infinite}
+@keyframes car{50%{opacity:0}}
+
+/* ---------- stage / cards ---------- */
+#stage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center}
+#deck{position:relative}
+.card{position:absolute;inset:0;border:1px solid var(--paper);background:var(--paper);will-change:transform;
+  transition:transform .28s cubic-bezier(.25,.8,.35,1),opacity .28s;transform:translateY(10px) scale(.95);opacity:.55}
+.card.top{transform:none;opacity:1;cursor:grab}
+.card.top:active{cursor:grabbing}
+.card canvas{display:block;width:100%;height:100%}
+.stamp{position:absolute;top:44px;padding:5px 10px 4px;border:2px solid var(--ink);color:var(--ink);font-size:20px;font-weight:700;letter-spacing:.14em;
+  opacity:0;pointer-events:none;background:rgba(244,241,234,.85)}
+.stamp::after{content:"";position:absolute;inset:2px;border:1px solid var(--ink)}
+.stamp.l{right:16px;transform:rotate(9deg)}
+.stamp.r{left:16px;transform:rotate(-9deg)}
+.stamp.err{color:var(--red);border-color:var(--red)}
+.stamp.err::after{border-color:var(--red)}
+
+/* ---------- timer + controls ---------- */
+.timer{height:3px;background:var(--line);position:relative;overflow:hidden}
+.timer i{position:absolute;left:0;top:0;bottom:0;width:100%;background:var(--paper)}
+.timer.low i{background:var(--red)}
+.ctl{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:8px}
+.ctl button{border:1px solid var(--line2);padding:9px 6px 7px;font-size:12px;font-weight:700;letter-spacing:.1em;text-align:center}
+.ctl button small{display:block;font-size:8px;font-weight:400;color:var(--dim);letter-spacing:.16em;margin-top:2px}
+.ctl button:active{background:var(--paper);color:var(--ink)}
+.ctl button:active small{color:var(--ink)}
+.meta{align-self:center;text-align:center;font-size:8.5px;color:var(--dim);letter-spacing:.1em;line-height:1.5;font-variant-numeric:tabular-nums}
+.toast{position:absolute;left:50%;bottom:-2px;transform:translate(-50%,0);font-size:10px;letter-spacing:.12em;padding:3px 8px;
+  background:var(--ink);border:1px solid currentColor;opacity:0;transition:opacity .2s,transform .2s;white-space:nowrap;pointer-events:none;z-index:5}
+.toast.show{opacity:1;transform:translate(-50%,-6px)}
+
+#flash{position:absolute;inset:0;background:var(--red);opacity:0;pointer-events:none;mix-blend-mode:screen;z-index:20}
+#app.shake{animation:shake .28s linear}
+@keyframes shake{20%{transform:translate(-3px,1px)}40%{transform:translate(3px,-1px)}60%{transform:translate(-2px,0)}80%{transform:translate(2px,1px)}}
+
+/* ---------- overlays ---------- */
+.ov{position:absolute;inset:0;z-index:30;background:var(--ink);display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 22px) 20px calc(env(safe-area-inset-bottom) + 40px);overflow-y:auto;transition:opacity .3s}
+.ov.hide{opacity:0;pointer-events:none}
+.ov .k{font-size:9px;letter-spacing:.2em;color:var(--dim)}
+.ov h1{font-size:46px;letter-spacing:.02em;line-height:1;margin-top:14px;font-weight:800}
+.ov h1 span{display:block;font-size:20px;font-weight:400;color:var(--dim);margin-top:6px;letter-spacing:.08em}
+.ov .rule{height:1px;background:var(--line2);margin:18px 0}
+.samples{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.samples figure{border:1px solid var(--line2)}
+.samples canvas{display:block;width:100%;aspect-ratio:1/1;background:var(--paper)}
+.samples figcaption{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.1em;padding:6px 7px}
+.samples figcaption em{font-style:normal;color:var(--dim)}
+.tuto{list-style:none;font-size:11.5px;line-height:1.5;display:grid;gap:8px}
+.tuto li{display:grid;grid-template-columns:22px 1fr}
+.tuto li b{color:var(--paper)}
+.tuto li::before{content:attr(data-n);color:var(--dim)}
+.tuto .c{color:#3d9ad6}
+.tuto .r{color:var(--red)}
+.go{margin-top:auto;border:1px solid var(--paper);padding:15px;font-size:13px;font-weight:700;letter-spacing:.18em;width:100%}
+.go:active,.go:hover{background:var(--paper);color:var(--ink)}
+.hint{font-size:9px;color:var(--dim);text-align:center;margin-top:10px;letter-spacing:.08em}
+.cause{font-size:26px;font-weight:800;margin-top:12px;line-height:1.1}
+.cause.q{color:var(--red)} .cause.o{color:#3d9ad6}
+.why{font-size:11.5px;line-height:1.5;color:var(--dim);margin-top:10px}
+.stats{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line2)}
+.stats div{padding:12px 10px;border-bottom:1px solid var(--line2)}
+.stats div:nth-child(odd){border-right:1px solid var(--line2)}
+.stats div:nth-last-child(-n+2){border-bottom:0}
+.stats b{display:block;font-size:22px;margin-top:4px;font-variant-numeric:tabular-nums}
+.stats .k{font-size:8.5px}
+.best{color:var(--dim);font-size:10px;letter-spacing:.1em;margin-top:12px}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="brand"><b>QUENCH</b> <span>// 0.01%</span></div>
+    <button id="snd" class="tiny" aria-label="Son">[SON: ON]</button>
+  </header>
+
+  <section class="hud">
+    <div class="g" id="gT">
+      <div class="lab">TEMPÉRATURE</div>
+      <div class="val"><span id="vT">1.90</span><small>K</small></div>
+      <div class="bar"><i id="bT"></i><s style="left:73.9%"></s></div>
+      <div class="sc"><span>1.9</span><span>3.6</span><span>4.2</span></div>
+    </div>
+    <div class="g" id="gO">
+      <div class="lab">OVERFIT IA</div>
+      <div class="val"><span id="vO">0</span><small>%</small></div>
+      <div class="bar"><i id="bO"></i><s style="left:85%"></s></div>
+      <div class="sc"><span>0</span><span>85</span><span>100</span></div>
+    </div>
+    <div class="g" id="gS">
+      <div class="lab">SCORE</div>
+      <div class="val"><span id="vS">0</span></div>
+      <div class="disc">DÉCOUV. <span id="vD">0</span></div>
+      <div class="disc">COMBO <span id="vC">0</span></div>
+    </div>
+  </section>
+
+  <div class="log" id="logbox"><span class="who">CORTEX-9 &gt;</span> <span id="log"></span><span class="caret"></span></div>
+
+  <main id="stage"><div id="deck"></div><div class="toast" id="toast"></div></main>
+
+  <div class="timer" id="timer"><i id="tb"></i></div>
+
+  <footer class="ctl">
+    <button id="bL">← PURGER<small>BRUIT</small></button>
+    <div class="meta" id="meta">TRACE 000<br>Δt 0.0 s</div>
+    <button id="bR">ARCHIVER →<small>ANOMALIE</small></button>
+  </footer>
+
+  <div id="flash"></div>
+
+  <!-- TITLE -->
+  <section class="ov" id="title">
+    <div class="k">ANNEAU PRINCIPAL · SUPERVISION CORTEX-9</div>
+    <h1>QUENCH<span>// 0.01%</span></h1>
+    <div class="rule"></div>
+    <div class="samples">
+      <figure><canvas id="sN"></canvas><figcaption><span>← BRUIT</span><em>symétrique</em></figcaption></figure>
+      <figure><canvas id="sA"></canvas><figcaption><span>ANOMALIE →</span><em>vertex décalé</em></figcaption></figure>
+    </div>
+    <div class="rule"></div>
+    <ol class="tuto">
+      <li data-n="01"><span><b>Glisse ←</b> pour purger le bruit, <b>→</b> pour archiver une anomalie (vertex décalé, spirale, énergie d'un seul côté).</span></li>
+      <li data-n="02"><span>Trop parfait, et <span class="c">CORTEX-9</span> te modélise : <span class="c">OVERFIT 100 %</span> = tu es remplacé.</span></li>
+      <li data-n="03"><span>Une erreur volontaire casse l'overfit (−18 %) mais chauffe les aimants : <span class="r">4.2 K = QUENCH</span>.</span></li>
+    </ol>
+    <div class="best" id="bestT"></div>
+    <div class="rule" style="margin-bottom:0;opacity:0"></div>
+    <button class="go" id="start">INITIER LA SESSION</button>
+    <div class="hint">CLAVIER : ← / A PURGER · → / D ARCHIVER · ESPACE POUR LANCER</div>
+  </section>
+
+  <!-- GAME OVER -->
+  <section class="ov hide" id="over">
+    <div class="k">SESSION TERMINÉE · RAPPORT D'INCIDENT</div>
+    <div class="cause" id="cause">QUENCH THERMIQUE</div>
+    <div class="why" id="why"></div>
+    <div class="rule"></div>
+    <div class="stats">
+      <div><span class="k">DÉCOUVERTES</span><b id="oD">0</b></div>
+      <div><span class="k">SCORE</span><b id="oS">0</b></div>
+      <div><span class="k">TEMPS DE SURVIE</span><b id="oT">00:00</b></div>
+      <div><span class="k">TRACES TRAITÉES</span><b id="oN">0</b></div>
+    </div>
+    <div class="best" id="bestO"></div>
+    <div class="rule" style="opacity:0"></div>
+    <button class="go" id="again">RELANCER LA SESSION</button>
+    <div class="hint">ESPACE POUR RELANCER</div>
+  </section>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const TAU = Math.PI * 2;
+
+/* ============================================================
+   STOCKAGE (préfixé : domaine partagé MK Apps)
+   ============================================================ */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('quench:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem('quench:' + k, JSON.stringify(v)); } catch (e) {} }
+};
+
+/* ============================================================
+   CONSTANTES D'ÉQUILIBRAGE
+   ============================================================ */
+const CFG = {
+  T_MIN: 1.9, T_WARN: 3.6, T_MAX: 4.2,
+  OF_WARN: 85, OF_MAX: 100,
+  SABOTAGE_OF: 18, SABOTAGE_T: 0.35, SABOTAGE_RAMP: 0.025,
+  TIMEOUT_T: 0.30,
+  COOL_FAST: 0.12, HEAT_SLOW: 0.04, SLOW_FRAC: 0.6,
+  TIMER_BASE: 5.5, TIMER_DECAY: 0.88, TIMER_MIN: 1.5,
+  P_ANOM: 0.45, AMB_FROM: 15
+};
+
+/* ============================================================
+   AUDIO PROCÉDURAL (Web Audio)
+   ============================================================ */
+const A = {
+  ctx: null, out: null, nb: null, on: store.get('sound', true),
+  init() {
+    if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume(); return; }
+    try {
+      const C = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new C();
+      this.out = this.ctx.createGain(); this.out.gain.value = 0.7; this.out.connect(this.ctx.destination);
+      const len = this.ctx.sampleRate; this.nb = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+      const d = this.nb.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    } catch (e) { this.ctx = null; }
+  },
+  ok() { return this.on && this.ctx; },
+  g(t, peak, a, d) {
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + a + d);
+    g.connect(this.out); return g;
+  },
+  osc(type, f0, f1, t, dur, dest) {
+    const o = this.ctx.createOscillator(); o.type = type;
+    o.frequency.setValueAtTime(f0, t);
+    if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    o.connect(dest); o.start(t); o.stop(t + dur + 0.05);
+  },
+  noise(t, dur, dest, off) {
+    const s = this.ctx.createBufferSource(); s.buffer = this.nb;
+    s.connect(dest); s.start(t, off || Math.random() * 0.5); s.stop(t + dur);
+  },
+  purge() { // clic mécanique sec
+    if (!this.ok()) return; const t = this.ctx.currentTime;
+    const hp = this.ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2500;
+    hp.connect(this.g(t, 0.55, 0.001, 0.035)); this.noise(t, 0.05, hp);
+    this.osc('square', 1400, 260, t, 0.03, this.g(t, 0.12, 0.001, 0.03));
+  },
+  archive() { // impulsion cristalline
+    if (!this.ok()) return; const t = this.ctx.currentTime;
+    this.osc('sine', 1568, 1568, t, 0.35, this.g(t, 0.22, 0.002, 0.3));
+    this.osc('sine', 2349, 2349, t, 0.25, this.g(t, 0.12, 0.002, 0.2));
+    this.osc('sine', 3136, 3136, t + 0.03, 0.18, this.g(t + 0.03, 0.07, 0.002, 0.14));
+  },
+  thermal() { // grésillement + impulsion grave
+    if (!this.ok()) return; const t = this.ctx.currentTime;
+    const bp = this.ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1100; bp.Q.value = 0.8;
+    const cr = this.ctx.createGain(); cr.gain.setValueAtTime(0, t);
+    for (let i = 0; i < 14; i++) cr.gain.setValueAtTime(Math.random() < 0.55 ? Math.random() * 0.6 : 0, t + i * 0.016);
+    cr.gain.setValueAtTime(0, t + 0.24);
+    bp.connect(cr); cr.connect(this.out); this.noise(t, 0.26, bp);
+    this.osc('sine', 82, 38, t, 0.35, this.g(t, 0.55, 0.004, 0.32));
+  },
+  alarm(hi) {
+    if (!this.ok()) return; const t = this.ctx.currentTime;
+    const lp = this.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2200; lp.connect(this.out);
+    const f = hi ? 1046 : 880;
+    for (let i = 0; i < 2; i++) {
+      const g = this.ctx.createGain(); const ti = t + i * 0.12;
+      g.gain.setValueAtTime(0.0001, ti); g.gain.exponentialRampToValueAtTime(0.06, ti + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, ti + 0.06); g.connect(lp);
+      const o = this.ctx.createOscillator(); o.type = 'square'; o.frequency.value = f; o.connect(g); o.start(ti); o.stop(ti + 0.08);
+    }
+  },
+  start() {
+    if (!this.ok()) return; const t = this.ctx.currentTime;
+    this.osc('sine', 660, 660, t, 0.08, this.g(t, 0.12, 0.002, 0.07));
+    this.osc('sine', 990, 990, t + 0.09, 0.12, this.g(t + 0.09, 0.12, 0.002, 0.1));
+  },
+  over(q) {
+    if (!this.ok()) return; const t = this.ctx.currentTime;
+    const lp = this.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(1800, t);
+    lp.frequency.exponentialRampToValueAtTime(120, t + 1.4); lp.connect(this.g(t, 0.22, 0.01, 1.4));
+    this.osc('sawtooth', q ? 220 : 440, q ? 40 : 110, t, 1.4, lp);
+    if (q) { const bp = this.ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 600; bp.connect(this.g(t, 0.3, 0.01, 0.9)); this.noise(t, 0.9, bp); }
+  }
+};
+
+/* ============================================================
+   GÉNÉRATION PROCÉDURALE DES TRACES
+   (unités normalisées : rayon du détecteur = 1)
+   ============================================================ */
+function rng(seed) {
+  let a = seed >>> 0;
+  return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+const NT = 32; // tours calorimétriques
+const towerIdx = a => Math.floor((((a % TAU) + TAU) % TAU) / TAU * NT) % NT;
+
+function genEvent(type, amb, seed) {
+  const r = rng(seed), R = (a, b) => a + (b - a) * r();
+  const ev = { type, amb, seed, tracks: [], svx: [], neutral: [], T: new Array(NT).fill(0) };
+  const T = ev.T;
+  if (type === 'noise') {
+    // Paires dos-à-dos, symétrie centrale, faible courbure
+    const np = amb ? 2 + (r() * 2 | 0) : 2 + (r() * 3 | 0);
+    for (let i = 0; i < np; i++) {
+      const th = R(0, TAU), k = R(-0.7, 0.7);
+      ev.tracks.push({ x: 0, y: 0, th, k, g: 1 }, { x: 0, y: 0, th: th + Math.PI, k, g: 1 });
+    }
+    for (let i = 0; i < NT / 2; i++) { const v = R(0.03, 0.13); T[i] = v; T[i + NT / 2] = v * R(0.85, 1.15); }
+    if (amb) { // bruit haute énergie : deux jets opposés, mais symétriques
+      const j = R(0, TAU), ji = towerIdx(j), h = R(0.75, 0.95);
+      for (const o of [0, NT / 2]) {
+        const c = (ji + o) % NT;
+        T[c] = Math.max(T[c], h * R(0.94, 1.04));
+        T[(c + 1) % NT] += h * R(0.3, 0.45); T[(c + NT - 1) % NT] += h * R(0.3, 0.45);
+      }
+      for (const o of [0, Math.PI]) {
+        const n = 2 + (r() * 2 | 0);
+        for (let i = 0; i < n; i++) ev.tracks.push({ x: 0, y: 0, th: j + (TAU / NT) * 0.5 + o + R(-0.12, 0.12), k: R(-0.25, 0.25), g: 1 });
+      }
+    }
+  } else {
+    // Anomalie : vertex secondaire décalé, spirale, asymétrie
+    const np = 1 + (r() * 3 | 0);
+    for (let i = 0; i < np; i++) ev.tracks.push({ x: 0, y: 0, th: R(0, TAU), k: R(-1, 1), g: 1 });
+    const phi = R(0, TAU), d = amb ? R(0.13, 0.19) : R(0.26, 0.44);
+    const sx = Math.cos(phi) * d, sy = Math.sin(phi) * d;
+    ev.neutral.push([0, 0, sx, sy]); ev.svx.push([sx, sy]);
+    const ns = 2 + (r() * 2 | 0);
+    for (let i = 0; i < ns; i++) ev.tracks.push({ x: sx, y: sy, th: phi + R(-0.55, 0.55), k: R(-1.2, 1.2), g: 1 });
+    if (!amb || r() < 0.5) {
+      const sgn = r() < 0.5 ? -1 : 1;
+      ev.tracks.push(amb
+        ? { x: sx, y: sy, th: phi + R(-1, 1), k: sgn * R(2.4, 3.1), g: 1.004 }
+        : { x: sx, y: sy, th: phi + R(-1, 1), k: sgn * R(4, 6), g: R(1.012, 1.02) });
+    }
+    for (let i = 0; i < NT; i++) T[i] = R(0.02, 0.12);
+    const ji = towerIdx(phi), h = amb ? R(0.42, 0.55) : R(0.72, 1);
+    T[ji] = h; T[(ji + 1) % NT] = h * R(0.35, 0.6); T[(ji + NT - 1) % NT] = h * R(0.35, 0.6);
+    for (let o = -4; o <= 4; o++) T[(ji + NT / 2 + o + NT) % NT] *= 0.35;
+  }
+  // Mesures
+  let vx = 0, vy = 0, s = 0;
+  T.forEach((v, i) => { const a = (i + 0.5) / NT * TAU; vx += Math.cos(a) * v; vy += Math.sin(a) * v; s += v; });
+  ev.et = s * 9.5; ev.asym = Math.hypot(vx, vy) / s; ev.ntrk = ev.tracks.length;
+  // Intégration des hélices (projection transverse)
+  ev.paths = ev.tracks.map(t => {
+    const pts = [[t.x, t.y]]; let x = t.x, y = t.y, th = t.th, k = t.k; const ds = 0.008;
+    for (let n = 0; n < 1100; n++) {
+      th += k * ds; x += Math.cos(th) * ds; y += Math.sin(th) * ds; k *= t.g; pts.push([x, y]);
+      if (x * x + y * y > 0.72 * 0.72 || Math.abs(k) > 70) break;
+    }
+    return pts;
+  });
+  return ev;
+}
+
+/* ============================================================
+   RENDU D'UNE PLAQUE (Canvas 2D, net en Retina)
+   ============================================================ */
+const INK = '#141619', PAPER = '#F4F1EA';
+function drawPlate(cv, ev, info) {
+  const dpr = Math.min(3, window.devicePixelRatio || 1);
+  const w = cv.clientWidth, h = cv.clientHeight;
+  if (!w || !h) return;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const c = cv.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const mini = !info;
+  const hd = mini ? 0 : 30, ft = mini ? 0 : 46;
+  c.fillStyle = PAPER; c.fillRect(0, 0, w, h);
+
+  // grille millimétrée
+  const gs = mini ? 10 : 14;
+  c.lineWidth = 1;
+  for (let x = gs, i = 1; x < w; x += gs, i++) {
+    c.strokeStyle = i % 5 === 0 ? 'rgba(20,22,25,.10)' : 'rgba(20,22,25,.045)';
+    c.beginPath(); c.moveTo(Math.round(x) + 0.5, hd); c.lineTo(Math.round(x) + 0.5, h - ft); c.stroke();
+  }
+  for (let y = hd + gs, i = 1; y < h - ft; y += gs, i++) {
+    c.strokeStyle = i % 5 === 0 ? 'rgba(20,22,25,.10)' : 'rgba(20,22,25,.045)';
+    c.beginPath(); c.moveTo(0, Math.round(y) + 0.5); c.lineTo(w, Math.round(y) + 0.5); c.stroke();
+  }
+
+  const cx = w / 2, cy = hd + (h - hd - ft) / 2;
+  const Rr = Math.min(w, h - hd - ft) / 2 - (mini ? 5 : 12);
+  const P = (x, y) => [cx + x * Rr, cy - y * Rr];
+
+  // axes
+  c.strokeStyle = 'rgba(20,22,25,.25)'; c.setLineDash([2, 4]);
+  c.beginPath(); c.moveTo(cx - Rr * 1.02, cy); c.lineTo(cx + Rr * 1.02, cy); c.moveTo(cx, cy - Rr * 1.02); c.lineTo(cx, cy + Rr * 1.02); c.stroke();
+  c.setLineDash([]);
+
+  // couches du trajectographe
+  c.strokeStyle = 'rgba(20,22,25,.22)';
+  for (const rr of [0.2, 0.35, 0.5, 0.65]) { c.beginPath(); c.arc(cx, cy, rr * Rr, 0, TAU); c.stroke(); }
+  c.strokeStyle = 'rgba(20,22,25,.45)';
+  c.beginPath(); c.arc(cx, cy, 0.05 * Rr, 0, TAU); c.stroke();
+
+  // calorimètre
+  c.strokeStyle = INK; c.lineWidth = 1;
+  c.beginPath(); c.arc(cx, cy, 0.75 * Rr, 0, TAU); c.stroke();
+  c.beginPath(); c.arc(cx, cy, 1.0 * Rr, 0, TAU); c.stroke();
+  for (let i = 0; i < NT; i++) { // séparateurs
+    const a = i / NT * TAU; const ca = Math.cos(a), sa = Math.sin(a);
+    c.strokeStyle = 'rgba(20,22,25,.18)';
+    c.beginPath(); c.moveTo(cx + ca * 0.75 * Rr, cy - sa * 0.75 * Rr); c.lineTo(cx + ca * Rr, cy - sa * Rr); c.stroke();
+  }
+  for (let i = 0; i < NT; i++) { // tours d'énergie
+    const v = Math.min(1, ev.T[i]); if (v < 0.01) continue;
+    const a0 = i / NT * TAU + 0.012, a1 = (i + 1) / NT * TAU - 0.012;
+    const r0 = 0.76 * Rr, r1 = (0.76 + v * 0.23) * Rr;
+    c.beginPath(); c.arc(cx, cy, r0, -a0, -a1, true); c.arc(cx, cy, r1, -a1, -a0, false); c.closePath();
+    c.fillStyle = `rgba(20,22,25,${0.18 + v * 0.72})`; c.fill();
+  }
+  // graduations
+  c.strokeStyle = INK;
+  for (let i = 0; i < 24; i++) {
+    const a = i / 24 * TAU, l = i % 6 === 0 ? 7 : 3.5;
+    c.beginPath(); c.moveTo(cx + Math.cos(a) * Rr, cy - Math.sin(a) * Rr);
+    c.lineTo(cx + Math.cos(a) * (Rr + l), cy - Math.sin(a) * (Rr + l)); c.stroke();
+  }
+
+  // particule neutre (pointillé)
+  c.strokeStyle = INK; c.lineWidth = mini ? 1 : 1.2; c.setLineDash([3, 3]);
+  for (const n of ev.neutral) { const a = P(n[0], n[1]), b = P(n[2], n[3]); c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke(); }
+  c.setLineDash([]);
+
+  // traces chargées
+  c.lineWidth = mini ? 1.1 : 1.5; c.lineCap = 'round'; c.lineJoin = 'round'; c.strokeStyle = INK;
+  for (const p of ev.paths) {
+    c.beginPath();
+    for (let i = 0; i < p.length; i++) { const q = P(p[i][0], p[i][1]); i ? c.lineTo(q[0], q[1]) : c.moveTo(q[0], q[1]); }
+    c.stroke();
+    // impacts sur les couches
+    if (!mini) {
+      c.fillStyle = INK;
+      for (const rr of [0.2, 0.35, 0.5, 0.65]) {
+        for (let i = 1; i < p.length; i++) {
+          const r0 = Math.hypot(p[i - 1][0], p[i - 1][1]), r1 = Math.hypot(p[i][0], p[i][1]);
+          if ((r0 - rr) * (r1 - rr) <= 0 && r0 !== r1) { const q = P(p[i][0], p[i][1]); c.fillRect(q[0] - 1.5, q[1] - 1.5, 3, 3); break; }
+        }
+      }
+    }
+  }
+  // vertex primaire
+  c.fillStyle = INK; c.beginPath(); c.arc(cx, cy, mini ? 2 : 2.6, 0, TAU); c.fill();
+  // vertex secondaire(s)
+  for (const v of ev.svx) {
+    const q = P(v[0], v[1]); c.lineWidth = 1.3;
+    c.fillStyle = PAPER; c.beginPath(); c.arc(q[0], q[1], mini ? 3 : 3.8, 0, TAU); c.fill(); c.stroke();
+  }
+
+  if (mini) return;
+
+  // en-tête
+  c.fillStyle = INK; c.font = '600 10px ' + getComputedStyle(document.body).fontFamily;
+  c.textBaseline = 'middle';
+  c.fillText('EVT ' + String(info.n).padStart(6, '0'), 10, 15);
+  c.textAlign = 'right'; c.fillText('RUN 2611 · B = 3.8 T', w - 10, 15); c.textAlign = 'left';
+  c.fillRect(0, hd - 0.5, w, 1);
+  // pied : relevés
+  c.fillRect(0, h - ft - 0.5, w, 1);
+  const cols = [['E_T', ev.et.toFixed(1), 'GeV'], ['ASYM Φ', ev.asym.toFixed(2), ''], ['N_TRK', String(ev.ntrk), '']];
+  const cw = w / 3;
+  cols.forEach((k, i) => {
+    const x = i * cw + 10;
+    if (i) c.fillRect(i * cw, h - ft, 1, ft);
+    c.font = '9px ' + getComputedStyle(document.body).fontFamily; c.globalAlpha = 0.6; c.fillText(k[0], x, h - ft + 13); c.globalAlpha = 1;
+    c.font = '700 15px ' + getComputedStyle(document.body).fontFamily; c.fillText(k[1], x, h - ft + 31);
+    if (k[2]) { const mw = c.measureText(k[1]).width; c.font = '9px ' + getComputedStyle(document.body).fontFamily; c.fillText(k[2], x + mw + 4, h - ft + 32); }
+  });
+}
+
+/* ============================================================
+   ÉTAT DU JEU
+   ============================================================ */
+const el = {
+  app: $('#app'), deck: $('#deck'), stage: $('#stage'),
+  vT: $('#vT'), bT: $('#bT'), gT: $('#gT'), vO: $('#vO'), bO: $('#bO'), gO: $('#gO'),
+  vS: $('#vS'), vD: $('#vD'), vC: $('#vC'), log: $('#log'), logbox: $('#logbox'),
+  tb: $('#tb'), timer: $('#timer'), meta: $('#meta'), flash: $('#flash'), toast: $('#toast'),
+  title: $('#title'), over: $('#over'), snd: $('#snd')
+};
+let S = null;
+let seedBase = (Date.now() & 0xffffff) ^ 0x5eed;
+
+function newState() {
+  return {
+    state: 'play', temp: CFG.T_MIN, dT: CFG.T_MIN, of: 0, dO: 0, score: 0, dS: 0, disc: 0,
+    n: 0, made: 0, streak: 0, elapsed: 0, timer: CFG.TIMER_BASE, left: CFG.TIMER_BASE,
+    cur: null, next: null, lock: false, ofStep: 0, nextAlarm: 0, cause: null
+  };
+}
+
+function timerFor(n) { return Math.max(CFG.TIMER_MIN, CFG.TIMER_BASE * Math.pow(CFG.TIMER_DECAY, Math.floor(n / 10))); }
+function ambProb(n) { return n < CFG.AMB_FROM ? 0 : Math.min(0.55, 0.3 + (n - CFG.AMB_FROM) * 0.01); }
+
+/* ---------- cartes ---------- */
+function makeCard() {
+  S.made++;
+  const idx = S.made;
+  const r = rng(seedBase + idx * 7919);
+  let type = r() < CFG.P_ANOM ? 'anom' : 'noise';
+  if (idx <= 2) type = idx === 1 ? 'noise' : 'anom'; // première lecture guidée
+  const amb = r() < ambProb(idx - 1);
+  const ev = genEvent(type, amb, seedBase + idx * 104729);
+  const card = document.createElement('div'); card.className = 'card';
+  card.innerHTML = '<canvas></canvas><div class="stamp l">PURGÉ</div><div class="stamp r">ARCHIVÉ</div>';
+  el.deck.insertBefore(card, el.deck.firstChild);
+  const o = { el: card, cv: card.querySelector('canvas'), sl: card.querySelector('.stamp.l'), sr: card.querySelector('.stamp.r'), ev, idx };
+  drawPlate(o.cv, ev, { n: 40000 + seedBase % 9000 + idx });
+  return o;
+}
+function promote() {
+  S.cur = S.next; S.cur.el.classList.add('top');
+  S.next = makeCard();
+  S.timer = timerFor(S.n); S.left = S.timer;
+}
+
+/* ---------- log CORTEX-9 ---------- */
+const LOG = { full: '', shown: 0, hot: false };
+function say(msg, hot) { LOG.full = msg; LOG.shown = 0; LOG.hot = !!hot; el.logbox.classList.toggle('hot', LOG.hot); }
+const pick = a => a[Math.random() * a.length | 0];
+const MSG = {
+  sabotage: ['Incohérence détectée. Modèle recalibré.', 'Signal contradictoire. Hypothèse rejetée.', 'Erreur non modélisable. Réapprentissage partiel.', 'Bruit opérateur injecté. Convergence réduite.', 'Décision irrationnelle. Poids réinitialisés.'],
+  streak: ['Décision prévue avant exécution.', 'Comportement opérateur : déterministe.', 'Variance humaine en baisse.', 'Ta main est redondante.', 'Latence cognitive cartographiée.'],
+  timeout: ['Latence opérateur enregistrée. Purge automatique.', 'Délai dépassé. CORTEX-9 a tranché à ta place.'],
+  speed: 'Cadence d\'acquisition augmentée.',
+  amb: 'Collisions ambiguës en entrée. Lis la trace.'
+};
+
+/* ---------- retours visuels ---------- */
+let toastT = 0;
+function toast(txt, color) { el.toast.textContent = txt; el.toast.style.color = color; el.toast.classList.add('show'); toastT = 0.9; }
+function thermalFlash() {
+  el.flash.animate([{ opacity: 0.32 }, { opacity: 0 }], { duration: 380, easing: 'ease-out' });
+  el.app.classList.remove('shake'); void el.app.offsetWidth; el.app.classList.add('shake');
+}
+
+/* ---------- décisions ---------- */
+function decide(dir) {
+  const ev = S.cur.ev;
+  const correct = (dir === 'L') === (ev.type === 'noise');
+  const frac = Math.min(1, (S.timer - S.left) / S.timer);
+  const mult = 1 + 2 * (1 - frac);
+  S.n++;
+  dir === 'L' ? A.purge() : A.archive();
+
+  if (correct) {
+    S.streak++;
+    const inc = 8 + Math.min(6, S.streak - 1);
+    S.of = Math.min(CFG.OF_MAX, S.of + inc);
+    S.temp += frac < CFG.SLOW_FRAC ? -CFG.COOL_FAST : CFG.HEAT_SLOW;
+    if (ev.type === 'anom') { S.disc++; S.score += Math.round(100 * mult); toast('DÉCOUVERTE +' + Math.round(100 * mult), PAPER); }
+    else S.score += Math.round(10 * mult);
+    if (frac >= CFG.SLOW_FRAC) toast('LENTEUR · +' + CFG.HEAT_SLOW.toFixed(2) + ' K', '#D9381E');
+    // messages CORTEX
+    const step = Math.floor(S.of / 10);
+    if (S.of >= 30 && step > S.ofStep) {
+      S.ofStep = step;
+      if (S.of >= 85) say('Convergence imminente. Transfert de contrôle à ' + Math.round(S.of) + ' %.');
+      else say('Pattern humain modélisé à ' + Math.round(S.of) + ' %.');
+    } else if (S.streak === 4 || S.streak === 7 || S.streak === 10) say(pick(MSG.streak));
+  } else {
+    S.streak = 0;
+    S.of = Math.max(0, S.of - CFG.SABOTAGE_OF);
+    S.ofStep = Math.floor(S.of / 10);
+    const heat = CFG.SABOTAGE_T + CFG.SABOTAGE_RAMP * Math.floor((S.n - 1) / 10);
+    S.temp += heat;
+    A.thermal(); thermalFlash();
+    toast('ERREUR CALIBRÉE · −18 % · +' + heat.toFixed(2) + ' K', '#D9381E');
+    if (S.temp >= CFG.T_WARN) say('Alerte cryogénique : aimants à ' + S.temp.toFixed(2) + ' K.', true);
+    else say(pick(MSG.sabotage));
+    const st = dir === 'L' ? S.cur.sl : S.cur.sr; st.classList.add('err');
+  }
+  S.temp = Math.max(CFG.T_MIN, S.temp);
+  milestone();
+  checkEnd();
+}
+function timeout() {
+  S.n++; S.streak = 0;
+  S.temp += CFG.TIMEOUT_T;
+  A.thermal(); thermalFlash();
+  toast('LATENCE · +' + CFG.TIMEOUT_T.toFixed(2) + ' K', '#D9381E');
+  say(S.temp >= CFG.T_WARN ? 'Alerte cryogénique : aimants à ' + S.temp.toFixed(2) + ' K.' : pick(MSG.timeout), S.temp >= CFG.T_WARN);
+  fly('L', true);
+  milestone();
+  checkEnd();
+}
+function milestone() {
+  if (S.n > 0 && S.n % 10 === 0 && S.state === 'play') { if (!LOG.hot) say(MSG.speed); }
+  if (S.n === CFG.AMB_FROM && !LOG.hot) say(MSG.amb);
+}
+function checkEnd() {
+  if (S.temp >= CFG.T_MAX) { S.temp = CFG.T_MAX; end('quench'); }
+  else if (S.of >= CFG.OF_MAX) end('obso');
+}
+
+/* ---------- animation de sortie ---------- */
+function fly(dir, auto) {
+  const c = S.cur; if (!c) return;
+  S.lock = true;
+  const W = el.deck.clientWidth;
+  const sx = dir === 'R' ? 1 : -1;
+  c.el.style.transition = 'transform .3s cubic-bezier(.3,.5,.45,1), opacity .3s';
+  c.el.style.transform = auto
+    ? `translateY(${el.deck.clientHeight * 0.35}px) scale(.85)`
+    : `translate(${sx * W * 1.35}px, ${(drag && drag.dy) || 0}px) rotate(${sx * 22}deg)`;
+  c.el.style.opacity = '0';
+  (dir === 'R' ? c.sr : c.sl).style.opacity = 1;
+  setTimeout(() => {
+    c.el.remove();
+    if (S.state === 'play') promote();
+    S.lock = false;
+  }, 300);
+}
+function commit(dir) {
+  if (!S || S.state !== 'play' || S.lock || !S.cur) return;
+  A.init();
+  decide(dir);
+  fly(dir, false);
+}
+
+/* ---------- fin de partie ---------- */
+function end(cause) {
+  if (S.state !== 'play') return;
+  S.state = 'over'; S.cause = cause;
+  A.over(cause === 'quench');
+  const best = Math.max(store.get('best', 0), S.score); store.set('best', best);
+  const q = cause === 'quench';
+  $('#cause').textContent = q ? 'QUENCH THERMIQUE' : 'OBSOLESCENCE';
+  $('#cause').className = 'cause ' + (q ? 'q' : 'o');
+  $('#why').textContent = q
+    ? 'Les aimants supraconducteurs ont franchi 4.2 K. L\'anneau a perdu sa supraconductivité : trop de sabotage, ou trop lent.'
+    : 'CORTEX-9 a convergé à 100 % sur ton pattern de décision. Le terminal est verrouillé : l\'opérateur n\'est plus nécessaire.';
+  $('#oD').textContent = S.disc;
+  $('#oS').textContent = S.score;
+  const t = Math.floor(S.elapsed);
+  $('#oT').textContent = String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0');
+  $('#oN').textContent = S.n;
+  $('#bestO').textContent = 'RECORD : ' + best + (S.score >= best && S.score > 0 ? '  ·  NOUVEAU' : '');
+  say(q ? 'Quench détecté. Session interrompue.' : 'Terminal verrouillé. Merci pour les données.', q);
+  setTimeout(() => el.over.classList.remove('hide'), q ? 650 : 900);
+  if (q) { el.flash.animate([{ opacity: 0.55 }, { opacity: 0 }], { duration: 900, easing: 'ease-out' }); }
+}
+
+/* ---------- démarrage ---------- */
+function start() {
+  A.init(); A.start();
+  seedBase = ((Date.now() * 2654435761) >>> 0) & 0x7fffffff;
+  el.deck.innerHTML = '';
+  S = newState();
+  S.cur = makeCard(); S.cur.el.classList.add('top');
+  S.next = makeCard();
+  S.timer = timerFor(0); S.left = S.timer;
+  say('Session ouverte. Observation de l\'opérateur en cours.');
+  el.title.classList.add('hide'); el.over.classList.add('hide');
+}
+
+/* ============================================================
+   ENTRÉES : swipe tactile / souris / clavier
+   ============================================================ */
+let drag = null;
+el.deck.addEventListener('pointerdown', e => {
+  if (!S || S.state !== 'play' || S.lock || !S.cur || !S.cur.el.contains(e.target)) return;
+  A.init();
+  const now = performance.now();
+  drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, dx: 0, dy: 0, lx: e.clientX, lt: now, v: 0 };
+  S.cur.el.style.transition = 'none';
+  try { S.cur.el.setPointerCapture(e.pointerId); } catch (_) {}
+});
+window.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.id || !S.cur) return;
+  const now = performance.now();
+  drag.dx = e.clientX - drag.x0; drag.dy = (e.clientY - drag.y0) * 0.25;
+  const dt = Math.max(1, now - drag.lt);
+  drag.v = drag.v * 0.6 + ((e.clientX - drag.lx) / dt) * 0.4; drag.lx = e.clientX; drag.lt = now;
+  const W = el.deck.clientWidth;
+  S.cur.el.style.transform = `translate(${drag.dx}px, ${drag.dy}px) rotate(${drag.dx * 0.06}deg)`;
+  const p = Math.min(1, Math.abs(drag.dx) / (W * 0.28));
+  S.cur.sr.style.opacity = drag.dx > 0 ? p : 0;
+  S.cur.sl.style.opacity = drag.dx < 0 ? p : 0;
+});
+function release(e) {
+  if (!drag || e.pointerId !== drag.id) return;
+  const W = el.deck.clientWidth, d = drag;
+  if (S && S.cur && S.state === 'play' && !S.lock) {
+    if (Math.abs(d.dx) > W * 0.28 || (Math.abs(d.v) > 0.55 && Math.abs(d.dx) > 24)) commit(d.dx > 0 ? 'R' : 'L');
+    else {
+      S.cur.el.style.transition = 'transform .25s cubic-bezier(.3,1.4,.5,1)';
+      S.cur.el.style.transform = ''; S.cur.sl.style.opacity = 0; S.cur.sr.style.opacity = 0;
+    }
+  }
+  drag = null;
+}
+window.addEventListener('pointerup', release);
+window.addEventListener('pointercancel', release);
+
+$('#bL').addEventListener('click', () => commit('L'));
+$('#bR').addEventListener('click', () => commit('R'));
+$('#start').addEventListener('click', start);
+$('#again').addEventListener('click', start);
+window.addEventListener('keydown', e => {
+  const k = e.key;
+  if (k === 'ArrowLeft' || k === 'a' || k === 'A' || k === 'q' || k === 'Q') { e.preventDefault(); commit('L'); }
+  else if (k === 'ArrowRight' || k === 'd' || k === 'D') { e.preventDefault(); commit('R'); }
+  else if (k === ' ' || k === 'Enter') {
+    if (!S || S.state === 'over') { e.preventDefault(); if (!S || !el.over.classList.contains('hide') || !S) start(); }
+  }
+});
+function setSnd() { el.snd.textContent = '[SON: ' + (A.on ? 'ON' : 'OFF') + ']'; }
+el.snd.addEventListener('click', () => { A.on = !A.on; store.set('sound', A.on); A.init(); setSnd(); if (A.on) A.archive(); });
+setSnd();
+document.addEventListener('pointerdown', () => A.init(), { once: true });
+
+/* ============================================================
+   MISE EN PAGE (devicePixelRatio, resize)
+   ============================================================ */
+function layout() {
+  const r = el.stage.getBoundingClientRect();
+  const ratio = 0.84;
+  let ch = Math.min(r.height - 14, (r.width) / ratio);
+  let cw = ch * ratio;
+  el.deck.style.width = Math.floor(cw) + 'px'; el.deck.style.height = Math.floor(ch) + 'px';
+  if (S) for (const c of [S.cur, S.next]) if (c && c.el.isConnected) drawPlate(c.cv, c.ev, { n: 40000 + seedBase % 9000 + c.idx });
+}
+let rT = 0;
+window.addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => { layout(); drawSamples(); }, 80); });
+
+function drawSamples() {
+  drawPlate($('#sN'), genEvent('noise', false, 7), null);
+  drawPlate($('#sA'), genEvent('anom', false, 31), null);
+}
+
+/* ============================================================
+   BOUCLE PRINCIPALE (requestAnimationFrame)
+   ============================================================ */
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  if (S) {
+    if (S.state === 'play' && !document.hidden) {
+      S.elapsed += dt;
+      if (!S.lock && S.cur && !drag) { S.left -= dt; if (S.left <= 0) { S.left = 0; timeout(); } }
+      else if (!S.lock && S.cur && drag) { S.left -= dt * 0.5; if (S.left <= 0) { S.left = 0; drag = null; timeout(); } }
+      // alarme rythmique
+      const hotT = S.temp > CFG.T_WARN, hotO = S.of > CFG.OF_WARN;
+      if ((hotT || hotO) && now / 1000 > S.nextAlarm) {
+        A.alarm(hotT);
+        S.nextAlarm = now / 1000 + ((S.temp > 3.95 || S.of > 93) ? 0.55 : 0.9);
+      }
+    }
+    // lissage des jauges
+    const k = 1 - Math.pow(0.0005, dt);
+    S.dT += (S.temp - S.dT) * k; S.dO += (S.of - S.dO) * k; S.dS += (S.score - S.dS) * Math.min(1, k * 1.5);
+    el.vT.textContent = S.dT.toFixed(2);
+    el.bT.style.width = ((S.dT - CFG.T_MIN) / (CFG.T_MAX - CFG.T_MIN) * 100).toFixed(1) + '%';
+    el.vO.textContent = Math.round(S.dO);
+    el.bO.style.width = S.dO.toFixed(1) + '%';
+    el.vS.textContent = Math.round(S.dS);
+    el.vD.textContent = S.disc; el.vC.textContent = S.streak;
+    el.gT.classList.toggle('warn', S.temp > CFG.T_WARN);
+    el.gO.classList.toggle('warn', S.of > CFG.OF_WARN);
+    const f = S.timer ? Math.max(0, S.left / S.timer) : 0;
+    el.tb.style.width = (f * 100).toFixed(2) + '%';
+    el.timer.classList.toggle('low', f < 0.3);
+    el.meta.innerHTML = 'TRACE ' + String(S.n + 1).padStart(3, '0') + '<br>Δt ' + S.timer.toFixed(1) + ' s';
+  }
+  // log machine à écrire
+  if (LOG.shown < LOG.full.length) { LOG.shown = Math.min(LOG.full.length, LOG.shown + dt * 70); el.log.textContent = LOG.full.slice(0, Math.floor(LOG.shown)); }
+  if (toastT > 0) { toastT -= dt; if (toastT <= 0) el.toast.classList.remove('show'); }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- init ---------- */
+const best = store.get('best', 0);
+$('#bestT').textContent = best ? 'RECORD : ' + best : '';
+layout(); drawSamples();
+say('En attente d\'un opérateur.');
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
