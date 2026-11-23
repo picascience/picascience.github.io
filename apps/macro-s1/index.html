@@ -12,9 +12,9 @@
 html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 8px) 12px 8px;border-bottom:1px solid var(--line)}
 header h1{font-size:15px;margin:0 0 8px;color:var(--mut);font-weight:600;letter-spacing:.02em}
-#dos{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 8px}#dos button{border:1.5px solid var(--line);background:var(--card);color:var(--mut);font:600 14px/1 inherit;padding:10px 4px;border-radius:10px}#dos button.on{border-color:var(--acc);background:var(--acc);color:#fff}
-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;background:var(--line);border-radius:10px;padding:3px}
-nav button{border:0;background:transparent;color:var(--mut);font:600 12.5px/1 inherit;padding:9px 1px;border-radius:8px}
+#dos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:0 0 8px}#dos button{border:1.5px solid var(--line);background:var(--card);color:var(--mut);font:600 14px/1 inherit;padding:10px 4px;border-radius:10px}#dos button.on{border-color:var(--acc);background:var(--acc);color:#fff}
+nav{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;background:var(--line);border-radius:10px;padding:3px}
+nav button{border:0;background:transparent;color:var(--mut);font:600 11.5px/1.1 inherit;padding:8px 1px;border-radius:8px}
 nav button.on{background:var(--card);color:var(--acc);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 main{padding:14px 14px calc(env(safe-area-inset-bottom) + 60px);max-width:680px;margin:0 auto}
 section{display:none}section.on{display:block}
@@ -51,16 +51,21 @@ b,strong{font-weight:650}
 .face .f{white-space:normal;border:0;background:transparent;font-size:19px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .btn.ko{background:var(--ko)}.btn.okb{background:var(--ok)}
+.inp{width:100%;font:600 20px/1 inherit;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);margin:0 0 8px}
+.dt{width:100%;border-collapse:collapse;margin:6px 0 10px;font-size:14.5px}.dt td{border:1px solid var(--line);padding:6px 8px}.dt td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:650}
+.seg{display:flex;gap:6px;margin:0 0 12px}.seg button{flex:1;border:1.5px solid var(--line);background:var(--card);color:var(--mut);font:600 14px/1 inherit;padding:10px 4px;border-radius:10px}.seg button.on{border-color:var(--acc);color:var(--acc);background:var(--acc2)}
+.ans{background:var(--okbg);border-left:3px solid var(--ok);border-radius:8px;padding:10px 12px;margin:8px 0 10px;font-size:15px}
 </style>
 </head>
 <body>
 <header>
 <h1 id="ttl">Macroéconomie · Séance 1</h1>
-<div id="dos"><button data-d="1">Dossier 1</button><button data-d="2">Dossier 2</button></div>
-<nav id="nav"><button data-t="fiche">Fiche</button><button data-t="qcm">QCM</button><button data-t="flash">Cartes</button><button data-t="carte">Carte</button><button data-t="pieges">Pièges</button></nav>
+<div id="dos"><button data-d="1">Dossier 1</button><button data-d="2">Dossier 2</button><button data-d="3">Dossier 3</button></div>
+<nav id="nav"><button data-t="fiche">Fiche</button><button data-t="oral">Quiz type</button><button data-t="qcm">QCM</button><button data-t="flash">Cartes</button><button data-t="carte">Carte</button><button data-t="pieges">Pièges</button></nav>
 </header>
 <main>
 <section id="fiche"></section>
+<section id="oral"></section>
 <section id="qcm"></section>
 <section id="flash"></section>
 <section id="carte"></section>
@@ -68,11 +73,14 @@ b,strong{font-weight:650}
 </main>
 <script src="./data.js"></script>
 <script src="./data2.js"></script>
+<script src="./data3.js"></script>
 <script>
 (function(){
-var DOS='2';try{DOS=localStorage.getItem('macro-s1:dossier')||'2'}catch(e){}
-if(DOS==='2'&&!window.DATA2)DOS='1';
-var D=(DOS==='2'?window.DATA2:window.DATA)||{fiche:[],qcm:[],flash:[],pieges:[]},K=DOS==='2'?'macro-s1:d2:':'macro-s1:';
+var SRC={'1':window.DATA,'2':window.DATA2,'3':window.DATA3};
+var DOS='3';try{DOS=localStorage.getItem('macro-s1:dossier')||'3'}catch(e){}
+if(!SRC[DOS])DOS='3';if(!SRC[DOS])DOS='1';
+var D=SRC[DOS]||{fiche:[],qcm:[],flash:[],pieges:[]},K=DOS==='1'?'macro-s1:':'macro-s1:d'+DOS+':';
+D.fiche=D.fiche||[];D.qcm=D.qcm||[];D.flash=D.flash||[];D.pieges=D.pieges||[];D.oral=D.oral||[];
 [].forEach.call(document.querySelectorAll('#dos button'),function(b){b.classList.toggle('on',b.dataset.d===DOS);b.onclick=function(){if(b.dataset.d===DOS)return;try{localStorage.setItem('macro-s1:dossier',b.dataset.d)}catch(e){}location.reload()}});
 function get(k,d){try{var v=localStorage.getItem(K+k);return v==null?d:JSON.parse(v)}catch(e){return d}}
 function set(k,v){try{localStorage.setItem(K+k,JSON.stringify(v))}catch(e){}}
@@ -134,7 +142,45 @@ function drawF(){var el=$('flash'),d=deck();
  fc.ontouchmove=function(e){if(x0==null)return;dx=e.touches[0].clientX-x0;fc.style.transform='translateX('+dx+'px) rotate('+dx/25+'deg)'};
  fc.ontouchend=function(){fc.style.transform='';if(dx>70)nxt(true);else if(dx<-70)nxt(false);x0=null;setTimeout(function(){dx=0},50)};
  $('fk').onclick=function(){nxt(false)};$('fo').onclick=function(){nxt(true)}}
+
+/* Quiz type : questions rédigées + calculs */
+var O=get('oral',{mode:'q',i:0,ok:0,n:0});
+function r1(x){return Math.round(x*10)/10}
+function fr(x,d){return x.toLocaleString('fr-FR',{minimumFractionDigits:d==null?1:d,maximumFractionDigits:d==null?1:d})}
+function rnd(a,b){return r1(a+Math.random()*(b-a))}
+var GEN=[
+function(){var v={DC:rnd(900,1800),FBCF:rnd(250,520),OV:rnd(0,3),VS:rnd(-12,12),EX:rnd(300,700),IM:rnd(300,720)};var p=r1(v.DC+v.FBCF+v.OV+v.VS+v.EX-v.IM);
+ return{t:'Calculez le PIB.',rows:[['Importations (IM)',v.IM],['Dépense de consommation finale (DC)',v.DC],['FBCF',v.FBCF],['Acquisitions − cessions d\'objets de valeur (OV)',v.OV],['Variation des stocks (VS)',v.VS],['Exportations (EX)',v.EX]],ans:p,d:1,sol:'PIB = DC + FBCF + VS + OV + EX − IM = '+fr(v.DC)+' + '+fr(v.FBCF)+(v.VS<0?' − '+fr(-v.VS):' + '+fr(v.VS))+' + '+fr(v.OV)+' + '+fr(v.EX)+' − '+fr(v.IM)+' = <b>'+fr(p)+'</b>'}},
+function(){var P=Math.round(rnd(900,2000)),CI=Math.round(P*rnd(.45,.6)),IP=Math.round(rnd(60,160)),SP=Math.round(rnd(3,20)),p=P-CI+IP-SP;
+ return{t:'Calculez le PIB par l\'approche production.',rows:[['Production (prix de base)',P],['Consommations intermédiaires',CI],['Impôts sur les produits (IP)',IP],['Subventions sur les produits (SP)',SP]],ans:p,d:0,sol:'PIB = P − CI + IP − SP = '+P+' − '+CI+' + '+IP+' − '+SP+' = <b>'+p+'</b> (VAB = '+(P-CI)+')'}},
+function(){var P=Math.round(rnd(30,900)),CI=Math.round(P*rnd(.3,.7)),a=Math.round(CI*rnd(.2,.6));var c=Math.round(a/P*1000)/1000;
+ return{t:'La branche j produit '+P+' et consomme '+a+' de produit i en CI. Calculez le coefficient technique a(i,j) (3 décimales).',rows:[],ans:c,d:3,tol:.0015,sol:'a(i,j) = CI de i par j / production de j = '+a+' / '+P+' = <b>'+fr(c,3)+'</b> : pour 1 € produit, la branche j utilise '+fr(c*100,1)+' centimes de produit i.'}},
+function(){var B=Math.round(rnd(20,900)),IP=Math.round(rnd(1,80)),SP=Math.round(rnd(0,15)),MC=Math.round(rnd(0,60)),p=B+IP-SP+MC;
+ return{t:'Calculez le total des ressources du produit au prix d\'acquisition.',rows:[['Production (prix de base)',B],['Importations',0],['Impôts sur les produits',IP],['Subventions sur les produits',SP],['Marges commerciales',MC]],ans:p,d:0,sol:'Ressources = P + IM + IP − SP + MC = '+B+' + 0 + '+IP+' − '+SP+' + '+MC+' = <b>'+p+'</b>'}},
+function(){var EX=Math.round(rnd(20,300)),IM=Math.round(rnd(20,300)),t=Math.round(EX/IM*1000)/10;
+ return{t:'Calculez le taux de couverture (en %, 1 décimale).',rows:[['Exportations',EX],['Importations',IM]],ans:t,d:1,tol:.06,sol:'Taux de couverture = EX / IM = '+EX+' / '+IM+' = <b>'+fr(t)+' %</b> → '+(t>=100?'excédent commercial':'déficit commercial')}}
+];
+function drawO(){var el=$('oral'),hasC=!!D.calc,hasQ=D.oral.length>0;
+ if(!hasC&&!hasQ){el.innerHTML='<p class="center">Bientôt disponible pour ce dossier.</p>';return}
+ if(!hasC)O.mode='q';if(!hasQ)O.mode='c';
+ var h='';if(hasC&&hasQ)h+='<div class="seg"><button data-m="q"'+(O.mode==='q'?' class="on"':'')+'>Questions rédigées</button><button data-m="c"'+(O.mode==='c'?' class="on"':'')+'>Calculs illimités</button></div>';
+ if(O.mode==='q'){var L=D.oral,i=O.i%L.length,x=L[i];
+  h+='<div class="meta"><span>Question '+(i+1)+' / '+L.length+'</span><span>'+O.ok+' / '+O.n+' sues</span></div><div class="card"><p class="q">'+x.q+'</p><p class="center" style="font-size:13px">Réponds dans ta tête ou sur papier, puis vérifie.</p><div id="oa"></div><button class="btn" id="ov">Voir la réponse modèle</button></div>';
+  el.innerHTML=h;
+  $('ov').onclick=function(){$('oa').innerHTML='<div class="ans">'+x.r+'</div><div class="row"><button class="btn ko" id="o0">À revoir</button><button class="btn okb" id="o1">Je l\'avais</button></div>';this.remove();
+   $('o0').onclick=function(){O.n++;O.i++;set('oral',O);drawO();window.scrollTo(0,0)};$('o1').onclick=function(){O.n++;O.ok++;O.i++;set('oral',O);drawO();window.scrollTo(0,0)}};
+ } else {var g=GEN[Math.floor(Math.random()*GEN.length)]();
+  h+='<div class="meta"><span>Calcul</span><span>'+(O.cok||0)+' / '+(O.cn||0)+' justes</span></div><div class="card"><p class="q">'+g.t+'</p>'+(g.rows.length?'<table class="dt">'+g.rows.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+fr(r[1],g.d===1?1:0)+'</td></tr>'}).join('')+'</table>':'')+'<input class="inp" id="ci" inputmode="decimal" placeholder="Ta réponse"><div id="cr"></div><button class="btn" id="cv">Vérifier</button></div>';
+  el.innerHTML=h;
+  $('cv').onclick=function(){var v=parseFloat(($('ci').value||'').replace(/\s/g,'').replace(',','.'));var ok=!isNaN(v)&&Math.abs(v-g.ans)<=(g.tol||(g.d?.051:.5));
+   O.cn=(O.cn||0)+1;if(ok)O.cok=(O.cok||0)+1;set('oral',O);
+   $('cr').innerHTML='<div class="exp" style="background:'+(ok?'var(--okbg)':'var(--kobg)')+'"><strong>'+(ok?'Juste.':'Faux.')+'</strong> '+g.sol+'</div>';
+   this.textContent='Nouveau calcul';this.onclick=function(){drawO();window.scrollTo(0,0)}};
+ }
+ [].forEach.call(el.querySelectorAll('.seg button'),function(b){b.onclick=function(){O.mode=b.dataset.m;set('oral',O);drawO()}});
+}
 drawF();
+drawO();
 tab(get('tab','fiche'));
 })();
 </script>

@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-23T12:29:39.938Z",
+  "generated": "2026-11-23T14:57:55.705Z",
   "apps": [
     {
       "name": "Harada",
@@ -388,7 +388,7 @@
       ],
       "category": "Dauphine",
       "added": "2026-11-13",
-      "description": "Fiche express, QCM, cartes et pièges : comptabilité nationale, Dossiers 1 et 2 (L1 Dauphine)",
+      "description": "Fiche express, QCM, cartes et pièges : comptabilité nationale, Dossiers 1 à 3, TES et PIB, quiz type et calculs illimités (L1 Dauphine)",
       "icon": "apps/macro-s1/icon.svg",
       "id": "macro-s1"
     },
