@@ -241,6 +241,27 @@ details.mod div{font-size:14.5px;border-left:4px solid var(--acc);padding:6px 10
 
 <section id="quiz" hidden></section>
 <section id="fiche" hidden>
+<div class="card hero">
+<span class="tag">⚡ Express · à relire juste avant le QCM</span>
+<h3>Module 3 en 6 lignes</h3>
+<ul>
+<li><b>Dépense</b> = argent qui sort. <b>Charge</b> = appauvrissement. <b>Recette</b> = argent qui entre. <b>Produit</b> = enrichissement.</li>
+<li>Test à chaque opération : l'argent a-t-il bougé ? suis-je plus riche ou plus pauvre ?</li>
+<li><b>Amortissement</b> = charge sans décaissement. Acheter une machine = dépense sans charge.</li>
+<li><b>Flux = résultat + charges non décaissées − produits non encaissés.</b></li>
+<li>3 principes : <b>séparation des exercices</b> (12 mois max), <b>reconnaissance des produits</b> (à la livraison, pas au paiement), <b>rattachement des charges aux produits</b> (seulement les marchandises vendues).</li>
+<li>Pièges : acompte ≠ produit ; stock invendu ≠ charge ; l'amortissement baisse les deux côtés du bilan.</li>
+</ul>
+<h3>Module 4 en 6 lignes</h3>
+<ul>
+<li>Ordre : <b>① compte de résultat → ② bilan → ③ état des flux</b>.</li>
+<li>Liens : résultat → <b>capitaux propres</b> du bilan ; variation de l'état des flux = évolution de la <b>trésorerie</b> du bilan.</li>
+<li>Encaissements clients = CA − créances de fin + créances de début. Matériels nets = début + acquisitions − amortissements. Emprunts = début + nouveaux − remboursés.</li>
+<li>État des flux : <b>activité / investissement / financement</b> (intérêts et dividendes en financement, impôt en activité).</li>
+<li>Vérifs : total actif = total passif ; trésorerie de fin = début + variation.</li>
+<li>Entraîne-toi : onglet <b>Annales → Cas Consultants Associés</b>, puis <b>QCM → Module 4</b>.</li>
+</ul>
+</div>
 <div class="card">
 <span class="tag">Modules 1 et 2 en bref</span>
 <details><summary>Module 1 · Le circuit financier</summary>
@@ -450,8 +471,8 @@ details.mod div{font-size:14.5px;border-left:4px solid var(--acc);padding:6px 10
 
 <script>
 const K='compta-fi:';
-const T={cf:'Circuit financier',fi:'Financement et rentabilité',bi:'Bilan',cr:'Résultat et flux de l\'année',dc:'Dépense / charge',rp:'Recette / produit',rf:'Résultat et flux',mr:'Mesure du résultat',td:'Cas de TD'};
-const M={cf:1,fi:1,bi:2,cr:2,dc:3,rp:3,rf:3,mr:3,td:3};
+const T={cf:'Circuit financier',fi:'Financement et rentabilité',bi:'Bilan',cr:'Résultat et flux de l\'année',dc:'Dépense / charge',rp:'Recette / produit',rf:'Résultat et flux',mr:'Mesure du résultat',td:'Cas de TD',ar:'Articulation des états',cs:'Construire les états',c4:'Cas Consultants Associés'};
+const M={cf:1,fi:1,bi:2,cr:2,dc:3,rp:3,rf:3,mr:3,td:3,ar:4,cs:4,c4:4};
 // a: première réponse = la bonne (mélangée à l'affichage)
 const Q=[
 {t:'cf',q:'De combien de sources de financement une entreprise dispose-t-elle fondamentalement ?',a:['Deux : les fonds propres et les emprunts','Une seule : son chiffre d\'affaires','Trois : fonds propres, emprunts et impôts','Deux : les ventes et les subventions'],e:'Les actionnaires apportent les fonds propres, les banques les emprunts. Le chiffre d\'affaires est un revenu, pas un financement.'},
@@ -537,6 +558,27 @@ const Q=[
 {t:'td',q:'Le stock de marchandises baisse de 15 pendant l\'année. Le coût des marchandises vendues est…',a:['Les achats + 15','Les achats − 15','Égal aux achats','15'],e:'On a vendu tout ce qu\'on a acheté, plus 15 pris dans le stock de départ. Le résultat baisse d\'autant.'}
 ];
 
+
+/* ===== Module 4 : articulation des trois états ===== */
+Q.push(
+{t:'ar',q:'Où le résultat net de l\'année apparaît-il dans le bilan de fin d\'année ?',a:['Dans les capitaux propres, côté passif','À l\'actif, dans la trésorerie','Dans les emprunts','Il n\'apparaît pas dans le bilan'],e:'Le résultat enrichit les actionnaires : il s\'ajoute aux capitaux propres. C\'est le lien compte de résultat → bilan.'},
+{t:'ar',q:'Comment obtient-on la trésorerie de fin avec l\'état des flux ?',a:['Trésorerie de début + flux d\'activité + investissement + financement','Trésorerie de début + résultat net','Total des produits − total des charges','Flux d\'activité seul'],e:'Variation = somme des 3 flux. Trésorerie de fin = début + variation. Elle doit être égale à la ligne trésorerie du bilan de fin : c\'est le lien flux → bilan.'},
+{t:'ar',q:'Un résultat positif avec une trésorerie qui monte beaucoup plus : possible ?',a:['Oui : emprunt, amortissement non décaissé et anciennes créances encaissées expliquent l\'écart','Non : la trésorerie monte exactement du montant du résultat','Oui, mais seulement si on paie un dividende','Non, sauf erreur de calcul'],e:'Le résultat ignore l\'emprunt et l\'achat de matériel ; la trésorerie les compte. Elle ignore l\'amortissement ; le résultat le compte.'},
+{t:'ar',q:'Quel lien entre le compte de résultat et le flux d\'activité ?',a:['Le résultat, retraité des charges non décaissées et des produits non encaissés, explique le flux d\'activité','Aucun : ils sont indépendants','Ils sont toujours égaux','Le flux d\'activité est le résultat moins l\'impôt'],e:'Flux = résultat + charges non décaissées − produits non encaissés (à la convention des intérêts et dividendes près).'},
+{t:'ar',q:'Quelle est la bonne description des trois états ?',a:['Bilan : photo à une date. Résultat : enrichissement sur la période. Flux : mouvements d\'argent sur la période','Bilan : mouvements d\'argent. Résultat : photo à une date. Flux : enrichissement','Bilan : enrichissement sur la période. Résultat : photo. Flux : photo','Les trois sont des photos à la date de clôture'],e:'Le bilan est un stock (31/12). Le compte de résultat et l\'état des flux sont des flux sur l\'exercice, avec deux logiques : engagement et caisse.'},
+{t:'ar',q:'Quel état est une photo à une date précise ?',a:['Le bilan','Le compte de résultat','L\'état des flux','Aucun des trois'],e:'Seul le bilan est « au 31/12 ». Les deux autres couvrent toute l\'année.'},
+{t:'cs',q:'Encaissements clients de l\'année = ?',a:['CA − créances de fin + créances de début','CA + créances de fin − créances de début','Le CA seulement','CA − résultat net'],e:'Ex. : CA 128, créances 24 au début et 16 à la fin : 128 − 16 + 24 = 136.'},
+{t:'cs',q:'Matériels nets au bilan de fin = ?',a:['Début + acquisitions − amortissements','Début + acquisitions','Début − acquisitions + amortissements','Début − amortissements seulement'],e:'Ex. : 100 + 35 − 24 = 111.'},
+{t:'cs',q:'Emprunts au bilan de fin = ?',a:['Début + nouveaux emprunts − remboursements du capital','Début + intérêts payés','Début − intérêts payés','Nouveaux emprunts seulement'],e:'Les intérêts sont une charge, ils ne changent pas la dette. Ex. : 47 + 27 = 74.'},
+{t:'cs',q:'Où met-on l\'achat d\'un matériel de 35 dans l\'état des flux ?',a:['Flux d\'investissement : −35','Flux d\'activité : −35','Flux de financement : −35','Nulle part, c\'est une charge'],e:'Dépense sans charge : ça devient une immobilisation, la charge viendra par l\'amortissement.'},
+{t:'cs',q:'Un nouvel emprunt de 27 : effet sur le résultat et sur les flux ?',a:['Aucun effet sur le résultat ; +27 en flux de financement','+27 de produit','−27 de charge','+27 de chiffre d\'affaires'],e:'Encaissement sans produit. La dette augmente au passif, la trésorerie à l\'actif.'},
+{t:'cs',q:'Les intérêts payés (3) : comment les traiter ?',a:['Charge du compte de résultat ET décaissement en financement (convention du corrigé 2020)','Uniquement un décaissement, sans charge','Uniquement une charge, sans décaissement','Flux d\'investissement'],e:'Charge car appauvrissement, décaissement car payés au comptant. Si l\'énoncé n\'impose rien, annonce ta convention.'},
+{t:'cs',q:'Quel état construit-on en premier ?',a:['Le compte de résultat : il donne le résultat à mettre au bilan','Le bilan de fin','L\'état des flux','Peu importe, aucun lien'],e:'Ordre : ① compte de résultat → ② bilan → ③ état des flux (méthode de l\'onglet Méthode).'},
+{t:'cs',q:'Quelle est la vérification finale à faire ?',a:['Total actif = total passif, et trésorerie du bilan = début + variation des flux','Résultat net = trésorerie de fin','Total actif = résultat net','Créances = dettes'],e:'Si l\'un des deux ne tombe pas juste, une opération a été oubliée.'},
+{t:'c4',q:'Consultants Associés : produits 128, frais 32, salaires 56, intérêts 3, amortissement 24. Résultat net ?',a:['13','45','37','115'],e:'128 − (32 + 56 + 3 + 24) = 128 − 115 = 13. Pas d\'impôt.'},
+{t:'c4',q:'Consultants Associés : trésorerie de fin ?',a:['40','37','45','3'],e:'Activité 136 − 32 − 56 = 48 ; investissement −35 ; financement +27 − 3 = 24. Variation +37, donc 3 + 37 = 40.'},
+{t:'c4',q:'Consultants Associés : total du bilan de fin ?',a:['167','127','115','111'],e:'Actif : 111 + 16 + 40 = 167. Passif : 80 + 13 + 74 = 167.'}
+);
 const $=s=>document.querySelector(s);
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
 const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -544,6 +586,7 @@ function load(k,d){try{return JSON.parse(localStorage.getItem(K+k))??d}catch(e){
 function save(k,v){try{localStorage.setItem(K+k,JSON.stringify(v))}catch(e){}}
 let wrong=new Set(load('wrong',[])), seen=new Set(load('seen',[]));
 let theme='all', run=null, mod=load('mod',3);
+if(load('v4',0)<1){mod=4;save('mod',4);save('v4',1)}
 // les questions des modules 1 et 2 ont été ajoutées en tête : anciens index décalés
 if(load('v',1)<2){wrong=new Set();seen=new Set();save('wrong',[]);save('seen',[]);save('v',2)}
 const inMod=i=>mod===0||M[Q[i].t]===mod;
@@ -561,7 +604,7 @@ function home(){
     <p class="sub">Réponses du CC 2025 déduites de ta copie corrigée et du cours (pas de corrigé officiel du QCM).</p>
   </div>
   <div class="row" style="margin:0 0 4px">
-    ${[[1,'Module 1'],[2,'Module 2'],[3,'Module 3'],[0,'Tout']].map(([k,v])=>`<button class="chip ${mod===k?'on':''}" data-m="${k}">${v}</button>`).join('')}
+    ${[[1,'Module 1'],[2,'Module 2'],[3,'Module 3'],[4,'Module 4'],[0,'Tout']].map(([k,v])=>`<button class="chip ${mod===k?'on':''}" data-m="${k}">${v}</button>`).join('')}
   </div>
   <div class="card">
     <span class="tag">Comme en TD</span>
@@ -758,6 +801,26 @@ q:[{l:'Variation 20x3',a:-1253,j:'Fin − début = 1 792 − 3 045'},
 {l:'Trésorerie début 20x1',a:3277,j:'1 201 + 2 076'},
 {k:'t',l:'Pourquoi la trésorerie monte en 20x2 et baisse en 20x3 ?',m:'En 20x2, l\'exploitation (34 743) couvre l\'investissement (21 250) et le financement (11 649) : +1 844. En 20x3, l\'exploitation progresse (36 100) et on investit un peu moins, mais le financement sort beaucoup plus (−17 673 contre −11 649 : plus de remboursements ou de dividendes). L\'exploitation ne couvre plus les deux : −1 253.'}]}
 ];
+
+A.push({id:'consult',tag:'TD 2026 · module 4',t:'Cas Consultants Associés',s:'Cas en ligne du module 4 : construire les 3 états. Convention : intérêts en financement.',
+e:`<p>Bilan de début d'année :</p>${bil([['Matériels (net)','100'],['Créances','24'],['Banque','3'],['Total','127',1]],[['Capitaux propres','80'],['Résultat','0'],['Emprunts','47'],['Total','127',1]])}
+<p>Prestations facturées 128, dont 16 non réglées en fin d'année. Frais de gestion 32, salaires 56, intérêts 3 (tous payés comptant). Nouvel emprunt 27 pour acquérir un matériel de 35. Amortissement 24. Toutes les créances de début d'année sont réglées. Pas d'impôt.</p>`,
+q:[{h:'Compte de résultat'},
+{l:'Total des charges (frais + salaires + intérêts + amortissement)',a:115,j:'32 + 56 + 3 + 24'},
+{l:'Résultat net',a:13,j:'128 − 115'},
+{h:'État des flux'},
+{l:'Encaissements clients',a:136,j:'128 − 16 non réglés + 24 de créances de début'},
+{l:'Flux d\'activité',a:48,j:'136 − 32 (frais) − 56 (salaires)'},
+{l:'Flux d\'investissement',a:-35,j:'Achat du matériel'},
+{l:'Flux de financement',a:24,j:'+27 emprunt − 3 intérêts'},
+{l:'Variation de trésorerie',a:37,j:'48 − 35 + 24'},
+{l:'Trésorerie de fin',a:40,j:'3 + 37'},
+{h:'Bilan de fin d\'année'},
+{l:'Matériels nets',a:111,j:'100 + 35 − 24'},
+{l:'Créances',a:16,j:'Les 16 non réglés'},
+{l:'Emprunts',a:74,j:'47 + 27'},
+{l:'Total du bilan',a:167,j:'Actif 111 + 16 + 40 = passif 80 + 13 + 74'},
+{k:'t',l:'Pourquoi un résultat de 13 mais une trésorerie qui monte de 37 ?',m:'Résultat 13 + amortissement 24 (charge non décaissée) + créances encaissées en net 8 (24 − 16) = 45, soit 48 − 3 d\'intérêts, puis − 35 d\'investissement et + 27 d\'emprunt : 13 + 24 + 8 − 35 + 27 = 37. Le résultat ignore l\'emprunt et l\'achat du matériel.'}]});
 let annSel=0;
 function annales(){
   const c=A[annSel];

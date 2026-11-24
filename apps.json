@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-23T21:54:45.464Z",
+  "generated": "2026-11-24T11:10:02.926Z",
   "apps": [
     {
       "name": "Harada",
@@ -375,7 +375,7 @@
       ],
       "category": "Dauphine",
       "added": "2026-11-13",
-      "description": "Spécial CC : méthode des 3 tableaux, annales 2019-2025 corrigées, cas infinis, QCM type examen",
+      "description": "Spécial CC : méthode des 3 tableaux, annales corrigées, cas infinis, QCM type examen, fiche express modules 3 et 4",
       "icon": "apps/compta-fi/icon.svg",
       "id": "compta-fi"
     },
