@@ -1,0 +1,9 @@
+{
+  "name": "Citadelles",
+  "emoji": "🏰",
+  "colors": ["#2a0a12", "#f43f5e"],
+  "category": "Jeux",
+  "added": "2026-11-26",
+  "description": "Duel de tours en ligne : pose tes cartes et abats la tour de ton ami.",
+  "icon": "icon.svg"
+}
