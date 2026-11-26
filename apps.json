@@ -1,6 +1,6 @@
 {
   "owner": "picascience",
-  "generated": "2026-11-26T15:34:34.122Z",
+  "generated": "2026-11-26T22:45:03.748Z",
   "apps": [
     {
       "name": "Citadelles",
@@ -14,6 +14,20 @@
       "description": "Duel de tours en ligne : pose tes cartes et abats la tour de ton ami.",
       "icon": "apps/citadelles/icon.svg",
       "id": "citadelles"
+    },
+    {
+      "name": "Fusion 2.0",
+      "emoji": "🫧",
+      "colors": [
+        "#140726",
+        "#f97316"
+      ],
+      "category": "Outils",
+      "added": "2026-11-26",
+      "description": "Vidéos de fusion avec ta voix, prêtes à télécharger",
+      "icon": "apps/fusion-2/icon.svg",
+      "open": "tab",
+      "id": "fusion-2"
     },
     {
       "name": "Télépixel",
